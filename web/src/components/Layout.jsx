@@ -1,6 +1,6 @@
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useEffect } from 'react'
-import { CircuitBoard, FolderGit2, Mail } from 'lucide-react'
+import { FolderGit2, Mail } from 'lucide-react'
 import ThemeToggle from './ThemeToggle'
 import { CURSO } from '../data/practicas'
 
@@ -17,8 +17,8 @@ function Navbar() {
     <header className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/80 backdrop-blur-lg dark:border-slate-800/70 dark:bg-slate-950/80">
       <nav className="mx-auto flex max-w-6xl items-center gap-3 px-5 py-3 sm:px-8 lg:px-12">
         <Link to="/" className="group flex items-center gap-3">
-          <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-white shadow-glow transition group-hover:scale-105">
-            <CircuitBoard className="h-5 w-5" />
+          <span className="grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-brand-500 to-brand-700 text-[15px] font-extrabold leading-none tracking-tight text-white shadow-glow transition group-hover:scale-105">
+            CE
           </span>
           <span className="hidden leading-tight sm:block">
             <span className="block text-sm font-bold text-slate-900 dark:text-white">

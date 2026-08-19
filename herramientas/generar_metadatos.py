@@ -13,7 +13,7 @@ Estilo: la misma paleta indigo del sitio, con trama de placa de circuito.
 import math
 import sys
 
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 FUENTES = 'C:/Windows/Fonts/'
 NEGRITA = FUENTES + 'segoeuib.ttf'
@@ -140,41 +140,59 @@ def tarjeta_og(salida):
 
 
 # ---------------------------------------------------------------------- iconos
-def icono(salida, lado):
+def icono(salida, lado, radio_rel=0.0):
+    """
+    Monograma CE sobre degradado indigo.
+
+    El centrado no se calcula con textbbox: PIL mide y dibuja con anclas
+    distintas por defecto, y el desajuste se nota mucho en tamanos pequenos.
+    En su lugar se dibuja el texto en una capa aparte, se mide la tinta que
+    realmente ha quedado (getbbox) y se desplaza esa capa para que su centro
+    coincida con el del lienzo. Asi el resultado es opticamente exacto sea
+    cual sea la fuente.
+    """
     S = 512
-    img = degradado((S, S), INDIGO_500, INDIGO_800)
-    img = trama_circuito(img, paso=64, alfa=22)
-    d = ImageDraw.Draw(img)
+    img = degradado((S, S), INDIGO_500, INDIGO_800).convert('RGBA')
+    img = trama_circuito(img, paso=64, alfa=20)
 
-    # Simbolo: nodo central con cuatro pistas, como un circuito integrado
-    cx = cy = S // 2
-    blanco = (255, 255, 255, 255)
-    largo, grosor = 128, 20
+    if radio_rel:
+        mascara = Image.new('L', (S, S), 0)
+        ImageDraw.Draw(mascara).rounded_rectangle(
+            [0, 0, S - 1, S - 1], radius=int(S * radio_rel), fill=255)
+        img.putalpha(mascara)
 
-    d.line([(cx, cy), (cx, cy - largo)], fill=blanco, width=grosor)
-    d.line([(cx, cy), (cx + largo, cy)], fill=blanco, width=grosor)
-    d.line([(cx, cy), (cx, cy + largo)], fill=blanco, width=grosor)
-    d.line([(cx, cy), (cx - largo, cy)], fill=blanco, width=grosor)
+    # Texto en su propia capa
+    capa = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    ImageDraw.Draw(capa).text(
+        (S // 2, S // 2), 'CE',
+        font=ImageFont.truetype(NEGRITA, 206),
+        fill=(255, 255, 255, 255), anchor='mm',
+    )
 
-    for px, py in [(cx, cy - largo), (cx + largo, cy), (cx, cy + largo), (cx - largo, cy)]:
-        r = 26
-        d.ellipse([px - r, py - r, px + r, py + r], fill=blanco)
+    # Recentrar segun la tinta real
+    caja = capa.getbbox()
+    if caja:
+        cx = (caja[0] + caja[2]) / 2
+        cy = (caja[1] + caja[3]) / 2
+        capa = ImageChops.offset(capa, int(round(S / 2 - cx)), int(round(S / 2 - cy)))
 
-    r = 52
-    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=blanco)
-    r = 24
-    d.ellipse([cx - r, cy - r, cx + r, cy + r], fill=INDIGO_700)
+    img = Image.alpha_composite(img, capa)
 
-    img = img.convert('RGB')
     if lado != S:
         img = img.resize((lado, lado), Image.LANCZOS)
-    img.save(salida, 'PNG', optimize=True)
+    if radio_rel:
+        img.save(salida, 'PNG', optimize=True)
+    else:
+        img.convert('RGB').save(salida, 'PNG', optimize=True)
     return salida
 
 
 if __name__ == '__main__':
     destino = sys.argv[1].rstrip('/')
     print(tarjeta_og(f'{destino}/og-image.png'))
-    for lado, nombre in [(512, 'icono-512.png'), (192, 'icono-192.png'),
-                         (180, 'apple-touch-icon.png'), (48, 'favicon.png')]:
-        print(icono(f'{destino}/{nombre}', lado))
+    # apple-touch-icon sin transparencia: iOS la rellena de negro.
+    for lado, nombre, radio in [(512, 'icono-512.png', 0.0),
+                                (192, 'icono-192.png', 0.0),
+                                (180, 'apple-touch-icon.png', 0.0),
+                                (48, 'favicon.png', 0.18)]:
+        print(icono(f'{destino}/{nombre}', lado, radio))
