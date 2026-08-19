@@ -131,57 +131,52 @@ def placa_ce(lado, radio_rel=0.22, cuerpo=0.44):
 
 # --------------------------------------------------------------- tarjeta social
 def tarjeta_og(salida):
+    """
+    Tarjeta de previsualizacion, 1200x630.
+
+    Diseno pensado para sobrevivir al recorte: WhatsApp y varios clientes de
+    mensajeria no muestran la tarjeta ancha, sino un CUADRADO recortado del
+    centro y reducido a pocos pixeles. Por eso:
+
+      - Todo el contenido va centrado y dentro de la zona segura (el cuadrado
+        central de 630x630, es decir x entre 285 y 915).
+      - Poco texto y muy grande: en la miniatura solo debe leerse el nombre
+        del curso. Las descripciones largas se quedan en las etiquetas
+        og:description, que si se muestran como texto aparte.
+    """
     W, H = 1200, 630
+    CX = W // 2
+    SEGURO = (W - H) // 2  # 285: borde izquierdo del recorte cuadrado
+
     img = degradado((W, H), INDIGO_800, INDIGO_950)
     img = trama_circuito(img, paso=48, alfa=15)
-    img = resplandor(img, (1010, 130), 340, INDIGO_500, 80)
-    img = resplandor(img, (120, 600), 260, INDIGO_700, 55)
-    img = pistas(img, [
-        (980, 470, [(0, -60), (90, 0), (0, -70)]),
-        (1080, 560, [(0, -80), (-70, 0)]),
-        (900, 560, [(60, 0), (0, -50)]),
-    ])
-
-    X = 80
-
-    # --- logo CE, el mismo que el favicon
-    LOGO, LOGO_Y = 104, 52
-    logo = placa_ce(LOGO, radio_rel=0.24, cuerpo=0.42)
-    img.paste(logo, (X, LOGO_Y), logo)
+    img = resplandor(img, (CX, 150), 420, INDIGO_500, 70)
+    img = resplandor(img, (CX, 640), 320, INDIGO_700, 45)
 
     d = ImageDraw.Draw(img)
 
-    # --- distintivo, a la derecha del logo y alineado con su centro
-    f_badge = ImageFont.truetype(NEGRITA, 21)
-    texto = 'UNIVERSIDAD CATÓLICA SAN PABLO  ·  2026-2'
-    caja = d.textbbox((0, 0), texto, font=f_badge)
-    pw, ph = caja[2] - caja[0], caja[3] - caja[1]
-    bx = X + LOGO + 26
-    alto_pastilla = ph + 30
-    by = LOGO_Y + (LOGO - alto_pastilla) // 2
-    d.rounded_rectangle([bx, by, bx + pw + 52, by + alto_pastilla], radius=24,
-                        fill=(255, 255, 255, 26), outline=(*INDIGO_200, 70), width=2)
-    d.text((bx + 26, by + 14), texto, font=f_badge, fill=INDIGO_200)
+    # --- logo CE, centrado
+    LOGO = 148
+    logo = placa_ce(LOGO, radio_rel=0.24, cuerpo=0.42)
+    img.paste(logo, (CX - LOGO // 2, 74), logo)
+    d = ImageDraw.Draw(img)
 
-    # --- titulo
-    f1 = ImageFont.truetype(LIGERA, 62)
-    f2 = ImageFont.truetype(NEGRITA, 84)
-    d.text((X, 186), 'Laboratorios de', font=f1, fill=(214, 219, 252))
-    d.text((X, 258), 'Circuitos', font=f2, fill=BLANCO)
-    d.text((X, 350), 'Electrónicos', font=f2, fill=BLANCO)
+    # --- nombre del curso: lo unico que debe leerse en la miniatura
+    f_titulo = ImageFont.truetype(NEGRITA, 92)
+    d.text((CX, 288), 'Circuitos', font=f_titulo, fill=BLANCO, anchor='mm')
+    d.text((CX, 386), 'Electrónicos', font=f_titulo, fill=BLANCO, anchor='mm')
 
     # --- linea de acento
-    d.rounded_rectangle([X, 470, X + 108, 476], radius=3, fill=INDIGO_500)
+    d.rounded_rectangle([CX - 62, 444, CX + 62, 450], radius=3, fill=INDIGO_500)
 
-    # --- descripcion
-    f3 = ImageFont.truetype(NORMAL, 27)
-    d.text((X, 500), 'Guías de práctica, documentos descargables', font=f3, fill=(186, 195, 245))
-    d.text((X, 536), 'y canal directo de retroalimentación', font=f3, fill=(186, 195, 245))
+    # --- contexto, en una sola linea corta
+    f_sub = ImageFont.truetype(NEGRITA, 30)
+    d.text((CX, 496), 'LABORATORIOS  ·  2026-2', font=f_sub, fill=(196, 205, 250),
+           anchor='mm')
 
-    # --- pie
-    f4 = ImageFont.truetype(NORMAL, 21)
-    d.text((X, 585), 'Facultad de Ingeniería  ·  Ing. Electrónica y de Telecomunicaciones',
-           font=f4, fill=(140, 150, 210))
+    f_pie = ImageFont.truetype(NORMAL, 26)
+    d.text((CX, 552), 'Universidad Católica San Pablo', font=f_pie,
+           fill=(150, 161, 220), anchor='mm')
 
     img.convert('RGB').save(salida, 'PNG', optimize=True)
     return salida
