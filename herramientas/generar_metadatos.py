@@ -90,6 +90,45 @@ def resplandor(img, centro, radio, color, intensidad=70):
     return Image.alpha_composite(img, capa)
 
 
+def placa_ce(lado, radio_rel=0.22, cuerpo=0.44):
+    """
+    Placa cuadrada con el monograma CE centrado. Se usa tanto para los iconos
+    como para el logo de la tarjeta social, de modo que sean identicos.
+
+    El centrado no se calcula con textbbox: PIL mide y dibuja con anclas
+    distintas por defecto y el desajuste se nota en tamanos pequenos. El texto
+    se dibuja en una capa aparte, se mide la tinta real con getbbox y se
+    desplaza la capa hasta el centro exacto del lienzo.
+    """
+    S = 512
+    img = degradado((S, S), INDIGO_500, INDIGO_800).convert('RGBA')
+
+    if radio_rel:
+        mascara = Image.new('L', (S, S), 0)
+        ImageDraw.Draw(mascara).rounded_rectangle(
+            [0, 0, S - 1, S - 1], radius=int(S * radio_rel), fill=255)
+        img.putalpha(mascara)
+
+    capa = Image.new('RGBA', (S, S), (0, 0, 0, 0))
+    ImageDraw.Draw(capa).text(
+        (S // 2, S // 2), 'CE',
+        font=ImageFont.truetype(NEGRITA, int(S * cuerpo)),
+        fill=(255, 255, 255, 255), anchor='mm',
+    )
+    caja = capa.getbbox()
+    if caja:
+        capa = ImageChops.offset(
+            capa,
+            int(round(S / 2 - (caja[0] + caja[2]) / 2)),
+            int(round(S / 2 - (caja[1] + caja[3]) / 2)),
+        )
+    img = Image.alpha_composite(img, capa)
+
+    if lado != S:
+        img = img.resize((lado, lado), Image.LANCZOS)
+    return img
+
+
 # --------------------------------------------------------------- tarjeta social
 def tarjeta_og(salida):
     W, H = 1200, 630
@@ -103,36 +142,45 @@ def tarjeta_og(salida):
         (900, 560, [(60, 0), (0, -50)]),
     ])
 
-    d = ImageDraw.Draw(img)
     X = 80
 
-    # --- distintivo superior
+    # --- logo CE, el mismo que el favicon
+    LOGO, LOGO_Y = 104, 52
+    logo = placa_ce(LOGO, radio_rel=0.24, cuerpo=0.42)
+    img.paste(logo, (X, LOGO_Y), logo)
+
+    d = ImageDraw.Draw(img)
+
+    # --- distintivo, a la derecha del logo y alineado con su centro
     f_badge = ImageFont.truetype(NEGRITA, 21)
     texto = 'UNIVERSIDAD CATÓLICA SAN PABLO  ·  2026-2'
     caja = d.textbbox((0, 0), texto, font=f_badge)
     pw, ph = caja[2] - caja[0], caja[3] - caja[1]
-    d.rounded_rectangle([X, 74, X + pw + 52, 74 + ph + 30], radius=24,
+    bx = X + LOGO + 26
+    alto_pastilla = ph + 30
+    by = LOGO_Y + (LOGO - alto_pastilla) // 2
+    d.rounded_rectangle([bx, by, bx + pw + 52, by + alto_pastilla], radius=24,
                         fill=(255, 255, 255, 26), outline=(*INDIGO_200, 70), width=2)
-    d.text((X + 26, 74 + 14), texto, font=f_badge, fill=INDIGO_200)
+    d.text((bx + 26, by + 14), texto, font=f_badge, fill=INDIGO_200)
 
     # --- titulo
     f1 = ImageFont.truetype(LIGERA, 62)
     f2 = ImageFont.truetype(NEGRITA, 84)
-    d.text((X, 172), 'Laboratorios de', font=f1, fill=(214, 219, 252))
-    d.text((X, 246), 'Circuitos', font=f2, fill=BLANCO)
-    d.text((X, 340), 'Electrónicos', font=f2, fill=BLANCO)
+    d.text((X, 186), 'Laboratorios de', font=f1, fill=(214, 219, 252))
+    d.text((X, 258), 'Circuitos', font=f2, fill=BLANCO)
+    d.text((X, 350), 'Electrónicos', font=f2, fill=BLANCO)
 
     # --- linea de acento
-    d.rounded_rectangle([X, 452, X + 108, 458], radius=3, fill=INDIGO_500)
+    d.rounded_rectangle([X, 470, X + 108, 476], radius=3, fill=INDIGO_500)
 
     # --- descripcion
     f3 = ImageFont.truetype(NORMAL, 27)
-    d.text((X, 486), 'Guías de práctica, documentos descargables', font=f3, fill=(186, 195, 245))
-    d.text((X, 524), 'y canal directo de retroalimentación', font=f3, fill=(186, 195, 245))
+    d.text((X, 500), 'Guías de práctica, documentos descargables', font=f3, fill=(186, 195, 245))
+    d.text((X, 536), 'y canal directo de retroalimentación', font=f3, fill=(186, 195, 245))
 
     # --- pie
     f4 = ImageFont.truetype(NORMAL, 21)
-    d.text((X, 578), 'Facultad de Ingeniería  ·  Ing. Electrónica y de Telecomunicaciones',
+    d.text((X, 585), 'Facultad de Ingeniería  ·  Ing. Electrónica y de Telecomunicaciones',
            font=f4, fill=(140, 150, 210))
 
     img.convert('RGB').save(salida, 'PNG', optimize=True)
@@ -141,45 +189,7 @@ def tarjeta_og(salida):
 
 # ---------------------------------------------------------------------- iconos
 def icono(salida, lado, radio_rel=0.0):
-    """
-    Monograma CE sobre degradado indigo.
-
-    El centrado no se calcula con textbbox: PIL mide y dibuja con anclas
-    distintas por defecto, y el desajuste se nota mucho en tamanos pequenos.
-    En su lugar se dibuja el texto en una capa aparte, se mide la tinta que
-    realmente ha quedado (getbbox) y se desplaza esa capa para que su centro
-    coincida con el del lienzo. Asi el resultado es opticamente exacto sea
-    cual sea la fuente.
-    """
-    S = 512
-    # Sin trama ni adornos: solo el degradado y las letras.
-    img = degradado((S, S), INDIGO_500, INDIGO_800).convert('RGBA')
-
-    if radio_rel:
-        mascara = Image.new('L', (S, S), 0)
-        ImageDraw.Draw(mascara).rounded_rectangle(
-            [0, 0, S - 1, S - 1], radius=int(S * radio_rel), fill=255)
-        img.putalpha(mascara)
-
-    # Texto en su propia capa
-    capa = Image.new('RGBA', (S, S), (0, 0, 0, 0))
-    ImageDraw.Draw(capa).text(
-        (S // 2, S // 2), 'CE',
-        font=ImageFont.truetype(NEGRITA, 226),
-        fill=(255, 255, 255, 255), anchor='mm',
-    )
-
-    # Recentrar segun la tinta real
-    caja = capa.getbbox()
-    if caja:
-        cx = (caja[0] + caja[2]) / 2
-        cy = (caja[1] + caja[3]) / 2
-        capa = ImageChops.offset(capa, int(round(S / 2 - cx)), int(round(S / 2 - cy)))
-
-    img = Image.alpha_composite(img, capa)
-
-    if lado != S:
-        img = img.resize((lado, lado), Image.LANCZOS)
+    img = placa_ce(lado, radio_rel=radio_rel)
     if radio_rel:
         img.save(salida, 'PNG', optimize=True)
     else:
