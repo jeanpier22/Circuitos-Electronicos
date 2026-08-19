@@ -39,7 +39,12 @@ jobs:
           VITE_WEB3FORMS_KEY: ${{ vars.WEB3FORMS_KEY }}
         run: npm run build
 
+      # enablement: true configura Pages en modo "GitHub Actions" desde el
+      # propio workflow. Sin esto falla si el repositorio todavia tiene Pages
+      # apagado o en modo "Deploy from a branch".
       - uses: actions/configure-pages@v5
+        with:
+          enablement: true
 
       - uses: actions/upload-pages-artifact@v3
         with:
