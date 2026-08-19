@@ -150,33 +150,25 @@ def tarjeta_og(salida):
 
     img = degradado((W, H), INDIGO_800, INDIGO_950)
     img = trama_circuito(img, paso=48, alfa=15)
-    img = resplandor(img, (CX, 150), 420, INDIGO_500, 70)
+    img = resplandor(img, (CX, 190), 430, INDIGO_500, 70)
     img = resplandor(img, (CX, 640), 320, INDIGO_700, 45)
 
     d = ImageDraw.Draw(img)
 
-    # --- logo CE, centrado
+    # Solo el logo y el nombre del curso. El resto de la informacion
+    # (periodo, universidad, descripcion) viaja en las etiquetas del HTML,
+    # que los clientes muestran como texto aparte junto a la miniatura.
+
+    # --- logo CE
     LOGO = 148
     logo = placa_ce(LOGO, radio_rel=0.24, cuerpo=0.42)
-    img.paste(logo, (CX - LOGO // 2, 74), logo)
+    img.paste(logo, (CX - LOGO // 2, 114), logo)
     d = ImageDraw.Draw(img)
 
-    # --- nombre del curso: lo unico que debe leerse en la miniatura
-    f_titulo = ImageFont.truetype(NEGRITA, 92)
-    d.text((CX, 288), 'Circuitos', font=f_titulo, fill=BLANCO, anchor='mm')
-    d.text((CX, 386), 'Electrónicos', font=f_titulo, fill=BLANCO, anchor='mm')
-
-    # --- linea de acento
-    d.rounded_rectangle([CX - 62, 444, CX + 62, 450], radius=3, fill=INDIGO_500)
-
-    # --- contexto, en una sola linea corta
-    f_sub = ImageFont.truetype(NEGRITA, 30)
-    d.text((CX, 496), 'LABORATORIOS  ·  2026-2', font=f_sub, fill=(196, 205, 250),
-           anchor='mm')
-
-    f_pie = ImageFont.truetype(NORMAL, 26)
-    d.text((CX, 552), 'Universidad Católica San Pablo', font=f_pie,
-           fill=(150, 161, 220), anchor='mm')
+    # --- nombre del curso, en dos lineas centradas
+    f_titulo = ImageFont.truetype(NEGRITA, 96)
+    d.text((CX, 366), 'Circuitos', font=f_titulo, fill=BLANCO, anchor='mm')
+    d.text((CX, 468), 'Electrónicos', font=f_titulo, fill=BLANCO, anchor='mm')
 
     img.convert('RGB').save(salida, 'PNG', optimize=True)
     return salida
