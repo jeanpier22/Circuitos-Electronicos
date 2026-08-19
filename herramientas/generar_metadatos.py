@@ -152,8 +152,8 @@ def icono(salida, lado, radio_rel=0.0):
     cual sea la fuente.
     """
     S = 512
+    # Sin trama ni adornos: solo el degradado y las letras.
     img = degradado((S, S), INDIGO_500, INDIGO_800).convert('RGBA')
-    img = trama_circuito(img, paso=64, alfa=20)
 
     if radio_rel:
         mascara = Image.new('L', (S, S), 0)
@@ -165,7 +165,7 @@ def icono(salida, lado, radio_rel=0.0):
     capa = Image.new('RGBA', (S, S), (0, 0, 0, 0))
     ImageDraw.Draw(capa).text(
         (S // 2, S // 2), 'CE',
-        font=ImageFont.truetype(NEGRITA, 206),
+        font=ImageFont.truetype(NEGRITA, 226),
         fill=(255, 255, 255, 255), anchor='mm',
     )
 
