@@ -16,3 +16,33 @@ web/.env.local
 # Sistema
 Thumbs.db
 .DS_Store
+
+# Borrador v1 del Laboratorio 2 (rectificacion de senales)
+#
+# Transcripcion completa de "Laboratorio_2_Propedeucio EEB.doc" que quedo
+# descartada: la guia que se publica es Laboratorio_2.tex, sobre la curva
+# caracteristica del diodo. Se conserva su .tex, que pesa 23 KB, pero no su PDF
+# ni las 17 imagenes que solo el usa: sumaban 41 MB que git guardaria para
+# siempre en el historial. Para recompilarlo hay que recuperar esas imagenes
+# del .doc original, que si esta versionado en Laboratorio_2/Originales/.
+Laboratorio_2/LaTeX/Laboratorio_2_v1_rectificacion.pdf
+Laboratorio_2/LaTeX/imagenes/image01.png
+Laboratorio_2/LaTeX/imagenes/image02.png
+Laboratorio_2/LaTeX/imagenes/image06.png
+Laboratorio_2/LaTeX/imagenes/image07.png
+Laboratorio_2/LaTeX/imagenes/image08.png
+Laboratorio_2/LaTeX/imagenes/image09.png
+Laboratorio_2/LaTeX/imagenes/image10.png
+Laboratorio_2/LaTeX/imagenes/image11.png
+Laboratorio_2/LaTeX/imagenes/image12.png
+Laboratorio_2/LaTeX/imagenes/image13.png
+Laboratorio_2/LaTeX/imagenes/image14.png
+Laboratorio_2/LaTeX/imagenes/image15.png
+Laboratorio_2/LaTeX/imagenes/image16.png
+Laboratorio_2/LaTeX/imagenes/image17.png
+Laboratorio_2/LaTeX/imagenes/image18.png
+Laboratorio_2/LaTeX/imagenes/image19.png
+Laboratorio_2/LaTeX/imagenes/image20.png
+
+# Python
+__pycache__/
