@@ -1,4 +1,4 @@
-%=======================================================================
+ %=======================================================================
 %  LABORATORIO N.o 1 - MI PRIMER CIRCUITO
 %  Curso : Circuitos Electronicos  (2026-2)
 %  UCSP  - Facultad de Ingenieria - Ing. Electronica y de Telecomunicaciones
@@ -9,15 +9,26 @@
 %  diseno" y "Verificacion experimental" son ANADIDOS a la guia original;
 %  el resto del texto conserva el contenido del documento .doc de origen.
 %
-%  Compilar:  pdflatex Laboratorio_1.tex   (dos veces)
+%  Compilar:  xelatex Laboratorio_1.tex    (dos veces)
 %=======================================================================
 \documentclass[11pt,a4paper]{article}
 
 %------------------------------------------------------------- idioma
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
+% Compilar con XeLaTeX (no con pdflatex): Trebuchet MS es una fuente TrueType
+% del sistema y solo fontspec, bajo XeLaTeX o LuaLaTeX, sabe cargarla.
+% inputenc y fontenc se omiten a proposito: XeLaTeX trabaja en UTF-8 de forma
+% nativa y esos paquetes dan error con este motor.
+\usepackage{fontspec}
+\setmainfont{Trebuchet MS}[
+  Path            = C:/Windows/Fonts/,
+  Extension       = .ttf,
+  UprightFont     = trebuc,
+  BoldFont        = trebucbd,
+  ItalicFont      = trebucit,
+  BoldItalicFont  = trebucbi,
+  Ligatures       = TeX
+]
 \usepackage[spanish,es-nodecimaldot]{babel}
-\usepackage{lmodern}
 \usepackage{microtype}
 
 %----------------------------------------------------------- geometria
@@ -113,32 +124,50 @@
 %=======================================================================
 %  CABECERA DE LA GUIA
 %=======================================================================
+% El documento es de 11 pt, asi que \normalsize son los 11 pt del Word original.
 \begin{center}
-    {\Large\bfseries PRIMERA UNIDAD: MI PRIMER CIRCUITO}
+    {\normalsize\bfseries PRIMERA UNIDAD: MI PRIMER CIRCUITO}
 \end{center}
 
-\vspace{0.35cm}
+\vspace{0.55cm}
 
-\renewcommand{\arraystretch}{1.45}
+% Cabecera de la guia.
+%
+%  - \tabularxcolumn redefinido a m{} hace que la columna elastica X se centre
+%    verticalmente, igual que las columnas m{} de los lados. Sin esto el texto
+%    del centro quedaria pegado arriba y la fila se veria descuadrada.
+%  - Titulo y subtitulo van juntos en UNA sola celda, apilados con \shortstack:
+%    antes los separaba un filete que partia el bloque en dos.
+%  - Las filas de datos llevan puntales (\rule de ancho cero) para dejar sitio
+%    real donde escribir a mano.
+%  - Todo va dentro de un grupo para que \arraystretch y \tabcolsep recuperen
+%    su valor al terminar y no afecten al resto de tablas del documento.
+\begingroup
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\renewcommand{\arraystretch}{2.0}
+\setlength{\tabcolsep}{12pt}
 \noindent
-\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}m{1.3cm}|X|>{\centering\arraybackslash}m{2.4cm}|}
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}X|>{\centering\arraybackslash}m{3.0cm}|}
 \hline
-\multirow{2}{*}{\Huge\bfseries 1}
-    & \centering\arraybackslash\bfseries Guía de Prácticas
-    & \bfseries Nota\\
-\cline{2-2}
-    & \centering\arraybackslash\bfseries Mi primer Circuito de Electrónica
-    & \\
+\rule{0pt}{2.1cm}{\fontsize{58}{58}\selectfont\bfseries 1}
+    % minipage y no \shortstack: \shortstack no conoce el ancho de la columna
+    % y el subtitulo se desbordaba sobre la celda de "Nota".
+    & \begin{minipage}[c]{\linewidth}\centering
+          {\large\bfseries Guía de Prácticas}\\[7pt]
+          {\Large\bfseries Mi primer Circuito de Electrónica}
+      \end{minipage}
+    & {\Large\bfseries Nota}\\
 \hline
-\multicolumn{3}{|l|}{\textbf{Grupo:}~\rule{4cm}{0.4pt}\hfill\textbf{Fecha:}~\rule{4cm}{0.4pt}\hspace{2mm}}\\
+\multicolumn{3}{|l|}{\rule{0pt}{1.3cm}\large\textbf{Grupo:}~\rule{4.6cm}{0.4pt}%
+    \hfill\large\textbf{Fecha:}~\rule{4.6cm}{0.4pt}\hspace{2mm}}\\
 \hline
-\multicolumn{3}{|l|}{\textbf{Alumno(s):}~\rule{12.2cm}{0.4pt}\hspace{2mm}}\\
-\multicolumn{3}{|l|}{\phantom{\textbf{Alumno(s):}}~\rule{12.2cm}{0.4pt}\hspace{2mm}}\\
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\large\textbf{Alumno(s):}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\phantom{\large\textbf{Alumno(s):}}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
 \hline
 \end{tabularx}
-\renewcommand{\arraystretch}{1}
+\endgroup
 
-\vspace{0.7cm}
+\vspace{1.2cm}
 
 %=======================================================================
 \section{Objetivos}
@@ -470,17 +499,6 @@ eléctrico; para conectarlos en serie deben ocupar columnas distintas.
     \end{tabular}
 \end{table}
 
-\begin{notatec}{interprete el resultado, no solo el número}
-Se recomienda calcular también la potencia disipada de cada fila con la
-ecuación~\eqref{eq:potencia} y responder: ¿el resultado es realizable con un componente de
-laboratorio? Observará que el ejercicio~1 exige una resistencia de \qty{5}{\watt}, que el
-ejercicio~3 da un valor del orden de los \unit{\milli\ohm} (propio de un \emph{shunt} de medida,
-no de una resistencia comercial) y que el ejercicio~4 disipa \qty{100}{\watt} con
-\qty{1}{\kilo\volt} presentes, una tensión letal. Solo la fila~5 corresponde a un montaje real
-como el de la actividad~2. Distinguir el ejercicio numérico del componente físico es parte del
-oficio del ingeniero.
-\end{notatec}
-
 \item Escoja 4 resistencias diferentes y complete la siguiente tabla. Use el código de colores de
 la tabla~\ref{tab:colores} y la ecuación~\eqref{eq:tol}.
 
@@ -527,30 +545,12 @@ la tabla~\ref{tab:colores} y la ecuación~\eqref{eq:tol}.
     \item 1 diodo LED.
     \item 2 resistencias (una de \qty{330}{\ohm} para la actividad~2).
     \item 1 potenciómetro.
-    \item 1 bocina.
 \end{itemize}
 
 \noindent\textbf{Software:}
 \begin{itemize}
-    \item WaveForms 2015 (o superior).
+    \item WaveForms.
 \end{itemize}
-
-\begin{seguridad}{antes de conectar la alimentación}
-\begin{itemize}
-    \item Arme y modifique el circuito \textbf{siempre con las fuentes apagadas}
-          (botón \emph{Supplies} en \emph{off}); enciéndalas solo cuando el montaje esté
-          verificado.
-    \item Respete la polaridad del LED: patilla larga $=$ ánodo ($+$), patilla corta y bisel
-          plano $=$ cátodo ($-$). Invertido no enciende y, con tensión inversa suficiente,
-          se destruye.
-    \item Nunca conecte un LED, ni ningún diodo, directamente entre $V_{CC}$ y tierra sin
-          resistencia limitadora.
-    \item No aplique más de \qty{\pm 20}{\volt} a las entradas del osciloscopio de la EEB
-          ni cortocircuite las salidas VP+, VP$-$ o $V_{CC}$.
-    \item Verifique que ningún terminal quede en el mismo nodo del protoboard por error antes
-          de energizar: el cortocircuito más común nace de dos patillas en la misma columna.
-\end{itemize}
-\end{seguridad}
 
 \FloatBarrier
 %=======================================================================
@@ -558,13 +558,13 @@ la tabla~\ref{tab:colores} y la ecuación~\eqref{eq:tol}.
 %=======================================================================
 \subsection{Actividad: conectando la Electronics Explorer Board}
 
-\begin{itemize}
+\begin{enumerate}[label=\textbf{\Alph*.}, leftmargin=*, labelsep=0.6em, series=acteeb]
 \item La \emph{Electronics Explorer Board} es un sistema de medición todo en uno, que sirve para
 diseñar y probar circuitos analógicos y digitales. Está construida en base a 2 placas protoboard
 y permite el prototipado rápido y simple de circuitos. La operación de la EE Board es fácil de
 manejar a través del software WaveForms de Digilent; los componentes de la tarjeta se pueden
 observar en la figura~\ref{fig:eeb}.
-\end{itemize}
+\end{enumerate}
 
 \begin{figure}[H]
     \centering
@@ -573,14 +573,14 @@ observar en la figura~\ref{fig:eeb}.
     \label{fig:eeb}
 \end{figure}
 
-\begin{itemize}
+\begin{enumerate}[resume*=acteeb]
 \item La comunicación con la EE Board se realiza a través de una conexión USB y la interconexión
 es bastante simple. Se utiliza un cable micro-USB para conectar la tarjeta a un ordenador. La EE
 Board también tiene un adaptador de \emph{jack} de alimentación de \qty{12}{\volt} de energía
 externa. Con el cable USB y la fuente de alimentación externa conectada, girar el interruptor de
 la tarjeta a \textbf{ON}, lo cual prepara a la EE Board para la comunicación con el software
 WaveForms. Esta conexión se puede apreciar en la figura~\ref{fig:conex}.
-\end{itemize}
+\end{enumerate}
 
 \begin{figure}[H]
     \centering
@@ -589,11 +589,11 @@ WaveForms. Esta conexión se puede apreciar en la figura~\ref{fig:conex}.
     \label{fig:conex}
 \end{figure}
 
-\begin{itemize}
+\begin{enumerate}[resume*=acteeb]
 \item Las partes que conforman la tarjeta se pueden separar en 3 grupos, que son: la zona de
 instrumentos, la tarjeta protoboard o \emph{breadboard} y la zona de conexiones digitales. Esto
 se aprecia en la figura~\ref{fig:grupos}.
-\end{itemize}
+\end{enumerate}
 
 \begin{figure}[H]
     \centering
@@ -602,85 +602,125 @@ se aprecia en la figura~\ref{fig:grupos}.
     \label{fig:grupos}
 \end{figure}
 
-\noindent Específicamente, la EE Board cuenta con:
+% Caracteristicas de la EE Board, agrupadas en TRES bloques, uno por panel
+% fisico de la tarjeta:
+%
+%   SCOPE   -> osciloscopio
+%   ANALOG  -> AWG, voltimetro (VMTR) y voltajes de referencia (VREF)
+%   POWER   -> fuente variable (VP+/VP-) y fuente fija (Vcc)
+%
+% Cada bloque es UNA fila: la imagen de la derecha ilustra todo lo que hay a su
+% izquierda. Por eso VMTR y VREF van con el AWG, y la fuente fija con la
+% variable: aparecen juntos en el mismo panel de la placa.
+%
+% Las siete caracteristicas llevan el marcador de primer nivel (\labelitemi, el
+% cuadradito) forzado con la opcion label: como el bloque vive dentro de una
+% enumerate, LaTeX les habria puesto por defecto el marcador de segundo nivel.
+% Las sublistas "Donde:" si usan el de segundo nivel, para que se distingan.
+%
+% La tabla va DENTRO del \item para heredar la sangria y quedar alineada con el
+% resto del contenido; de ahi que se dimensione con \linewidth y no \textwidth.
+% Es una tabularx SIN filetes, cabecera ni \caption: solo alinea las columnas,
+% y no se envuelve en un entorno table para que no reciba numeracion de cuadro.
+\begin{enumerate}[resume*=acteeb]
+\item Específicamente, la EE Board cuenta con:
 
-\begin{itemize}
+\begingroup
+\setlength{\tabcolsep}{0pt}
+\renewcommand{\arraystretch}{1.2}
+\setlist[itemize]{itemsep=2pt,topsep=4pt,parsep=0pt}
+% marcador de cuadradito, con sangria colgante
+\newlist{carac}{itemize}{1}
+\setlist[carac]{label=\labelitemi, leftmargin=1.5em, topsep=0pt, itemsep=0pt}
+\newcommand{\dentroeeb}{0.32cm}
+
+\vspace{0.4cm}
+\noindent
+\begin{tabularx}{\linewidth}{@{}>{\raggedright\arraybackslash}X@{\hspace{0.7cm}}>{\centering\arraybackslash}p{4.0cm}@{}}
+
+%------------------------------------------------- bloque 1: SCOPE
+\begin{carac}
 \item \textbf{4 canales de osciloscopio a \qty{40}{\mega\sample\per\second},
       \qty{100}{\mega\hertz}.}
 
-    \vspace{2pt}
-    \begin{minipage}[c]{0.30\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{image15.png}
-    \end{minipage}
-    \hfill
-    \begin{minipage}[c]{0.63\textwidth}
-        Dónde:
-        \begin{itemize}
-            \item \textbf{AC}: canal sin \emph{offset} de voltaje.
-            \item \textbf{DC}: canal con \emph{offset} de voltaje.
-            \item \textbf{--}: es la tierra (referencia común).
-        \end{itemize}
-    \end{minipage}
+      Dónde:
+      \begin{itemize}[leftmargin=1.4em]
+          \item \textbf{AC}: canal sin \emph{offset} de voltaje.
+          \item \textbf{DC}: canal con \emph{offset} de voltaje.
+          \item \textbf{--}: es la tierra (referencia común).
+      \end{itemize}
+\end{carac}
+&
+\begin{minipage}[t]{\linewidth}\vspace{0pt}
+    \includegraphics[width=\linewidth]{image15.png}
+\end{minipage}
+\\
+\addlinespace[1.1cm]
 
-\vspace{0.35cm}
+%------------------------------------------------- bloque 2: ANALOG
+\begin{carac}
+\item \textbf{2 canales, \qty{40}{\mega\sample\per\second},
+      \qty{20}{\mega\hertz}, generador de forma de onda arbitraria (AWG).}
 
-\item \textbf{2 canales, \qty{40}{\mega\sample\per\second}, \qty{20}{\mega\hertz},
-      generador de forma de onda arbitraria (AWG).}
+      Dónde:
+      \begin{itemize}[leftmargin=1.4em]
+          \item \textbf{AWG 1}: primer canal.
+          \item \textbf{AWG 2}: segundo canal.
+          \item \textbf{--}: es la tierra.
+      \end{itemize}
 
-    \vspace{2pt}
-    \begin{minipage}[c]{0.30\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{image16.png}
-    \end{minipage}
-    \hfill
-    \begin{minipage}[c]{0.63\textwidth}
-        Dónde:
-        \begin{itemize}
-            \item \textbf{AWG 1}: primer canal.
-            \item \textbf{AWG 2}: segundo canal.
-            \item \textbf{--}: es la tierra.
-        \end{itemize}
-    \end{minipage}
-
-\vspace{0.35cm}
-
+\vspace{\dentroeeb}
 \item \textbf{4 canales de voltímetro (VMTR).}
 
+\vspace{\dentroeeb}
 \item \textbf{2 voltajes de referencia programables:} VREF~1 y VREF~2.
+\end{carac}
+&
+\begin{minipage}[t]{\linewidth}\vspace{0pt}
+    \includegraphics[width=\linewidth]{image16.png}
+\end{minipage}
+\\
+\addlinespace[1.1cm]
 
-\vspace{0.15cm}
+%------------------------------------------------- bloque 3: POWER
+\begin{carac}
+\item \textbf{2 canales, \qty{\pm 9}{\volt}, \qty{1.5}{\ampere}, fuente de
+      alimentación variable.}
 
-\item \textbf{2 canales, \qty{\pm 9}{\volt}, \qty{1.5}{\ampere}, fuente de alimentación
-      variable.}
+      Dónde:
+      \begin{itemize}[leftmargin=1.4em]
+          \item \textbf{VP+}: es $+\qty{9}{\volt}$, \qty{1.5}{\ampere}.
+          \item \textbf{VP--}: es $-\qty{9}{\volt}$, \qty{1.5}{\ampere}.
+          \item \textbf{--}: es la tierra.
+      \end{itemize}
 
-    \vspace{2pt}
-    \begin{minipage}[c]{0.30\textwidth}
-        \centering
-        \includegraphics[width=\linewidth]{image17.png}
-    \end{minipage}
-    \hfill
-    \begin{minipage}[c]{0.63\textwidth}
-        Dónde:
-        \begin{itemize}
-            \item \textbf{VP+}: es $+\qty{9}{\volt}$, \qty{1.5}{\ampere}.
-            \item \textbf{VP--}: es $-\qty{9}{\volt}$, \qty{1.5}{\ampere}.
-            \item \textbf{--}: es la tierra.
-        \end{itemize}
-    \end{minipage}
+\vspace{\dentroeeb}
+\item \textbf{1 canal, \qty{3.3}{\volt}~/~\qty{5}{\volt}, \qty{2}{\ampere},
+      fuente de alimentación fija ($V_{CC}$).}
+\end{carac}
+&
+\begin{minipage}[t]{\linewidth}\vspace{0pt}
+    \includegraphics[width=\linewidth]{image17.png}
+\end{minipage}
+\\
 
-\vspace{0.35cm}
+\end{tabularx}
 
-\item \textbf{1 canal, \qty{3.3}{\volt}~/~\qty{5}{\volt}, \qty{2}{\ampere}, fuente de
-      alimentación fija ($V_{CC}$).}
+\vspace{0.45cm}
 
-\item \textbf{Puede conectar 32 señales digitales,} que se pueden configurar como:
-    \begin{itemize}
-        \item Analizador lógico de 32 canales.
-        \item Generador de patrones de 32 canales.
-        \item E/S digitales discretas (botones, interruptores, LED, etc.).
-    \end{itemize}
-\end{itemize}
+% Septima caracteristica: mismo marcador y misma jerarquia que las seis
+% anteriores, aunque no lleve imagen que la acompane.
+\begin{carac}
+\item \textbf{Puede conectar 32 señales digitales,} que se pueden configurar
+      como:
+      \begin{itemize}[leftmargin=1.4em]
+          \item Analizador lógico de 32 canales.
+          \item Generador de patrones de 32 canales.
+          \item E/S digitales discretas (botones, interruptores, LED, etc.).
+      \end{itemize}
+\end{carac}
+\endgroup
+\end{enumerate}
 
 \begin{figure}[H]
     \centering
@@ -689,54 +729,16 @@ se aprecia en la figura~\ref{fig:grupos}.
     \label{fig:digital}
 \end{figure}
 
-\begin{table}[H]
-    \centering
-    \caption{Características eléctricas de los instrumentos de la EE Board.}
-    \label{tab:specs}
-    \small
-    \begin{tabularx}{\textwidth}{lX}
-    \toprule
-    \textbf{Instrumento} & \textbf{Características principales}\\
-    \midrule
-    Osciloscopio & 4 canales, ADC de \qty{10}{bit}, \qty{40}{\mega\sample\per\second},
-        ancho de banda analógico \qty{100}{\mega\hertz}, rango de entrada
-        \qty{\pm 20}{\volt}, impedancia \qty{9.3}{\mega\ohm} en paralelo con
-        \qty{10}{\pico\farad}, buffer de hasta \qty{16}{kS}.\\
-    Generador (AWG) & 2 canales, DAC de \qty{14}{bit},
-        \qty{40}{\mega\sample\per\second}, \qty{20}{\mega\hertz},
-        salida de \qty{20}{\volt} pico a pico, \qty{25}{\milli\ampere},
-        resolución \qty{1.2}{\milli\volt}.\\
-    Fuentes variables & VP+ / VP--: \qty{\pm 9}{\volt}, \qty{1.5}{\ampere}.\\
-    Fuente fija & $V_{CC}$: \qty{3.3}{\volt} o \qty{5}{\volt}, \qty{2}{\ampere}.\\
-    Voltímetros & 4 canales independientes.\\
-    Referencias & VREF~1 y VREF~2 programables.\\
-    Digital & 32 señales configurables (analizador lógico, generador de patrones o E/S
-        discretas).\\
-    \bottomrule
-    \end{tabularx}
-\end{table}
 
-\begin{notatec}{qué significan realmente \qty{40}{\mega\sample\per\second} y
-                \qty{100}{\mega\hertz}}
-Son dos parámetros distintos y conviene no confundirlos. Los \qty{100}{\mega\hertz} son el
-\emph{ancho de banda analógico del amplificador de entrada}; los
-\qty{40}{\mega\sample\per\second} son la \emph{velocidad de muestreo} del ADC. Por el criterio de
-Nyquist, la máxima frecuencia reconstruible en una captura en tiempo real es
-\[
-    f_{\max}=\frac{f_s}{2}=\frac{\qty{40}{\mega\hertz}}{2}=\qty{20}{\mega\hertz},
-\]
-y en la práctica se recomienda no pasar de $f_s/4 \approx \qty{10}{\mega\hertz}$ para que la
-forma de onda se vea fielmente. Por encima de eso aparece \emph{aliasing}: la pantalla muestra
-una señal de frecuencia menor que no existe. En este laboratorio se trabaja en continua y a baja
-frecuencia, así que el margen sobra ampliamente.
-\end{notatec}
 
-\begin{itemize}
+
+
+\begin{enumerate}[resume*=acteeb]
 \item En cuanto al software WaveForms, antes de iniciarlo conecte la EE Board al ordenador,
 conecte su transformador y encienda el \emph{switch} (ON); después ejecute el programa y le
 aparecerá la imagen de la figura~\ref{fig:waveforms}. Acepte la configuración por defecto de la
 EE Board.
-\end{itemize}
+\end{enumerate}
 
 \begin{figure}[H]
     \centering
@@ -748,12 +750,12 @@ EE Board.
 \FloatBarrier
 \subsection{Actividad: mi primer circuito}
 
-\begin{itemize}
+\begin{enumerate}[label=\textbf{\Alph*.}, leftmargin=*, labelsep=0.6em, series=actcir]
 \item En este primer circuito haremos simplemente un circuito serie que nos permitirá encender y
 apagar un diodo LED. Para esto arme en la zona protoboard de la EE Board el circuito esquemático
 mostrado en la figura~\ref{fig:esquema}; para tener una mejor perspectiva del circuito puede
 revisar la figura~\ref{fig:implement}.
-\end{itemize}
+\end{enumerate}
 
 \begin{figure}[H]
     \centering
@@ -762,12 +764,12 @@ revisar la figura~\ref{fig:implement}.
     \label{fig:esquema}
 \end{figure}
 
-\begin{itemize}
+\begin{enumerate}[resume*=actcir]
 \item Configure el circuito de la figura~\ref{fig:implement} y tenga cuidado con las patillas de
 conexión del LED; después configure el software: en la opción \emph{Static I/O} cambie el tipo de
 \emph{switch} y pruebe que el LED enciende. Esto se puede apreciar en la
 figura~\ref{fig:switch}.
-\end{itemize}
+\end{enumerate}
 
 \begin{figure}[H]
     \centering
@@ -822,13 +824,6 @@ las tensiones medidas no coincide con la fuente, hay un contacto flojo en el pro
 \end{ejemplo}
 
 \FloatBarrier
-%=======================================================================
-\section{Tarea asignada}
-%=======================================================================
-\begin{itemize}
-    \item Ninguna, es un taller.
-\end{itemize}
-
 %=======================================================================
 \section*{Referencias}
 \addcontentsline{toc}{section}{Referencias}
