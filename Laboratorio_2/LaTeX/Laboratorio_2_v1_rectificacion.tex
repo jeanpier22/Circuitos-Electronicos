@@ -1,0 +1,579 @@
+%=======================================================================
+%  LABORATORIO N.o 2 - APRENDIENDO A RECTIFICAR SENALES
+%  Curso : Circuitos Electronicos  (2026-2)
+%  UCSP  - Facultad de Ingenieria - Ing. Electronica y de Telecomunicaciones
+%  Docente: Ebert San Roman Castillo
+%
+%  Version 1 - Transcripcion del documento
+%              "Laboratorio_2_Propedeucio EEB.doc".
+%
+%  Esta version NO anade contenido: reproduce la guia original. Solo se
+%  corrigieron erratas ortograficas evidentes del .doc ("se parecia" ->
+%  "se aprecia", "oscilocopio" -> "osciloscopio", "pareciar" -> "apreciar",
+%  "senal cuadra" -> "senal cuadrada") y se dejo que LaTeX numere las
+%  figuras: el original repite el numero 10 y el numero 11 en dos figuras
+%  distintas cada uno, y con \ref las referencias del texto quedan
+%  correctas por si solas.
+%
+%  Las cajas notatec / seguridad / ejemplo quedan definidas en el preambulo
+%  para la futura revision tecnica, pero en esta version no se usan.
+%
+%  Compilar:  xelatex Laboratorio_2.tex    (dos veces)
+%=======================================================================
+\documentclass[11pt,a4paper]{article}
+
+%------------------------------------------------------------- idioma
+% Compilar con XeLaTeX (no con pdflatex): Trebuchet MS es una fuente TrueType
+% del sistema y solo fontspec, bajo XeLaTeX o LuaLaTeX, sabe cargarla.
+% inputenc y fontenc se omiten a proposito: XeLaTeX trabaja en UTF-8 de forma
+% nativa y esos paquetes dan error con este motor.
+\usepackage{fontspec}
+\setmainfont{Trebuchet MS}[
+  Path            = C:/Windows/Fonts/,
+  Extension       = .ttf,
+  UprightFont     = trebuc,
+  BoldFont        = trebucbd,
+  ItalicFont      = trebucit,
+  BoldItalicFont  = trebucbi,
+  Ligatures       = TeX
+]
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{microtype}
+
+%----------------------------------------------------------- geometria
+\usepackage[left=2.4cm,right=2.4cm,top=3.1cm,bottom=2.6cm,headheight=30pt,
+            footskip=1.2cm]{geometry}
+
+%------------------------------------------------------------ graficos
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\graphicspath{{imagenes/}}
+
+%-------------------------------------------------------------- tablas
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+%----------------------------------------------------- matematicas / SI
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\sisetup{
+  output-decimal-marker = {,},
+  per-mode              = symbol,
+  range-phrase          = { a },
+  range-units           = single,
+  detect-weight         = true,
+  detect-family         = true
+}
+
+%--------------------------------------------------------------- listas
+\usepackage{enumitem}
+\setlist[itemize]{itemsep=3pt,topsep=4pt,parsep=0pt}
+\setlist[enumerate]{itemsep=8pt,topsep=4pt,parsep=0pt}
+
+%--------------------------------------------------------------- cajas
+\usepackage[most]{tcolorbox}
+\usepackage{pgffor}
+
+\newtcolorbox{notatec}[1]{enhanced,breakable,
+  colback=blue!3!white, colframe=blue!55!black,
+  fonttitle=\bfseries\small, title={Nota técnica --- #1},
+  boxrule=0.6pt, arc=2pt, left=6pt,right=6pt,top=4pt,bottom=4pt}
+
+\newtcolorbox{seguridad}[1]{enhanced,breakable,
+  colback=red!3!white, colframe=red!60!black,
+  fonttitle=\bfseries\small, title={Seguridad --- #1},
+  boxrule=0.6pt, arc=2pt, left=6pt,right=6pt,top=4pt,bottom=4pt}
+
+\newtcolorbox{ejemplo}[1]{enhanced,breakable,
+  colback=green!3!white, colframe=green!45!black,
+  fonttitle=\bfseries\small, title={Ejemplo de diseño --- #1},
+  boxrule=0.6pt, arc=2pt, left=6pt,right=6pt,top=4pt,bottom=4pt}
+
+%------------------------------------------------------------ comandos
+% Lineas punteadas para respuestas del alumno: \lineasresp{n}
+\newcommand{\lineasresp}[1]{%
+  \par\vspace{6pt}%
+  \foreach \i in {1,...,#1}{\noindent\rule{\linewidth}{0.4pt}\par\vspace{11pt}}%
+}
+
+%---------------------------------------------------- encabezado / pie
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize UCSP --- Facultad de Ingeniería\\
+              Ing. Electrónica y de Telecomunicaciones}
+\fancyhead[R]{\footnotesize 2026-2 Circuitos Electrónicos\\
+              Ebert San Román Castillo}
+\fancyfoot[L]{\footnotesize Laboratorio N.\textsuperscript{o} 2 --- Aprendiendo a rectificar señales}
+\fancyfoot[R]{\footnotesize Página \thepage\ de \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\usepackage{lastpage}
+
+%------------------------------------------------------- numeracion
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\arabic{subsection}}
+
+%-------------------------------------------------------- hiperenlaces
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+\hypersetup{
+  pdftitle={Laboratorio 2 - Aprendiendo a rectificar senales sinusoidales},
+  pdfsubject={Circuitos Electronicos - Guia de practicas},
+  pdfauthor={Ebert San Roman Castillo},
+  pdfkeywords={electronica, diodo, rectificador, condensador, osciloscopio, Electronics Explorer Board}
+}
+
+\begin{document}
+
+%=======================================================================
+%  CABECERA DE LA GUIA
+%=======================================================================
+% El documento es de 11 pt, asi que \normalsize son los 11 pt del Word original.
+\begin{center}
+    {\normalsize\bfseries SEGUNDA UNIDAD: APRENDIENDO A RECTIFICAR SEÑALES}
+\end{center}
+
+\vspace{0.55cm}
+
+% Cabecera identica a la del Laboratorio 1 (ver los comentarios de aquel archivo).
+\begingroup
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\renewcommand{\arraystretch}{2.0}
+\setlength{\tabcolsep}{12pt}
+\noindent
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}X|>{\centering\arraybackslash}m{3.0cm}|}
+\hline
+\rule{0pt}{2.1cm}{\fontsize{58}{58}\selectfont\bfseries 2}
+    & \begin{minipage}[c]{\linewidth}\centering
+          {\large\bfseries Guía de Prácticas}\\[7pt]
+          {\Large\bfseries Aprendiendo a Rectificar Señales Sinusoidales}
+      \end{minipage}
+    & {\Large\bfseries Nota}\\
+\hline
+\multicolumn{3}{|l|}{\rule{0pt}{1.3cm}\large\textbf{Grupo:}~\rule{4.6cm}{0.4pt}%
+    \hfill\large\textbf{Fecha:}~\rule{4.6cm}{0.4pt}\hspace{2mm}}\\
+\hline
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\large\textbf{Alumno(s):}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\phantom{\large\textbf{Alumno(s):}}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
+\hline
+\end{tabularx}
+\endgroup
+
+\vspace{1.2cm}
+
+%=======================================================================
+\section{Objetivos}
+%=======================================================================
+\begin{itemize}
+    \item Continuar familiarizándose con el sistema de medición \emph{Electronics Explorer Board}.
+    \item Reconocer los diferentes dispositivos de instrumentación electrónica.
+    \item Reconocer componentes electrónicos tales como los diodos, resistencia, potenciómetro
+          y capacitores.
+    \item Comprender el uso de los diodos como rectificadores.
+    \item Comprender la aplicación de los condensadores en la rectificación de una señal.
+\end{itemize}
+
+%=======================================================================
+\section{Contenido teórico}
+%=======================================================================
+\subsection{Las medidas eléctricas}
+
+Las medidas eléctricas utilizan métodos, dispositivos y cálculos usados para medir cantidades
+eléctricas. La medición de cantidades eléctricas abarca un amplio uso; generalmente utilizan
+transductores, que permiten medir propiedades físicas como la temperatura, presión, flujo,
+fuerza, y muchas otras al convertirlas en señales eléctricas, las cuales pueden ser medidas y
+registradas.
+
+En esta práctica utilizaremos 2 herramientas básicas de la instrumentación electrónica, que son:
+
+\begin{enumerate}
+    \item El osciloscopio.
+    \item Generador de señales.
+\end{enumerate}
+
+El osciloscopio es un aparato de medida que permite medir los valores de voltaje de un circuito
+en función del tiempo; es un instrumento indispensable en el campo de la electrónica. Posee
+controles de la división vertical, amplitud de la señal, y de la división horizontal, que es la
+escala temporal, que se aprecian en la figura~\ref{fig:scope}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.50\textwidth]{image01.png}
+    \caption{Controles del osciloscopio.}
+    \label{fig:scope}
+\end{figure}
+
+Un generador de señales, o de funciones o de formas de onda, es un dispositivo electrónico de
+laboratorio que genera patrones de señales periódicas o no periódicas tanto analógicas como
+digitales. Se emplea normalmente en el diseño, prueba y reparación de dispositivos electrónicos.
+La figura~\ref{fig:wavegen} muestra la pantalla de un generador de señales, en la que se pueden
+visualizar los diferentes tipos de señales que puede producir el instrumento, como señales
+sinusoidales, rectangulares, triangulares, dientes de sierra y otras.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.29\textwidth]{image02.png}
+    \caption{Pantalla de un generador de señales.}
+    \label{fig:wavegen}
+\end{figure}
+
+\FloatBarrier
+\subsection{Componentes electrónicos pasivos}
+
+\subsubsection{El diodo}
+
+Los semiconductores han revolucionado el mundo de la electrónica y han permitido grandes avances
+en casi todas las ciencias; el más simple de los semiconductores es el diodo. El diodo solo
+permite la circulación de la corriente en un único sentido, como se aprecia en la
+figura~\ref{fig:diodo-func}, donde en la primera configuración permite el paso de corriente y en
+la segunda la evita, principio del rectificador.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{image03.png}
+    \caption{Funcionamiento del diodo.}
+    \label{fig:diodo-func}
+\end{figure}
+
+Los semiconductores son elementos que en condiciones normales son aislantes, pero con cierta
+modificación en su organización molecular pueden convertirse en conductores. Esta modificación
+consiste básicamente en el dopado con otros elementos que poseen enlaces covalentes incompletos;
+ejemplos de semiconductores son el silicio, el selenio y el germanio. El símbolo del diodo y el
+dispositivo se pueden apreciar en la figura~\ref{fig:diodo-simb}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.46\textwidth]{image04.png}
+    \caption{Imagen y símbolo del diodo.}
+    \label{fig:diodo-simb}
+\end{figure}
+
+El diodo está compuesto por la unión de un cristal tipo P con otro tipo N, en donde las cargas
+opuestas de la unión AB crean una pequeña barrera de oposición, que con una mínima tensión de
+polarización entre \qtyrange{0.2}{0.7}{\volt} logra la conducción de corriente en el diodo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{image05.png}
+    \caption{Esquema eléctrico del funcionamiento del diodo.}
+    \label{fig:diodo-pn}
+\end{figure}
+
+\FloatBarrier
+\subsubsection{El condensador o capacitor}
+
+El condensador es un dispositivo capaz de almacenar pequeñas cantidades de energía, para
+devolverlas al circuito cuando este lo requiera; esto se puede apreciar en la
+figura~\ref{fig:cap-carga}, donde se ha cargado un condensador para luego, con dicha carga, poder
+encender un LED. Los condensadores se han utilizado en diferentes aplicaciones que van desde
+temporizadores electrónicos, circuitos de rectificación, fenómenos de resonancia, supresión de
+ruido y corrección del factor de potencia, entre otras.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{image06.png}
+    \caption{Carga y descarga de un condensador a través de un diodo LED.}
+    \label{fig:cap-carga}
+\end{figure}
+
+Físicamente un condensador está compuesto por un par de placas metálicas separadas por un
+material aislante, denominado dieléctrico, que se puede apreciar en la
+figura~\ref{fig:cap-partes}. El dieléctrico puede ser aire, papel, cerámica, mica, plásticos y
+otros.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.78\textwidth]{image07.png}
+    \caption{Partes de un condensador.}
+    \label{fig:cap-partes}
+\end{figure}
+
+La capacidad de un condensador es la propiedad de almacenar mayor o menor cantidad de
+electricidad o carga, dada en la siguiente ecuación, donde $Q$ es la cantidad de carga
+almacenada, $C$ es la capacidad del condensador con unidad faradios y $V$ es la tensión entre las
+armaduras. El faradio es una unidad muy grande, por lo que se utilizan submúltiplos de este, que
+se pueden apreciar en la figura~\ref{fig:cap-ecuacion}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{image08.png}
+    \caption{Ecuación del condensador y submúltiplos más utilizados de los faradios.}
+    \label{fig:cap-ecuacion}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.72\textwidth]{image09.png}
+    \caption{Distintos tipos de condensadores.}
+    \label{fig:cap-tipos}
+\end{figure}
+
+Existe una gran variedad de condensadores, que se diferencian por su capacidad, la frecuencia de
+funcionamiento y la cantidad de voltaje con la que operan. Entre ellos tenemos los condensadores
+de papel, los condensadores de plástico o poliéster, condensadores cerámicos, condensadores de
+mica, condensadores electrolíticos y los condensadores variables; esto se puede apreciar en la
+figura~\ref{fig:cap-tipos}, además de los símbolos circuitales de los condensadores.
+
+Por lo general los valores de la capacidad y tensión de trabajo aparecen inscritos en la
+superficie del condensador electrolítico; esto se puede apreciar en la
+figura~\ref{fig:cap-electro}. Los condensadores cerámicos por lo general usan la misma forma de
+lectura de la resistencia, como se aprecia en la figura~\ref{fig:cap-ceramico}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.70\textwidth]{image10.png}
+    \caption{Lectura de capacitor electrolítico.}
+    \label{fig:cap-electro}
+\end{figure}
+
+% En el .doc original la imagen y la tabla de codigos de tension comparten un
+% unico pie de figura, por eso van juntas dentro del mismo entorno figure.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.90\textwidth]{image11.png}\\[10pt]
+    \small
+    \renewcommand{\arraystretch}{1.25}
+    \begin{tabular}{|>{\centering\arraybackslash}m{3.1cm}|>{\centering\arraybackslash}m{3.1cm}
+                    |>{\centering\arraybackslash}m{3.1cm}|}
+    \hline
+    0G = \qty{4}{\volt} DC   & 0L = \qty{5.5}{\volt} DC & 0J = \qty{6.3}{\volt} DC\\
+    \hline
+    1A = \qty{10}{\volt} DC  & 1C = \qty{16}{\volt} DC  & 1E = \qty{25}{\volt} DC\\
+    \hline
+    1H = \qty{50}{\volt} DC  & 1J = \qty{63}{\volt} DC  & 1K = \qty{80}{\volt} DC\\
+    \hline
+    2A = \qty{100}{\volt} DC & 2Q = \qty{110}{\volt} DC & 2B = \qty{125}{\volt} DC\\
+    \hline
+    2C = \qty{160}{\volt} DC & 2Z = \qty{180}{\volt} DC & 2D = \qty{200}{\volt} DC\\
+    \hline
+    2P = \qty{220}{\volt} DC & 2E = \qty{250}{\volt} DC & 2F = \qty{315}{\volt} DC\\
+    \hline
+    2V = \qty{350}{\volt} DC & 2G = \qty{400}{\volt} DC & 2W = \qty{450}{\volt} DC\\
+    \hline
+    2H = \qty{500}{\volt} DC & 2J = \qty{630}{\volt} DC & 3A = \qty{1000}{\volt} DC\\
+    \hline
+    \end{tabular}
+    \renewcommand{\arraystretch}{1}
+    \caption{Lectura de capacitores cerámicos.}
+    \label{fig:cap-ceramico}
+\end{figure}
+
+\FloatBarrier
+%=======================================================================
+\section{Cuestionario previo}
+%=======================================================================
+\begin{enumerate}
+\item Al realizar una medida de tensión alterna con un osciloscopio, aparece la imagen a
+continuación.
+
+% El .doc no da pie de figura a esta imagen, por eso va suelta y sin \caption.
+\begin{center}
+    \includegraphics[width=0.69\textwidth]{image12.png}
+\end{center}
+
+Complete la tabla a continuación:
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.45}
+    \begin{tabular}{|>{\centering\arraybackslash}m{6.0cm}|>{\centering\arraybackslash}m{4.0cm}|}
+    \hline
+    \textbf{Magnitud} & \textbf{Valor}\\
+    \hline
+    $V$ máximo ($V_{\max}$) & \\
+    \hline
+    $V$ eficaz ($V_{e}=V_{\max}/\sqrt{2}$) & \\
+    \hline
+    Periodo ($T$) & \\
+    \hline
+    Frecuencia ($f=1/T$) & \\
+    \hline
+    \end{tabular}
+\end{table}
+
+\item Complete la siguiente tabla de lectura de condensadores cerámicos.
+
+\begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.6}
+    \begin{tabular}{|>{\centering\arraybackslash}m{1.8cm}|>{\centering\arraybackslash}m{2.2cm}
+                    |>{\centering\arraybackslash}m{3.6cm}|>{\centering\arraybackslash}m{2.4cm}
+                    |>{\centering\arraybackslash}m{2.2cm}|}
+    \hline
+    \textbf{Ejercicio} & \textbf{Código} & \textbf{Valor del condensador} &
+    \textbf{Tolerancia} & \textbf{Voltaje}\\
+    \hline
+    1 & 2A 102J & & & \\
+    \hline
+    2 & 1H 103H & & & \\
+    \hline
+    3 & 2J 472K & & & \\
+    \hline
+    4 & 2D 104M & & & \\
+    \hline
+    \end{tabular}
+\end{table}
+
+\item Describa con sus propias palabras cómo funciona el dispositivo regulador LM317.
+
+\lineasresp{2}
+\end{enumerate}
+
+\FloatBarrier
+%=======================================================================
+\section{Equipos y materiales}
+%=======================================================================
+\noindent\textbf{Laboratorio:} Electrónica y Comunicaciones.
+
+\vspace{0.25cm}
+\noindent\textbf{Equipos y dispositivos:}
+\begin{itemize}
+    \item 1 computador personal.
+    \item 1 EEB.
+    \item 1 diodo LED.
+    \item 1 resistencia de \qty{1}{\kilo\ohm}.
+    \item 1 potenciómetro.
+    \item 1 bocina.
+    \item 4 diodos.
+    \item 1 capacitor.
+\end{itemize}
+
+\noindent\textbf{Software:}
+\begin{itemize}
+    \item WaveForms 2015.
+\end{itemize}
+
+\FloatBarrier
+%=======================================================================
+\section{Actividades}
+%=======================================================================
+\subsection{Actividad: conectando el osciloscopio y el generador de señales}
+
+\begin{enumerate}[label=\textbf{\Alph*.}, leftmargin=*, labelsep=0.6em, series=actosc]
+\item Arme el circuito de la figura~\ref{fig:circ1} en el EE Board y corra el programa WaveForms;
+antes de iniciarlo, conecte la EE Board al ordenador, conecte su transformador y encienda el
+\emph{switch} (ON).
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.67\textwidth]{image13.png}
+    \caption{Circuito para el desarrollo de la primera parte.}
+    \label{fig:circ1}
+\end{figure}
+
+\begin{enumerate}[resume*=actosc]
+\item Primero seleccione la opción \emph{Scope}, ver figura~\ref{fig:scope-sel}, y luego solo
+habilite el canal 4 del osciloscopio, con los valores configurados en la
+figura~\ref{fig:scope-cfg}.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{image14.png}
+    \caption{Selección del osciloscopio y generador de señales para esta actividad.}
+    \label{fig:scope-sel}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.93\textwidth]{image15.png}
+    \caption{Configuración inicial del osciloscopio.}
+    \label{fig:scope-cfg}
+\end{figure}
+
+\begin{enumerate}[resume*=actosc]
+\item Luego seleccione la opción \emph{Wavegen}, ver figura~\ref{fig:scope-sel}, y configure el
+generador con los valores que se muestran en la figura~\ref{fig:gen-cfg}; después encienda el
+generador con el botón \emph{Run}.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{image16.png}
+    \caption{Configuración inicial del generador de señales.}
+    \label{fig:gen-cfg}
+\end{figure}
+
+\begin{enumerate}[resume*=actosc]
+\item Conteste: ¿qué ocurre en el diodo LED?
+
+\item Seleccione la opción \emph{Scope 1}, conecte la punta del osciloscopio en el punto central
+entre el diodo y la resistencia, como se muestra en la figura~\ref{fig:scope-con}, y configure
+los parámetros del osciloscopio como en la figura~\ref{fig:scope-align}.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.60\textwidth]{image17.png}
+    \caption{Conexión del osciloscopio.}
+    \label{fig:scope-con}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{image18.png}
+    \caption{Configuración y alineación temporal del osciloscopio.}
+    \label{fig:scope-align}
+\end{figure}
+
+\noindent\textbf{Preguntas:}
+\begin{enumerate}
+    \item ¿Qué ha pasado con la señal sinusoidal? Explique por qué se comporta de esa forma.
+    \item Cambie la señal sinusoidal por una señal cuadrada, triangular, rampa y ruido. ¿Qué
+          ocurre con la respuesta del circuito?
+          \begin{enumerate}
+              \item Para mayor claridad, conecte el osciloscopio directamente a la salida del
+                    generador de señales, para ver las diferentes formas de onda.
+          \end{enumerate}
+    \item En el circuito de la figura~\ref{fig:circ1}, invierta la posición del diodo LED e
+          inmediatamente cambie a un voltaje negativo en la amplitud del generador de señales.
+          ¿Qué ha ocurrido en el circuito? ¿Por qué enciende el LED?
+    \item Cambie el diodo LED por la bocina y establezca una frecuencia de \qty{2}{\kilo\hertz}.
+          ¿Qué ocurre?
+    \item Cambie los valores de la frecuencia hasta que deje de escuchar. ¿Cuál es el valor de
+          frecuencia máximo que puede escuchar?
+\end{enumerate}
+
+\FloatBarrier
+\subsection{Actividad: el rectificador}
+
+\begin{enumerate}[label=\textbf{\Alph*.}, leftmargin=*, labelsep=0.6em, series=actrec]
+\item En este primer apartado arme en el EE Board el circuito de la figura~\ref{fig:rect1} y
+coloque el osciloscopio en el capacitor de \qty{10}{\micro\farad}. ¿Qué ocurre con la señal
+sinusoidal de la entrada?
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{image19.png}
+    \caption{Esquemático del circuito a implementar.}
+    \label{fig:rect1}
+\end{figure}
+
+\begin{enumerate}[resume*=actrec]
+\item En este segundo apartado arme en el EE Board el circuito de la figura~\ref{fig:rect2} y
+coloque el osciloscopio en el capacitor. ¿Qué ocurre con la señal sinusoidal de la entrada? ¿Qué
+diferencia existe con la respuesta del apartado anterior?
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.79\textwidth]{image20.png}
+    \caption{Esquemático del circuito a implementar.}
+    \label{fig:rect2}
+\end{figure}
+
+\FloatBarrier
+%=======================================================================
+\section{Tarea asignada}
+%=======================================================================
+\begin{itemize}
+    \item Ninguna, es un taller.
+\end{itemize}
+
+\end{document}

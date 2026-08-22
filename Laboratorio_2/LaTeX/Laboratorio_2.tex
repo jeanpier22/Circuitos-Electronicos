@@ -1,0 +1,687 @@
+%=======================================================================
+%  LABORATORIO N.o 2 - DIODOS: CURVA CARACTERISTICA
+%  Curso : Circuitos Electronicos  (2026-2)
+%  UCSP  - Facultad de Ingenieria - Ing. Electronica y de Telecomunicaciones
+%  Docente     : Ebert San Roman Castillo
+%  Laboratorio : Ing. Jeanpier Ancori Sanchez
+%
+%  Version 2 - Fusion de dos guias de origen:
+%
+%    (B) "Lab. 01 - v2026-1 - Diodo - Curva Caracteristica.doc"
+%        Aporta la ESTRUCTURA y todo el procedimiento calificado
+%        (secciones I, III, IV, V, VI, VII, VIII y los temas de II.3).
+%
+%    (A) "Laboratorio_2_Propedeucio EEB.doc"
+%        Aporta unicamente la teoria del diodo (II.1), de la que (B) carece.
+%
+%  Por decision del autor NO se incorpora el resto de (A): osciloscopio,
+%  generador de senales, rectificacion de senales y las actividades con la
+%  Electronics Explorer Board. Esa transcripcion completa e independiente
+%  queda en  Laboratorio_2_v1_rectificacion.tex,  que sigue compilando.
+%
+%  No se anade contenido propio. Sobre los originales solo se hizo:
+%    - Corregir erratas evidentes ("se parecia" -> "se aprecia",
+%      "pareciar" -> "apreciar", "en le Diodo" -> "en el Diodo",
+%      "esta conectado" -> "este conectado").
+%    - Sustituir los objetos de Editor de ecuaciones de (B) -- que en el
+%      .doc eran imagenes .wmf sueltas -- por matematicas nativas:
+%      image2=uA, image4/image10=V1, image5/image7=V2, image11=VD,
+%      image6/image8/image12=ID, image14="VD vs ID".
+%    - Dejar que LaTeX numere secciones, figuras y tablas. El original (B)
+%      repite el numeral "V." en dos secciones seguidas y (A) repite el
+%      numero de figura 10; con \ref eso se corrige solo.
+%    - Reemplazar la portada y el membrete de (B), que eran imagenes
+%      escaneadas, por la cabecera que construye este mismo archivo.
+%
+%  Version 3 - La practica trata del diodo en polarizacion directa e inversa,
+%  asi que se retira la teoria del condensador (antigua II.2, procedente de (A)
+%  y ajena al tema) con sus seis figuras. El resto del documento no cambia: la
+%  seccion era autocontenida y ninguna otra la referenciaba. La lista de
+%  materiales de (B) nunca incluyo condensadores, por lo que queda intacta.
+%
+%  El preambulo se alinea con el del Laboratorio 1 para que ambas guias se vean
+%  iguales: misma geometria de pagina (bottom=2.6cm, footskip=1.2cm) y pie de
+%  una sola linea. Unicos anadidos propios de esta guia: \puntos, que rotula el
+%  peso de cada seccion calificada, y \tablename -> "Tabla", porque el texto
+%  dice "la tabla 1" y babel-spanish rotularia "Cuadro 1".
+%
+%  Version 4 - Se anade la seccion VI, "Ejercicio adicional: el diodo como
+%  capacitor variable", que no procede de ninguna de las dos guias. Prolonga la
+%  polarizacion inversa (IV.2): el diodo en inversa presenta una capacitancia de
+%  juntura que, con L1, forma un resonador sintonizable por tension.
+%    - circuito_resonador.png  es el esquema del simulador.
+%    - bode_resonador.pdf      lo genera herramientas/graficar_bode.py leyendo
+%                              LAB2.DAT, el barrido en alterna exportado por el
+%                              simulador. Va en PDF, no en PNG: una curva es
+%                              vectorial y asi no pixela ni engorda el archivo.
+%  Esta seccion todavia NO tiene puntaje asignado; las demas suman ya los 20.
+%
+%  Imagenes: image03-image05 provienen de (A); image21-image23 de (B).
+%  Las image06-image11 (condensador) quedan en imagenes/ pero ya no se usan.
+%  La figura 1 de (B) venia en EMF vectorial y se rasterizo a 2094 px.
+%
+%  Compilar:  xelatex Laboratorio_2.tex    (dos veces)
+%=======================================================================
+\documentclass[11pt,a4paper]{article}
+
+%------------------------------------------------------------- idioma
+% Compilar con XeLaTeX (no con pdflatex): Trebuchet MS es una fuente TrueType
+% del sistema y solo fontspec, bajo XeLaTeX o LuaLaTeX, sabe cargarla.
+% inputenc y fontenc se omiten a proposito: XeLaTeX trabaja en UTF-8 de forma
+% nativa y esos paquetes dan error con este motor.
+\usepackage{fontspec}
+\setmainfont{Trebuchet MS}[
+  Path            = C:/Windows/Fonts/,
+  Extension       = .ttf,
+  UprightFont     = trebuc,
+  BoldFont        = trebucbd,
+  ItalicFont      = trebucit,
+  BoldItalicFont  = trebucbi,
+  Ligatures       = TeX
+]
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{microtype}
+
+%----------------------------------------------------------- geometria
+\usepackage[left=2.4cm,right=2.4cm,top=3.1cm,bottom=2.6cm,headheight=30pt,
+            footskip=1.2cm]{geometry}
+
+%------------------------------------------------------------ graficos
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\graphicspath{{imagenes/}}
+
+%-------------------------------------------------------------- tablas
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+%----------------------------------------------------- matematicas / SI
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\sisetup{
+  output-decimal-marker = {,},
+  per-mode              = symbol,
+  range-phrase          = { a },
+  range-units           = single,
+  detect-weight         = true,
+  detect-family         = true
+}
+
+%--------------------------------------------------------------- listas
+\usepackage{enumitem}
+\setlist[itemize]{itemsep=3pt,topsep=4pt,parsep=0pt}
+\setlist[enumerate]{itemsep=8pt,topsep=4pt,parsep=0pt}
+
+%--------------------------------------------------------------- cajas
+\usepackage[most]{tcolorbox}
+\usepackage{pgffor}
+
+\newtcolorbox{notatec}[1]{enhanced,breakable,
+  colback=blue!3!white, colframe=blue!55!black,
+  fonttitle=\bfseries\small, title={Nota técnica --- #1},
+  boxrule=0.6pt, arc=2pt, left=6pt,right=6pt,top=4pt,bottom=4pt}
+
+\newtcolorbox{seguridad}[1]{enhanced,breakable,
+  colback=red!3!white, colframe=red!60!black,
+  fonttitle=\bfseries\small, title={Seguridad --- #1},
+  boxrule=0.6pt, arc=2pt, left=6pt,right=6pt,top=4pt,bottom=4pt}
+
+\newtcolorbox{ejemplo}[1]{enhanced,breakable,
+  colback=green!3!white, colframe=green!45!black,
+  fonttitle=\bfseries\small, title={Ejemplo de diseño --- #1},
+  boxrule=0.6pt, arc=2pt, left=6pt,right=6pt,top=4pt,bottom=4pt}
+
+%------------------------------------------------------------ comandos
+% Lineas punteadas para respuestas del alumno: \lineasresp{n}
+\newcommand{\lineasresp}[1]{%
+  \par\vspace{6pt}%
+  \foreach \i in {1,...,#1}{\noindent\rule{\linewidth}{0.4pt}\par\vspace{11pt}}%
+}
+
+% Puntaje al final del titulo de una seccion calificada.
+\newcommand{\puntos}[1]{\normalfont\normalsize\textmd{(#1 puntos)}}
+
+%---------------------------------------------------- encabezado / pie
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize UCSP --- Facultad de Ingeniería\\
+              Ing. Electrónica y de Telecomunicaciones}
+\fancyhead[R]{\footnotesize 2026-2 Circuitos Electrónicos\\
+              Ebert San Román Castillo}
+\fancyfoot[L]{\footnotesize Laboratorio N.\textsuperscript{o} 2 --- Diodos: curva característica}
+\fancyfoot[R]{\footnotesize Página \thepage\ de \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\usepackage{lastpage}
+
+%------------------------------------------------------- numeracion
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\arabic{subsection}}
+
+%-------------------------------------------------------- hiperenlaces
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+\hypersetup{
+  pdftitle={Laboratorio 2 - Diodos: curva caracteristica},
+  pdfsubject={Circuitos Electronicos - Guia de practicas},
+  pdfauthor={Ebert San Roman Castillo; Jeanpier Ancori Sanchez},
+  pdfkeywords={electronica, diodo, 1N4007, curva caracteristica, polarizacion directa,
+               polarizacion inversa, Multisim}
+}
+
+% babel-spanish rotula las tablas como "Cuadro"; los originales dicen "Tabla"
+% y asi lo pide el texto de la guia ("las medidas solicitadas en la tabla 1").
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+\begin{document}
+
+%=======================================================================
+%  CABECERA DE LA GUIA
+%=======================================================================
+% El documento es de 11 pt, asi que \normalsize son los 11 pt del Word original.
+\begin{center}
+    {\normalsize\bfseries PRIMERA UNIDAD: DIODOS Y APLICACIONES BÁSICAS}
+\end{center}
+
+\vspace{0.55cm}
+
+% Cabecera identica a la del Laboratorio 1 (ver los comentarios de aquel archivo).
+% Sustituye a la portada escaneada del .doc de origen.
+\begingroup
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\renewcommand{\arraystretch}{2.0}
+\setlength{\tabcolsep}{12pt}
+\noindent
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}X|>{\centering\arraybackslash}m{3.0cm}|}
+\hline
+\rule{0pt}{2.1cm}{\fontsize{58}{58}\selectfont\bfseries 2}
+    & \begin{minipage}[c]{\linewidth}\centering
+          {\large\bfseries Guía de Prácticas}\\[7pt]
+          {\Large\bfseries Diodos --- Curva Característica}
+      \end{minipage}
+    & {\Large\bfseries Nota}\\
+\hline
+\multicolumn{3}{|l|}{\rule{0pt}{1.3cm}\large\textbf{Grupo:}~\rule{4.6cm}{0.4pt}%
+    \hfill\large\textbf{Fecha:}~\rule{4.6cm}{0.4pt}\hspace{2mm}}\\
+\hline
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\large\textbf{Alumno(s):}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\phantom{\large\textbf{Alumno(s):}}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
+\hline
+\end{tabularx}
+\endgroup
+
+\vspace{1.2cm}
+
+%=======================================================================
+\section{Objetivos}
+%=======================================================================
+El objetivo principal de esta práctica es conocer experimentalmente la operación del diodo
+semiconductor, para lo cual se desarrollan las siguientes actividades:
+
+\begin{itemize}
+    \item Polarización del diodo en forma directa, a fin de representar su curva característica
+          de operación.
+    \item Polarización del diodo en forma inversa, a fin de representar su curva característica
+          de operación.
+    \item Análisis del comportamiento externo del diodo semiconductor en sus diferentes
+          polarizaciones.
+\end{itemize}
+
+%=======================================================================
+\section{Contenido teórico}
+%=======================================================================
+\subsection{El diodo}
+
+Los semiconductores han revolucionado el mundo de la electrónica y han permitido grandes avances
+en casi todas las ciencias; el más simple de los semiconductores es el diodo. El diodo solo
+permite la circulación de la corriente en un único sentido, como se aprecia en la
+figura~\ref{fig:diodo-func}, donde en la primera configuración permite el paso de corriente y en
+la segunda la evita, principio del rectificador.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.75\textwidth]{image03.png}
+    \caption{Funcionamiento del diodo.}
+    \label{fig:diodo-func}
+\end{figure}
+
+Los semiconductores son elementos que en condiciones normales son aislantes, pero con cierta
+modificación en su organización molecular pueden convertirse en conductores. Esta modificación
+consiste básicamente en el dopado con otros elementos que poseen enlaces covalentes incompletos;
+ejemplos de semiconductores son el silicio, el selenio y el germanio. El símbolo del diodo y el
+dispositivo se pueden apreciar en la figura~\ref{fig:diodo-simb}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.46\textwidth]{image04.png}
+    \caption{Imagen y símbolo del diodo.}
+    \label{fig:diodo-simb}
+\end{figure}
+
+El diodo está compuesto por la unión de un cristal tipo P con otro tipo N, en donde las cargas
+opuestas de la unión AB crean una pequeña barrera de oposición, que con una mínima tensión de
+polarización entre \qtyrange{0.2}{0.7}{\volt} logra la conducción de corriente en el diodo.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.95\textwidth]{image05.png}
+    \caption{Esquema eléctrico del funcionamiento del diodo.}
+    \label{fig:diodo-pn}
+\end{figure}
+
+\FloatBarrier
+\subsection{Operación del diodo semiconductor y análisis de circuitos}
+
+\begin{itemize}
+    \item Operación interna del diodo semiconductor.
+    \item Operación externa del diodo semiconductor.
+    \item Análisis de circuitos con diodos: modelos de circuito equivalente para el diodo y
+          análisis rápido de circuitos con diodos.
+\end{itemize}
+
+\FloatBarrier
+%=======================================================================
+\section{Equipos y materiales}
+%=======================================================================
+\noindent\textbf{Equipos y dispositivos:}
+\begin{itemize}
+    \item Fuente regulada de voltaje (\qtyrange{0}{30}{\volt}).
+\end{itemize}
+
+\noindent\textbf{Software:}
+\begin{itemize}
+    \item Simulador Multisim.
+\end{itemize}
+
+\vspace{0.25cm}
+\noindent\textbf{Materiales y fungibles} (deben ser adquiridos por los alumnos). Comprar cada uno
+de los siguientes valores:
+\begin{itemize}
+    \item 04 diodos 1N4007.
+    % El original dice "1/4 vatio"; se expresa como 0,25 W, igual que en el Laboratorio 1.
+    \item 06 resistencias de \qty{1}{\kilo\ohm} (\qty{0.25}{\watt}).
+    \item 02 diodos LED azules.
+    \item 01 motor DC de \qty{12}{\volt} (pequeño).
+    \item 01 protoboard.
+    \item 01 multímetro.
+    \item Cables conectores para protoboard.
+    \item Mandil (obligatorio).
+\end{itemize}
+
+\FloatBarrier
+%=======================================================================
+\section{Procedimiento}
+%=======================================================================
+\subsection{Polarización directa \puntos{4}}
+
+\begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
+\item Arme el circuito de la figura~\ref{fig:pol-directa} y, con el simulador Proteus, tome las
+medidas solicitadas en la tabla~\ref{tab:directa}.
+
+\item En el protoboard, arme el circuito de la figura~\ref{fig:pol-directa}. Antes de encender la
+fuente de alimentación considere lo siguiente:
+\end{enumerate}
+
+\begin{itemize}
+    \item Revisar que el ánodo del diodo esté conectado a la salida positiva de la fuente de
+          alimentación.
+    \item Revisar que los multímetros estén bien conectados. Para medir la corriente del diodo
+          ($I_D$) colocar el multímetro en serie con el diodo (DC A) y para medir el voltaje en
+          el diodo ($V_D$), en paralelo con el diodo (DC V), tal como se muestra en la figura.
+    \item Encender la fuente de alimentación y fijar el voltaje de salida según la
+          tabla~\ref{tab:directa}. Para cada voltaje medir el voltaje del diodo ($V_D$) y la
+          corriente del diodo ($I_D$); luego anotar las medidas en dicha tabla, expresando los
+          valores en \unit{\milli\volt} y \unit{\micro\ampere} para el voltaje o la corriente del
+          diodo respectivamente.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.46\textwidth]{image21.png}
+    \caption{Circuito para la polarización directa del diodo.}
+    \label{fig:pol-directa}
+\end{figure}
+
+\begin{table}[H]
+    \centering
+    \caption{Tabla de lecturas para el diodo en polarización directa.}
+    \label{tab:directa}
+    \small
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{|>{\centering\arraybackslash}m{1.5cm}|>{\centering\arraybackslash}m{2.0cm}
+                    |>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.3cm}
+                    |>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.3cm}|}
+    \hline
+    \multirow{2}{*}{\textbf{Lectura}}
+      & \multirow{2}{2.0cm}{\centering\textbf{Voltaje de la fuente} ($V_1$)}
+      & \multicolumn{2}{c|}{\textbf{SIMULADO}}
+      & \multicolumn{2}{c|}{\textbf{EXPERIMENTADO}}\\
+    \cline{3-6}
+      & & \textbf{Voltaje en el diodo} ($V_2$) & \textbf{Corriente en el diodo} ($I_D$)
+        & \textbf{Voltaje en el diodo} ($V_2$) & \textbf{Corriente en el diodo} ($I_D$)\\
+    \hline
+    1  & 0,1 & & & & \\ \hline
+    2  & 0,2 & & & & \\ \hline
+    3  & 0,3 & & & & \\ \hline
+    4  & 0,4 & & & & \\ \hline
+    5  & 0,5 & & & & \\ \hline
+    6  & 0,6 & & & & \\ \hline
+    7  & 0,7 & & & & \\ \hline
+    8  & 0,8 & & & & \\ \hline
+    9  & 1,0 & & & & \\ \hline
+    10 & 2   & & & & \\ \hline
+    11 & 4   & & & & \\ \hline
+    12 & 8   & & & & \\ \hline
+    13 & 12  & & & & \\ \hline
+    14 & 16  & & & & \\ \hline
+    15 & 20  & & & & \\ \hline
+    16 & 24  & & & & \\ \hline
+    17 & 28  & & & & \\ \hline
+    18 & 30  & & & & \\ \hline
+    \end{tabular}
+\end{table}
+
+\FloatBarrier
+\subsection{Polarización inversa \puntos{4}}
+\label{sec:inversa}
+
+\begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
+\item Arme el circuito de la figura~\ref{fig:pol-inversa} en el simulador Proteus y tome las
+medidas solicitadas en la tabla~\ref{tab:inversa}.
+
+\item En el protoboard, arme el circuito de la figura~\ref{fig:pol-inversa}. Antes de encender la
+fuente de alimentación considere lo siguiente:
+\end{enumerate}
+
+\begin{itemize}
+    \item Revisar que el cátodo del diodo esté conectado a la salida positiva de la fuente de
+          alimentación.
+    \item Revisar que los multímetros estén bien conectados. Para medir la corriente del diodo
+          ($I_D$) colocar el multímetro en serie con el diodo (DC A) y para medir el voltaje en
+          el diodo ($V_D$), en paralelo con el diodo (DC V), tal como se muestra en la figura.
+    \item Encender la fuente de alimentación y fijar el voltaje de salida según la
+          tabla~\ref{tab:inversa}. Para cada voltaje medir el voltaje del diodo ($V_D$) y la
+          corriente del diodo ($I_D$). Anotar las medidas en la tabla~\ref{tab:inversa} (todo
+          expresado en \unit{\milli\volt} o \unit{\micro\ampere}).
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.46\textwidth]{image22.png}
+    \caption{Circuito para la polarización inversa del diodo.}
+    \label{fig:pol-inversa}
+\end{figure}
+
+\begin{table}[H]
+    \centering
+    \caption{Tabla de lecturas para el diodo en polarización inversa.}
+    \label{tab:inversa}
+    \small
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{|>{\centering\arraybackslash}m{1.5cm}|>{\centering\arraybackslash}m{2.0cm}
+                    |>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.3cm}
+                    |>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.3cm}|}
+    \hline
+    \multirow{2}{*}{\textbf{Lectura}}
+      & \multirow{2}{2.0cm}{\centering\textbf{Voltaje de la fuente} ($V_1$)}
+      & \multicolumn{2}{c|}{\textbf{SIMULADO}}
+      & \multicolumn{2}{c|}{\textbf{EXPERIMENTADO}}\\
+    \cline{3-6}
+      & & \textbf{Voltaje en el diodo} ($V_D$) & \textbf{Corriente en el diodo} ($I_D$)
+        & \textbf{Voltaje en el diodo} ($V_D$) & \textbf{Corriente en el diodo} ($I_D$)\\
+    \hline
+    1  & 2,0  & & & & \\ \hline
+    2  & 4,0  & & & & \\ \hline
+    3  & 6,0  & & & & \\ \hline
+    4  & 8,0  & & & & \\ \hline
+    5  & 10   & & & & \\ \hline
+    6  & 12   & & & & \\ \hline
+    7  & 14   & & & & \\ \hline
+    8  & 16   & & & & \\ \hline
+    9  & 18   & & & & \\ \hline
+    10 & 20   & & & & \\ \hline
+    \end{tabular}
+\end{table}
+
+\FloatBarrier
+%=======================================================================
+\section{Configuración de diodos \puntos{4}}
+%=======================================================================
+\begin{enumerate}[leftmargin=*, labelsep=0.6em, series=confdiodos]
+\item Arme el circuito de la figura~\ref{fig:conf-diodos}.
+
+\item Antes de conectar la fuente revise si la salida positiva de la fuente está conectada en el
+punto A y si el negativo en el punto B, y tome las medidas solicitadas en la
+tabla~\ref{tab:conf}.
+
+\item Luego conecte el polo positivo de la fuente en el punto B y el polo negativo en el punto A,
+y luego tome las medidas solicitadas en la tabla~\ref{tab:conf}.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.46\textwidth]{image23.png}
+    \caption{Configuración de diodos $D_1$ y $D_2$.}
+    \label{fig:conf-diodos}
+\end{figure}
+
+\begin{table}[H]
+    \centering
+    \caption{Datos de las dos configuraciones de diodos $D_1$ y $D_2$.}
+    \label{tab:conf}
+    \small
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{1.9cm}
+                    |>{\centering\arraybackslash}m{2.1cm}|>{\centering\arraybackslash}m{2.1cm}
+                    |>{\centering\arraybackslash}m{2.1cm}|>{\centering\arraybackslash}m{2.1cm}|}
+    \hline
+    \multirow{2}{*}{\textbf{Lectura}}
+      & \multirow{2}{1.9cm}{\centering\textbf{Voltaje de la fuente}}
+      & \multicolumn{4}{c|}{\textbf{EXPERIMENTADO}}\\
+    \cline{3-6}
+      & & \textbf{Voltaje en el diodo (1)} & \textbf{Voltaje en el foco}
+        & \textbf{Voltaje en el diodo (2)} & \textbf{Voltaje en el motor}\\
+    \hline
+    \multirow{7}{*}{\textbf{Conexión AB}}
+       & 1,0 & & & & \\ \cline{2-6}
+     & 2,0 & & & & \\ \cline{2-6}
+     & 3,0 & & & & \\ \cline{2-6}
+     & 4,0 & & & & \\ \cline{2-6}
+     & 5,0 & & & & \\ \cline{2-6}
+     & 6,0 & & & & \\ \cline{2-6}
+     & 7,0 & & & & \\
+    \hline
+    \multirow{7}{*}{\textbf{Conexión BA}}
+       & 1,0 & & & & \\ \cline{2-6}
+     & 2,0 & & & & \\ \cline{2-6}
+     & 3,0 & & & & \\ \cline{2-6}
+     & 4,0 & & & & \\ \cline{2-6}
+     & 5,0 & & & & \\ \cline{2-6}
+     & 6,0 & & & & \\ \cline{2-6}
+     & 7,0 & & & & \\
+    \hline
+    \end{tabular}
+\end{table}
+
+\begin{enumerate}[resume*=confdiodos]
+\item Conteste las siguientes preguntas:
+\end{enumerate}
+
+\begin{enumerate}[label=\arabic*., leftmargin=2em]
+    \item Al hacer la conexión del punto 2: ¿qué sucede? ¿Por qué?
+    \item Al hacer la conexión del punto 3: ¿qué sucede? ¿Por qué?
+    \item ¿El voltaje del diodo $D_1$ es positivo o negativo? ¿Por qué?
+    \item ¿El voltaje del diodo $D_2$ es positivo o negativo? ¿Por qué?
+    \item ¿A medida que aumenta el voltaje de la fuente, qué sucede con el LED y con el motor en
+          ambas conexiones?
+\end{enumerate}
+
+\FloatBarrier
+%=======================================================================
+\section{Ejercicio adicional: el diodo como capacitor variable}
+%=======================================================================
+% Ejercicio anadido a la guia original. Los datos de la figura del Bode salen
+% de LAB2.DAT (barrido en alterna exportado por el simulador) y se trazan con
+% herramientas/graficar_bode.py.
+
+% \ref a una subseccion solo imprime su numero (\thesubsection es \arabic), asi
+% que aqui se la nombra: un "seccion 2" a secas no le diria nada al alumno.
+En el apartado \emph{Polarización inversa} (\ref{sec:inversa}) se comprobó que un diodo
+polarizado inversamente apenas conduce. Sin embargo, no se comporta como un circuito abierto: al ensancharse
+la zona de deplexión, esta actúa como el dieléctrico entre dos placas conductoras y
+el diodo presenta una \emph{capacitancia de juntura} $C_j$ que \textbf{disminuye al
+aumentar la tensión inversa}. Un diodo usado de esta forma se denomina
+\emph{varicap} o \emph{varactor}.
+
+Si esa capacitancia se conecta a una bobina se obtiene un circuito resonante cuya
+frecuencia central puede ajustarse con una tensión continua. Es el principio con el
+que sintonizan los receptores de radio.
+
+\subsection{Circuito propuesto}
+
+Arme en el simulador el circuito de la figura~\ref{fig:resonador}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.80\textwidth]{circuito_resonador.png}
+    \caption{Resonador $LC$ sintonizado por la capacitancia de juntura del diodo $D_1$
+             en polarización inversa.}
+    \label{fig:resonador}
+\end{figure}
+
+\noindent Cada componente cumple una función precisa:
+
+\begin{itemize}
+    \item $V_2 = \qty{2}{\volt}$ polariza \textbf{inversamente} a $D_1$ a través de
+          $R_2 = \qty{100}{\kilo\ohm}$. El valor alto de $R_2$ inyecta la continua sin
+          cargar el circuito resonante.
+    \item $C_1 = \qty{10}{\micro\farad}$ acopla la señal y bloquea la continua, de modo
+          que la polarización de $D_1$ no se pierda por la fuente $V_1$.
+    \item $L_1 = \qty{10}{\micro\henry}$ resuena con la capacitancia $C_j$ del diodo.
+    \item $R_1 = \qty{1}{\kilo\ohm}$ fija el factor de calidad del conjunto.
+    \item $V_1$ entrega \qty{0.1}{\volt} eficaces, una amplitud deliberadamente pequeña:
+          si fuese grande, $D_1$ conduciría en los picos y dejaría de portarse como
+          capacitor.
+\end{itemize}
+
+\subsection{Procedimiento}
+
+\begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
+\item Ejecute un análisis en alterna (\emph{AC sweep}) sobre el nodo marcado como
+\texttt{C1(2)}, entre \qty{100}{\kilo\hertz} y \qty{1}{\giga\hertz}, con al menos
+10 puntos por década y el eje vertical en decibelios.
+
+\item Exporte el resultado a un archivo de texto. El archivo \texttt{LAB2.DAT} que
+acompaña a esta guía es una exportación de ese mismo barrido y sirve como referencia.
+
+\item Grafique la curva con Python, como se pide también en la
+sección~\ref{sec:analisis}. El resultado debe parecerse al de la
+figura~\ref{fig:bode}.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth]{bode_resonador.pdf}
+    \caption{Diagrama de Bode (magnitud) del resonador, trazado a partir de
+             \texttt{LAB2.DAT}. Por debajo de $f_0$ la respuesta sube a
+             \qty{20}{\decibel} por década porque domina la reactancia de $L_1$; por
+             encima cae a igual ritmo porque domina la de $C_j$.}
+    \label{fig:bode}
+\end{figure}
+
+\begin{notatec}{qué se puede y qué no se puede leer en estos datos}
+El barrido tiene 10 puntos por década, suficiente para situar el pico pero no para
+resolverlo con finura: el ancho de banda y el factor $Q$ que se obtengan de él son
+estimaciones. Además, las once columnas que exporta \texttt{LAB2.DAT} son idénticas
+entre sí, de modo que el parámetro del barrido no llegó a afectar al circuito; para
+estudiar cómo cambia $f_0$ con la tensión inversa hay que repetir la simulación
+variando $V_2$ a mano, tal como pide la tabla~\ref{tab:resonador}.
+\end{notatec}
+
+\FloatBarrier
+\subsection{Mediciones}
+
+Repita el barrido para cada valor de $V_2$ y complete la tabla~\ref{tab:resonador}.
+La capacitancia se despeja de la frecuencia de resonancia:
+
+\begin{equation}
+    f_0 = \frac{1}{2\pi\sqrt{L_1\,C_j}}
+    \qquad\Longrightarrow\qquad
+    C_j = \frac{1}{\left(2\pi f_0\right)^2 L_1}
+    \label{eq:resonancia}
+\end{equation}
+
+\begin{table}[H]
+    \centering
+    \caption{Frecuencia de resonancia del tanque en función de la tensión inversa
+             aplicada al diodo.}
+    \label{tab:resonador}
+    \small
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{|>{\centering\arraybackslash}m{2.6cm}|>{\centering\arraybackslash}m{2.8cm}
+                    |>{\centering\arraybackslash}m{2.8cm}|>{\centering\arraybackslash}m{3.4cm}|}
+    \hline
+    \textbf{Tensión inversa} ($V_2$) & \textbf{Frecuencia de resonancia} ($f_0$)
+      & \textbf{Ganancia en el pico} & \textbf{Capacitancia del diodo} ($C_j$)\\
+    \hline
+    \qty{0}{\volt}  & & & \\ \hline
+    \qty{1}{\volt}  & & & \\ \hline
+    \qty{2}{\volt}  & & & \\ \hline
+    \qty{5}{\volt}  & & & \\ \hline
+    \qty{10}{\volt} & & & \\ \hline
+    \end{tabular}
+\end{table}
+
+\subsection{Preguntas}
+
+\begin{enumerate}[label=\arabic*., leftmargin=2em]
+    \item A partir de la figura~\ref{fig:bode} y de la ecuación~\eqref{eq:resonancia},
+          calcule la capacitancia que presenta $D_1$ con $V_2 = \qty{2}{\volt}$.
+          Compárela con la que indica la hoja de datos del 1N4149.
+    \item La fuente $V_1$ está fijada en \qty{30.4}{\mega\hertz}, pero el pico de la
+          simulación no cae exactamente ahí. ¿A qué se debe la diferencia y qué
+          capacitancia haría que ambas coincidieran?
+    \item Según los valores que anotó en la tabla~\ref{tab:resonador}, ¿la frecuencia
+          de resonancia sube o baja al aumentar $V_2$? Explíquelo a partir del ancho de
+          la zona de deplexión.
+    \item ¿Qué ocurriría si $V_1$ entregase \qty{5}{\volt} eficaces en lugar de
+          \qty{0.1}{\volt}? ¿Seguiría siendo válido el análisis?
+    \item ¿Por qué se emplea aquí un 1N4149 y no el 1N4007 de las secciones
+          anteriores? Compare el tiempo de recuperación inversa de ambos.
+\end{enumerate}
+
+\FloatBarrier
+%=======================================================================
+\section{Análisis de resultados \puntos{4}}
+\label{sec:analisis}
+%=======================================================================
+\begin{itemize}
+    \item Realice una gráfica $V_D$ \emph{vs.} $I_D$ con las medidas anotadas en las
+          tablas~\ref{tab:directa} y~\ref{tab:inversa} (simulación y medición). Esta gráfica
+          deberá ser generada con Python. Identificar las regiones de la curva característica del
+          diodo semiconductor.
+\end{itemize}
+
+%=======================================================================
+\section{Cuestionario \puntos{2}}
+%=======================================================================
+\begin{enumerate}
+    \item ¿A partir de qué voltaje comienza a conducir el diodo?
+    \item ¿Por qué la corriente aumenta rápidamente después del voltaje umbral?
+    \item ¿Qué diferencias observa entre la simulación y el experimento?
+    \item ¿Qué ocurre cuando el diodo se polariza inversamente?
+    \item ¿Por qué la corriente inversa es muy pequeña?
+\end{enumerate}
+
+%=======================================================================
+\section{Conclusiones \puntos{2}}
+%=======================================================================
+\begin{itemize}
+    \item Deberán consignar 05 conclusiones como mínimo.
+\end{itemize}
+
+\end{document}

@@ -37,8 +37,8 @@ export const PRACTICAS = [
     documento: {
       // Visor principal embebido en la pagina
       src: 'practicas/lab1/Laboratorio_1.pdf',
-      paginas: 16,
-      peso: '1.6 MB',
+      paginas: 15,
+      peso: '1.4 MB',
     },
     descargas: [
       {
@@ -47,7 +47,7 @@ export const PRACTICAS = [
         archivo: 'practicas/lab1/Laboratorio_1.pdf',
         nombre: 'Laboratorio_1_Circuitos_Electronicos.pdf',
         tipo: 'PDF',
-        peso: '1.6 MB',
+        peso: '1.4 MB',
         destacado: true,
       },
       {
@@ -73,16 +73,64 @@ export const PRACTICAS = [
   {
     id: 'lab2',
     numero: 2,
-    titulo: 'Laboratorio 2',
-    subtitulo: 'Laboratorio propedéutico — EEB',
-    estado: 'proximamente',
+    titulo: 'El diodo semiconductor',
+    subtitulo: 'Curva característica en polarización directa e inversa',
+    estado: 'disponible',
     duracion: '2 horas',
     resumen:
-      'La transcripción a LaTeX de esta práctica todavía está en preparación. El documento original ya se encuentra en el repositorio.',
-    objetivos: [],
-    temas: [],
-    documento: null,
-    descargas: [],
+      'Estudio experimental del diodo semiconductor: se levanta punto a punto su curva característica en polarización directa e inversa, se contrastan las medidas con la simulación y se analizan configuraciones con LED y motor DC. Cierra con un ejercicio adicional sobre el diodo en inversa como capacitor variable de un resonador LC.',
+    objetivos: [
+      'Polarizar el diodo en forma directa y representar su curva característica de operación.',
+      'Polarizar el diodo en forma inversa y representar su curva característica de operación.',
+      'Analizar el comportamiento externo del diodo semiconductor en sus diferentes polarizaciones.',
+      'Contrastar los resultados experimentales con la simulación en Multisim.',
+      'Aprovechar la capacitancia de juntura del diodo en inversa para sintonizar un resonador LC.',
+    ],
+    temas: ['Diodo 1N4007', 'Curva característica', 'Polarización directa', 'Polarización inversa', 'Multisim', 'LED', 'Varicap', 'Diagrama de Bode'],
+    documento: {
+      // Visor principal embebido en la pagina
+      src: 'practicas/lab2/Laboratorio_2.pdf',
+      paginas: 10,
+      peso: '0.3 MB',
+    },
+    descargas: [
+      {
+        etiqueta: 'Práctica en PDF',
+        detalle: 'Documento compilado desde LaTeX — versión revisada',
+        archivo: 'practicas/lab2/Laboratorio_2.pdf',
+        nombre: 'Laboratorio_2_Circuitos_Electronicos.pdf',
+        tipo: 'PDF',
+        peso: '0.3 MB',
+        destacado: true,
+      },
+      {
+        etiqueta: 'Fuente LaTeX',
+        detalle: 'Código .tex para recompilar o reutilizar el formato',
+        archivo: 'practicas/lab2/Laboratorio_2.tex',
+        nombre: 'Laboratorio_2.tex',
+        tipo: 'TEX',
+        peso: '30 KB',
+        destacado: false,
+      },
+      {
+        etiqueta: 'Datos del resonador',
+        detalle: 'Barrido en frecuencia del simulador — para trazar el Bode del ejercicio adicional',
+        archivo: 'practicas/lab2/LAB2.DAT',
+        nombre: 'LAB2.DAT',
+        tipo: 'DAT',
+        peso: '5 KB',
+        destacado: false,
+      },
+      {
+        etiqueta: 'Guía original del docente',
+        detalle: 'Documento Word entregado en clase',
+        archivo: 'practicas/lab2/Laboratorio_2_original.doc',
+        nombre: 'Laboratorio_2_Diodo_Curva_Caracteristica.doc',
+        tipo: 'DOC',
+        peso: '2 MB',
+        destacado: false,
+      },
+    ],
   },
   {
     id: 'lab3',
