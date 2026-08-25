@@ -430,34 +430,35 @@ polarización entre \qtyrange{0.2}{0.7}{\volt} logra la conducción de corriente
 \noindent\textbf{Materiales y fungibles} (deben ser adquiridos por los alumnos). Comprar cada uno
 de los siguientes valores:
 \begin{itemize}
-    % Antes eran 04; la seccion VI usa un quinto en el resonador.
-    \item 05 diodos 1N4007.
+    % --- Semiconductores. Las cantidades son las que fijo el docente. Ojo: con solo
+    % 02 unidades del 1N4007 la seccion V, que monta D1 y D2 a la vez, deja libre uno
+    % solo para el resonador de la seccion VI; hay que desmontar entre secciones.
+    \item 02 diodos 1N4007.
+    % No existe zener comercial de 5,0 ni de 7,0 V exactos: la serie normalizada da
+    % 4,7 - 5,1 - 5,6 - 6,2 - 6,8 - 7,5. Se nombran las dos mas cercanas.
+    \item 02 diodos zener de \qty{5.1}{\volt} (1N4733A) o de \qty{6.8}{\volt} (1N4736A).
+    \item 02 diodos Schottky 1N5817.
+    \item 02 diodos LED azules.
+    \item 01 motor DC de \qty{12}{\volt} (pequeño).
+    % --- Pasivos.
     % El original dice "1/4 vatio"; se expresa como 0,25 W, igual que en el Laboratorio 1.
     \item 06 resistencias de \qty{1}{\kilo\ohm} (\qty{0.25}{\watt}).
-    \item 02 diodos LED azules.
-    % No existe un zener comercial de 5,0 V exactos: la serie normalizada salta de
-    % 4,7 a 5,1 V. Se pide el de 5,1 V, que es el 1N4733A de toda la vida.
-    \item 01 diodo zener de \qty{5.1}{\volt} (1N4733A).
-    \item 01 motor DC de \qty{12}{\volt} (pequeño).
-    % --- Componentes de la seccion VI (el diodo como capacitor variable). Antes no
-    % estaban en esta lista porque aquel apartado se resolvia solo en el simulador;
-    % ahora tambien se monta en protoboard, asi que hay que comprarlos. El diodo del
-    % resonador es el propio 1N4007: su juntura es mucho mayor que la de un 1N4148 y
-    % por eso su capacitancia compite con las parasitas del montaje.
-    \item 01 resistencia de \qty{470}{\kilo\ohm} (\qty{0.25}{\watt}).
-    \item 01 resistencia de \qty{68}{\kilo\ohm} (\qty{0.25}{\watt}).
+    \item 02 resistencias de \qty{68}{\kilo\ohm} (\qty{0.25}{\watt}).
+    \item 02 resistencias de \qty{470}{\kilo\ohm} (\qty{0.25}{\watt}).
     % Ceramico y no electrolitico: el electrolitico es polarizado y en este circuito
     % quedaria con la continua de V2 encima, ademas de portarse mal en radiofrecuencia.
-    \item 01 condensador cerámico de \qty{22}{\nano\farad} (marcado \texttt{223}).
+    \item 02 condensadores cerámicos de \qty{22}{\nano\farad} (marcado \texttt{223}).
     \item 01 condensador cerámico NP0/C0G de \qty{1}{\nano\farad} (marcado
           \texttt{102}).
+    % --- Para construir las bobinas.
     % Alambre: dos bobinas de 27 vueltas sobre 33,4 mm de diametro son 6,2 m; se piden
     % 7 m para tener margen si hay que rebobinar, que en la primera pasa casi siempre.
     \item \qty{7}{\metre} de alambre de cobre esmaltado AWG~26
           (\qty{0.40}{\milli\metre} de diámetro).
     \item 01 tubo de PVC de 1\textquotedbl{} (\qty{33}{\milli\metre} de diámetro
           exterior), de unos \qty{6}{\centi\metre} de largo.
-    \item Lija fina o cúter.
+    % --- Herramientas y varios.
+    \item Tijeras o cúter.
     \item 01 protoboard.
     \item 01 multímetro.
     \item Cables conectores para protoboard.
