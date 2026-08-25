@@ -423,8 +423,7 @@ polarización entre \qtyrange{0.2}{0.7}{\volt} logra la conducción de corriente
     \item Simulador de circuitos: Multisim o Proteus.
     % La guia exige Python dos veces (seccion VI.3 y analisis de resultados) pero
     % el original no lo listaba.
-    \item Python~3 con las bibliotecas \texttt{numpy} y \texttt{matplotlib}, para
-          trazar las gráficas que se piden en el análisis de resultados.
+    \item Python~3 con las bibliotecas \texttt{numpy} y \texttt{matplotlib}.
 \end{itemize}
 
 \vspace{0.25cm}
@@ -438,36 +437,27 @@ de los siguientes valores:
     \item 02 diodos LED azules.
     % No existe un zener comercial de 5,0 V exactos: la serie normalizada salta de
     % 4,7 a 5,1 V. Se pide el de 5,1 V, que es el 1N4733A de toda la vida.
-    \item 01 diodo zener de \qty{5.1}{\volt} (1N4733A o equivalente); es el valor
-          comercial más próximo a los \qty{5}{\volt}, pues la serie normalizada pasa
-          de \qty{4.7}{\volt} a \qty{5.1}{\volt} sin escala intermedia.
+    \item 01 diodo zener de \qty{5.1}{\volt} (1N4733A).
     \item 01 motor DC de \qty{12}{\volt} (pequeño).
     % --- Componentes de la seccion VI (el diodo como capacitor variable). Antes no
     % estaban en esta lista porque aquel apartado se resolvia solo en el simulador;
     % ahora tambien se monta en protoboard, asi que hay que comprarlos. El diodo del
     % resonador es el propio 1N4007: su juntura es mucho mayor que la de un 1N4148 y
     % por eso su capacitancia compite con las parasitas del montaje.
-    \item 01 resistencia de \qty{470}{\kilo\ohm} (\qty{0.25}{\watt}), para $R_1$.
-    \item 01 resistencia de \qty{68}{\kilo\ohm} (\qty{0.25}{\watt}), para $R_2$.
+    \item 01 resistencia de \qty{470}{\kilo\ohm} (\qty{0.25}{\watt}).
+    \item 01 resistencia de \qty{68}{\kilo\ohm} (\qty{0.25}{\watt}).
     % Ceramico y no electrolitico: el electrolitico es polarizado y en este circuito
     % quedaria con la continua de V2 encima, ademas de portarse mal en radiofrecuencia.
-    \item 01 condensador cerámico o de poliéster de \qty{22}{\nano\farad} (marcado
-          \texttt{223}), para el acoplamiento $C_2$. \emph{No} use un electrolítico: es
-          polarizado y aquí quedaría con la continua encima.
-    \item 01 condensador cerámico de \qty{1}{\nano\farad} (marcado \texttt{102}), tipo
-          \textbf{NP0/C0G}, para verificar el inductor. Aquí el dieléctrico sí importa,
-          porque su valor es el patrón de la medida.
+    \item 01 condensador cerámico de \qty{22}{\nano\farad} (marcado \texttt{223}).
+    \item 01 condensador cerámico NP0/C0G de \qty{1}{\nano\farad} (marcado
+          \texttt{102}).
     % Alambre: dos bobinas de 27 vueltas sobre 33,4 mm de diametro son 6,2 m; se piden
     % 7 m para tener margen si hay que rebobinar, que en la primera pasa casi siempre.
-    \item \qty{7}{\metre} de \textbf{alambre de cobre esmaltado AWG~26}
-          (\qty{0.40}{\milli\metre} de diámetro), para bobinar $L_1$ y $L_2$. Los
-          inductores no se compran: se construyen siguiendo el
-          apartado~\ref{sec:varicap}.\ref{sec:bobina}.
-    \item 01 tubo de \textbf{PVC de 1\textquotedbl} (\qty{33}{\milli\metre} de diámetro
-          exterior) de unos \qty{6}{\centi\metre} de largo, que sirve de formador de las
-          bobinas. Vale cualquier cilindro rígido no metálico de diámetro parecido: un
-          trozo de tubo, un frasco o un rollo de cinta.
-    \item Lija fina o cúter, para retirar el esmalte de las puntas del alambre.
+    \item \qty{7}{\metre} de alambre de cobre esmaltado AWG~26
+          (\qty{0.40}{\milli\metre} de diámetro).
+    \item 01 tubo de PVC de 1\textquotedbl{} (\qty{33}{\milli\metre} de diámetro
+          exterior), de unos \qty{6}{\centi\metre} de largo.
+    \item Lija fina o cúter.
     \item 01 protoboard.
     \item 01 multímetro.
     \item Cables conectores para protoboard.
