@@ -56,6 +56,37 @@
 %                              vectorial y asi no pixela ni engorda el archivo.
 %  Esta seccion todavia NO tiene puntaje asignado; las demas suman ya los 20.
 %
+%  Version 5 - Se pone al dia "Equipos y materiales", que habia quedado como
+%  estaba en (B) pese a los anadidos de la version 4:
+%    - Software: se admite Multisim o Proteus (la lista decia uno y el
+%      procedimiento pedia el otro) y se anade Python, que la guia exige en la
+%      seccion VI.3 y en el analisis de resultados pero no aparecia por ningun
+%      lado.
+%    - Los componentes del resonador (L1, C1, R1, R2, V2) NO se anaden a los
+%      fungibles: esa seccion es solo de simulador y no hay nada que comprar.
+%      En su lugar se abre la seccion VI con una nota que los enumera y lo
+%      deja dicho.
+%
+%  Version 6 - Se rehacen las dos tablas de lecturas para que la practica se
+%  pueda hacer con la Analog Discovery Studio, cuya fuente no llega a los 30 V
+%  que pedia la guia original (tiene fuentes programables de 1 a 5 V, railes
+%  fijos de 12/5/3,3 V y un generador W1 de +-5 V).
+%    - Tabla 1 (directa): de 18 a 13 lecturas, ahora 0,2..10 V. Las ocho
+%      primeras cubren el codo (0,2 a 1,0 V), donde V_D va de 199 a 529 mV; las
+%      cinco ultimas (2, 4, 6, 8 y 10 V) el tramo saturado, donde V_D apenas
+%      sube de 583 a 683 mV. El recorte no es solo instrumental: a 30 V
+%      circulaban 29 mA y R1, de 0,25 W, disipaba 0,86 W.
+%    - Tabla 2 (inversa): de 10 a 13 lecturas, con exactamente los mismos
+%      valores de V1 que la tabla 1, de modo que la curva conjunta del
+%      analisis de resultados quede simetrica respecto al origen.
+%    - La guia no dice que salida del ADS corresponde a cada tramo: se decidio
+%      dejar las tablas solas, sin nota de instrumentacion.
+%
+%    - A image22.png (figura 5) se le quito el marco discontinuo del simulador
+%      y el widget de zoom que lo acompanaba, para que la figura quede como la
+%      del circuito de directa (image21.png): solo el esquema, sin cromo de la
+%      aplicacion. La captura sin retocar sigue en image22_original.png.
+%
 %  Imagenes: image03-image05 provienen de (A); image21-image23 de (B).
 %  Las image06-image11 (condensador) quedan en imagenes/ pero ya no se usan.
 %  La figura 1 de (B) venia en EMF vectorial y se rasterizo a 2094 px.
@@ -294,7 +325,13 @@ polarización entre \qtyrange{0.2}{0.7}{\volt} logra la conducción de corriente
 
 \noindent\textbf{Software:}
 \begin{itemize}
-    \item Simulador Multisim.
+    % El procedimiento de IV.1 y IV.2 pedia "Proteus" mientras esta lista decia
+    % "Multisim". El circuito es el mismo en ambos, asi que se admiten los dos.
+    \item Simulador de circuitos: Multisim o Proteus.
+    % La guia exige Python dos veces (seccion VI.3 y analisis de resultados) pero
+    % el original no lo listaba.
+    \item Python~3 con las bibliotecas \texttt{numpy} y \texttt{matplotlib}, para
+          trazar las gráficas que se piden en el análisis de resultados.
 \end{itemize}
 
 \vspace{0.25cm}
@@ -319,7 +356,7 @@ de los siguientes valores:
 \subsection{Polarización directa \puntos{4}}
 
 \begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
-\item Arme el circuito de la figura~\ref{fig:pol-directa} y, con el simulador Proteus, tome las
+\item Arme el circuito de la figura~\ref{fig:pol-directa} y, en el simulador, tome las
 medidas solicitadas en la tabla~\ref{tab:directa}.
 
 \item En el protoboard, arme el circuito de la figura~\ref{fig:pol-directa}. Antes de encender la
@@ -364,24 +401,27 @@ fuente de alimentación considere lo siguiente:
       & & \textbf{Voltaje en el diodo} ($V_2$) & \textbf{Corriente en el diodo} ($I_D$)
         & \textbf{Voltaje en el diodo} ($V_2$) & \textbf{Corriente en el diodo} ($I_D$)\\
     \hline
-    1  & 0,1 & & & & \\ \hline
-    2  & 0,2 & & & & \\ \hline
-    3  & 0,3 & & & & \\ \hline
-    4  & 0,4 & & & & \\ \hline
-    5  & 0,5 & & & & \\ \hline
-    6  & 0,6 & & & & \\ \hline
-    7  & 0,7 & & & & \\ \hline
-    8  & 0,8 & & & & \\ \hline
-    9  & 1,0 & & & & \\ \hline
-    10 & 2   & & & & \\ \hline
-    11 & 4   & & & & \\ \hline
-    12 & 8   & & & & \\ \hline
-    13 & 12  & & & & \\ \hline
-    14 & 16  & & & & \\ \hline
-    15 & 20  & & & & \\ \hline
-    16 & 24  & & & & \\ \hline
-    17 & 28  & & & & \\ \hline
-    18 & 30  & & & & \\ \hline
+    % Tabla acortada de 18 a 13 lecturas, con el muestreo repartido en dos tramos:
+    %  - Lecturas 1 a 8 (0,2 a 1,0 V): el codo del diodo. Es donde V_D cambia de
+    %    verdad -- de 199 mV a 529 mV -- y donde esta toda la forma de la curva.
+    %  - Lecturas 9 a 13 (2 a 10 V): el tramo de conduccion, ya saturado. V_D solo
+    %    sube de 583 mV a 683 mV, asi que basta con puntos espaciados.
+    % El original llegaba a 30 V, donde circulaban 29 mA y R1 disipaba 0,86 W, muy
+    % por encima de los 0,25 W de la resistencia que pide la lista de materiales.
+    % A 10 V son 9,3 mA y 87 mW, holgadamente dentro de especificacion.
+    1  & 0,2 & & & & \\ \hline
+    2  & 0,4 & & & & \\ \hline
+    3  & 0,5 & & & & \\ \hline
+    4  & 0,6 & & & & \\ \hline
+    5  & 0,7 & & & & \\ \hline
+    6  & 0,8 & & & & \\ \hline
+    7  & 0,9 & & & & \\ \hline
+    8  & 1,0 & & & & \\ \hline
+    9  & 2,0 & & & & \\ \hline
+    10 & 4,0 & & & & \\ \hline
+    11 & 6,0 & & & & \\ \hline
+    12 & 8,0 & & & & \\ \hline
+    13 & 10  & & & & \\ \hline
     \end{tabular}
 \end{table}
 
@@ -390,7 +430,7 @@ fuente de alimentación considere lo siguiente:
 \label{sec:inversa}
 
 \begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
-\item Arme el circuito de la figura~\ref{fig:pol-inversa} en el simulador Proteus y tome las
+\item Arme el circuito de la figura~\ref{fig:pol-inversa} en el simulador y tome las
 medidas solicitadas en la tabla~\ref{tab:inversa}.
 
 \item En el protoboard, arme el circuito de la figura~\ref{fig:pol-inversa}. Antes de encender la
@@ -434,16 +474,25 @@ fuente de alimentación considere lo siguiente:
       & & \textbf{Voltaje en el diodo} ($V_D$) & \textbf{Corriente en el diodo} ($I_D$)
         & \textbf{Voltaje en el diodo} ($V_D$) & \textbf{Corriente en el diodo} ($I_D$)\\
     \hline
-    1  & 2,0  & & & & \\ \hline
-    2  & 4,0  & & & & \\ \hline
-    3  & 6,0  & & & & \\ \hline
-    4  & 8,0  & & & & \\ \hline
-    5  & 10   & & & & \\ \hline
-    6  & 12   & & & & \\ \hline
-    7  & 14   & & & & \\ \hline
-    8  & 16   & & & & \\ \hline
-    9  & 18   & & & & \\ \hline
-    10 & 20   & & & & \\ \hline
+    % Mismos valores de V1 que la tabla 1, a proposito: al recorrer las dos
+    % polarizaciones con la misma escala, la curva conjunta del analisis de
+    % resultados queda simetrica respecto al origen y cada punto de directa
+    % tiene su pareja en inversa. El recorrido acaba en 10 V y no en los 20 V
+    % del original; el limite no lo pone el 1N4007, que aguanta 1000 V
+    % inversos, sino la instrumentacion disponible.
+    1  & 0,2  & & & & \\ \hline
+    2  & 0,4  & & & & \\ \hline
+    3  & 0,5  & & & & \\ \hline
+    4  & 0,6  & & & & \\ \hline
+    5  & 0,7  & & & & \\ \hline
+    6  & 0,8  & & & & \\ \hline
+    7  & 0,9  & & & & \\ \hline
+    8  & 1,0  & & & & \\ \hline
+    9  & 2,0  & & & & \\ \hline
+    10 & 4,0  & & & & \\ \hline
+    11 & 6,0  & & & & \\ \hline
+    12 & 8,0  & & & & \\ \hline
+    13 & 10   & & & & \\ \hline
     \end{tabular}
 \end{table}
 
@@ -540,6 +589,17 @@ aumentar la tensión inversa}. Un diodo usado de esta forma se denomina
 Si esa capacitancia se conecta a una bobina se obtiene un circuito resonante cuya
 frecuencia central puede ajustarse con una tensión continua. Es el principio con el
 que sintonizan los receptores de radio.
+
+% Los componentes de esta seccion no estan en "Equipos y materiales" a proposito:
+% el ejercicio no se monta en protoboard, asi que no hay nada que comprar.
+\begin{notatec}{este ejercicio se resuelve solo en el simulador}
+Este apartado no se monta en el protoboard, de modo que sus componentes no figuran en
+la lista de materiales que hay que adquirir. Todos ellos se declaran dentro del
+simulador: la bobina $L_1$ de \qty{10}{\micro\henry}, el condensador de acoplamiento
+$C_1$ de \qty{10}{\micro\farad}, las resistencias $R_1$ de \qty{1}{\kilo\ohm} y $R_2$
+de \qty{100}{\kilo\ohm}, la fuente continua $V_2$ de \qty{2}{\volt} y el generador de
+alterna $V_1$. El diodo $D_1$ es el mismo 1N4007 empleado en el resto de la práctica.
+\end{notatec}
 
 \subsection{Circuito propuesto}
 

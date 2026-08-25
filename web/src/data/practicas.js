@@ -109,7 +109,7 @@ export const PRACTICAS = [
         archivo: 'practicas/lab2/Laboratorio_2.tex',
         nombre: 'Laboratorio_2.tex',
         tipo: 'TEX',
-        peso: '30 KB',
+        peso: '34 KB',
         destacado: false,
       },
       {
