@@ -78,7 +78,7 @@ export const PRACTICAS = [
     estado: 'disponible',
     duracion: '2 horas',
     resumen:
-      'Estudio experimental del diodo semiconductor: se levanta punto a punto su curva característica en polarización directa e inversa, se contrastan las medidas con la simulación y se analizan configuraciones con LED y motor DC. Cierra estudiando el diodo en inversa como capacitor variable de un resonador LC, con un inductor de núcleo de aire que los alumnos calculan y bobinan.',
+      'Estudio experimental del diodo semiconductor: se levanta punto a punto su curva característica en polarización directa e inversa, se contrastan las medidas con la simulación y se analizan configuraciones con LED y motor DC. Cierra estudiando el diodo en inversa como capacitor variable de un resonador LC, con un inductor de núcleo de aire que los alumnos calculan sobre un tubo de PVC y bobinan ellos mismos.',
     objetivos: [
       'Polarizar el diodo en forma directa y representar su curva característica de operación.',
       'Polarizar el diodo en forma inversa y representar su curva característica de operación.',
@@ -90,8 +90,8 @@ export const PRACTICAS = [
     documento: {
       // Visor principal embebido en la pagina
       src: 'practicas/lab2/Laboratorio_2.pdf',
-      paginas: 10,
-      peso: '0.3 MB',
+      paginas: 15,
+      peso: '0.4 MB',
     },
     descargas: [
       {
@@ -109,16 +109,16 @@ export const PRACTICAS = [
         archivo: 'practicas/lab2/Laboratorio_2.tex',
         nombre: 'Laboratorio_2.tex',
         tipo: 'TEX',
-        peso: '44 KB',
+        peso: '57 KB',
         destacado: false,
       },
       {
         etiqueta: 'Datos del resonador',
-        detalle: 'Barrido en frecuencia del simulador — para trazar el Bode del resonador LC',
-        archivo: 'practicas/lab2/LAB2.DAT',
-        nombre: 'LAB2.DAT',
+        detalle: 'Barrido del simulador, 1000 puntos de 0,1 a 8 MHz — para trazar el Bode del resonador LC',
+        archivo: 'practicas/lab2/resonador_4800khz.DAT',
+        nombre: 'resonador_4800khz.DAT',
         tipo: 'DAT',
-        peso: '5 KB',
+        peso: '120 KB',
         destacado: false,
       },
       {

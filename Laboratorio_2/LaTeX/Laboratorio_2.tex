@@ -49,9 +49,9 @@
 %  capacitor variable", que no procede de ninguna de las dos guias. Prolonga la
 %  polarizacion inversa (IV.2): el diodo en inversa presenta una capacitancia de
 %  juntura que, con L1, forma un resonador sintonizable por tension.
-%    - circuito_resonador.png  es el esquema del simulador.
+%    - resonador_4800khz.png   es el esquema del simulador.
 %    - bode_resonador.pdf      lo genera herramientas/graficar_bode.py leyendo
-%                              LAB2.DAT, el barrido en alterna exportado por el
+%                              resonador_4800khz.DAT, el barrido exportado por el
 %                              simulador. Va en PDF, no en PNG: una curva es
 %                              vectorial y asi no pixela ni engorda el archivo.
 %  Esta seccion todavia NO tiene puntaje asignado; las demas suman ya los 20.
@@ -111,8 +111,69 @@
 %      encima de los 30 MHz y el instrumental no llega, asi que sobre el montaje
 %      real se mide la polarizacion continua del diodo, que si se puede.
 %
-%  PENDIENTE: la seccion VI sigue sin puntaje. Las demas suman ya los 20 puntos,
-%  asi que darselo obliga a redistribuir; queda a criterio del docente.
+%  Version 8 - Se redimensiona el resonador de la seccion VI para que la medida
+%  sea realizable con la Analog Discovery Studio. El limite que manda no es el
+%  osciloscopio (30+ MHz por BNC, 9 MHz por MTE) sino el GENERADOR, que solo
+%  llega a 8 MHz; el Network Analyzer usa esas mismas salidas, de modo que 8 MHz
+%  es el techo de cualquier barrido. El diseno anterior resonaba en 31,6 MHz.
+%    - D1 pasa del 1N4149 al 1N4007. No es comodidad: la Cj de un diodo de senal
+%      son ~2,5 pF y queda sepultada bajo las parasitas del protoboard y de la
+%      punta; la del 1N4007 llega a ~39 pF sin polarizar y si domina el tanque.
+%      Como consecuencia se piden 05 diodos 1N4007 en vez de 04 y desaparece el
+%      1N4149 de la lista.
+%    - L1: de 10 a 60 uH.  R1: de 1 k a 470 k.  R2: de 100 k a 68 k.
+%      C1: de 10 uF electrolitico a 100 nF ceramico. V1: de 0,1 a 0,5 Vrms.
+%      Resultado: la resonancia barre de 3,3 a 6,2 MHz al variar V2 de 0 a 10 V,
+%      un corrimiento del 90 % entero por debajo del techo del generador.
+%    - R1 sube a 470 k porque el Q cargado lo fijan las resistencias, no los
+%      reactivos: con 1 k salia Q < 1, una loma inservible. Ahora Q ~ 30 y el
+%      pico mide 160 kHz, lo que a su vez OBLIGA a barrer con >= 1000 puntos.
+%      Se anade la ecuacion eq:q y la nota tecnica lo advierte.
+%    - C1 debe ser ceramico y no electrolitico: el electrolitico es polarizado y
+%      en este circuito queda con la continua de V2 encima. Ademas su valor no
+%      influye en la frecuencia (solo acopla), asi que el dielectrico da igual;
+%      no asi el de 1 nF de verificacion, que si debe ser NP0/C0G.
+%    - El apartado VI.2 se rehace entero para los 60 uH: formador de tubo de PVC
+%      de 1" (33,4 mm), AWG 26, 43 vueltas, 19,8 mm de largo, 4,8 m de alambre.
+%      Se anade una tabla de formadores alternativos (de 1/2" a 1 1/2") y, para
+%      los tubos anchos donde Wheeler deja de valer (l < 0,4 d), la correccion
+%      de Nagaoka con su tabla de k. La verificacion con el condensador de 1 nF
+%      pasa a 652 kHz, y se antepone el Impedance Analyzer de la tarjeta, que da
+%      la inductancia directamente.
+%    - El procedimiento se reordena: ahora EMPIEZA midiendo la Cj real del diodo
+%      con el Impedance Analyzer, porque la hoja de datos de un rectificador no
+%      garantiza ese parametro. Asi el alumno disena su bobina sobre un dato
+%      medido y la practica deja de depender de que consiga un componente
+%      concreto. Se anade el paso de medir el circuito real con el Network
+%      Analyzer, que sustituye a la medida con multimetro de la version 7.
+%    - La tabla de resultados gana una columna: f0 simulada y f0 medida, para
+%      que la comparacion entre ambas sea el objeto de las preguntas 1 y 2.
+%
+%  PENDIENTE 1: la seccion VI sigue sin puntaje. Las demas suman ya los 20
+%  puntos, asi que darselo obliga a redistribuir; queda a criterio del docente.
+%
+%  Version 9 - Llegan del simulador el esquema y el barrido del diseno nuevo, y
+%  el texto se alinea con ellos. Queda resuelto el PENDIENTE 2 de la version 8.
+%    - La figura pasa a resonador_4800khz.png y los datos a
+%      resonador_4800khz.DAT. El pico cae en 4,797 MHz con Q = 32, ancho de
+%      banda de 146 kHz y una Cj implicita de 18,3 pF: los tres valores
+%      confirman el dimensionado de la version 8 (se preveian ~5 MHz y Q ~ 30).
+%    - Los papeles de las resistencias van al reves de como los describia el
+%      texto: en el esquema R2 (68 k) inyecta la senal y R1 (470 k) la continua.
+%      Se reescribe la lista de componentes segun la figura. El Q no cambia,
+%      porque depende del paralelo de ambas y el paralelo es conmutativo.
+%    - El acoplamiento pasa de 100 nF a 22 nF: da igual, solo tiene que ser
+%      mucho mayor que la Cj, y lo es unas mil veces.
+%    - La bobina se parte en dos de 30 uH en serie, como en el esquema. Cada una
+%      baja de 43 a 27 vueltas sobre el mismo tubo de 1", que era el objetivo.
+%      Se anade una caja de seguridad sobre la inductancia mutua: la suma solo
+%      vale si no se acoplan. El alambre sube de 5 a 7 m.
+%    - graficar_bode.py: el .DAT nuevo viene en magnitud LINEAL y el anterior en
+%      dB. El script lo detecta solo (en este divisor pasivo la ganancia nunca
+%      pasa de 1, asi que un valor positivo delata datos lineales) y convierte.
+%      De paso, la ficha rotulaba "L1 = 10 uH" a mano y quedaba desfasada: ahora
+%      toma el valor de la constante del modulo. El ancho de banda se imprime en
+%      kHz cuando procede, porque "0.1 MHz" ocultaba la cifra que interesa.
 %
 %  Imagenes: image03-image05 provienen de (A); image21-image23 de (B).
 %  Las image06-image11 (condensador) quedan en imagenes/ pero ya no se usan.
@@ -370,26 +431,42 @@ polarización entre \qtyrange{0.2}{0.7}{\volt} logra la conducción de corriente
 \noindent\textbf{Materiales y fungibles} (deben ser adquiridos por los alumnos). Comprar cada uno
 de los siguientes valores:
 \begin{itemize}
-    \item 04 diodos 1N4007.
+    % Antes eran 04; la seccion VI usa un quinto en el resonador.
+    \item 05 diodos 1N4007.
     % El original dice "1/4 vatio"; se expresa como 0,25 W, igual que en el Laboratorio 1.
     \item 06 resistencias de \qty{1}{\kilo\ohm} (\qty{0.25}{\watt}).
     \item 02 diodos LED azules.
+    % No existe un zener comercial de 5,0 V exactos: la serie normalizada salta de
+    % 4,7 a 5,1 V. Se pide el de 5,1 V, que es el 1N4733A de toda la vida.
+    \item 01 diodo zener de \qty{5.1}{\volt} (1N4733A o equivalente); es el valor
+          comercial más próximo a los \qty{5}{\volt}, pues la serie normalizada pasa
+          de \qty{4.7}{\volt} a \qty{5.1}{\volt} sin escala intermedia.
     \item 01 motor DC de \qty{12}{\volt} (pequeño).
     % --- Componentes de la seccion VI (el diodo como capacitor variable). Antes no
     % estaban en esta lista porque aquel apartado se resolvia solo en el simulador;
-    % ahora tambien se monta en protoboard, asi que hay que comprarlos.
-    \item 01 diodo 1N4149 o 1N4148, para la sección~\ref{sec:varicap}. \emph{No} sirve el
-          1N4007 en su lugar (véase la pregunta 5 de esa sección).
-    \item 01 resistencia de \qty{100}{\kilo\ohm} (\qty{0.25}{\watt}).
-    \item 01 condensador electrolítico de \qty{10}{\micro\farad} (\qty{25}{\volt} o más).
-    \item 01 condensador cerámico de \qty{1}{\nano\farad} con tolerancia del
-          \qty{5}{\percent} o mejor, para verificar el inductor.
-    % El alambre calculado son ~2,2 m; se piden 3 m para tener margen de sobra si hay
-    % que rebobinar la primera bobina, que casi siempre queda mal.
-    \item \qty{3}{\metre} de alambre de cobre esmaltado AWG~24 y un cilindro rígido de
-          \qty{10}{\milli\metre} de diámetro que sirva de formador (un tubo de PVC, una
-          broca o el cuerpo de un plumón), para bobinar $L_1$: el inductor no se compra,
-          se construye siguiendo el apartado~\ref{sec:varicap}.\ref{sec:bobina}.
+    % ahora tambien se monta en protoboard, asi que hay que comprarlos. El diodo del
+    % resonador es el propio 1N4007: su juntura es mucho mayor que la de un 1N4148 y
+    % por eso su capacitancia compite con las parasitas del montaje.
+    \item 01 resistencia de \qty{470}{\kilo\ohm} (\qty{0.25}{\watt}), para $R_1$.
+    \item 01 resistencia de \qty{68}{\kilo\ohm} (\qty{0.25}{\watt}), para $R_2$.
+    % Ceramico y no electrolitico: el electrolitico es polarizado y en este circuito
+    % quedaria con la continua de V2 encima, ademas de portarse mal en radiofrecuencia.
+    \item 01 condensador cerámico o de poliéster de \qty{22}{\nano\farad} (marcado
+          \texttt{223}), para el acoplamiento $C_2$. \emph{No} use un electrolítico: es
+          polarizado y aquí quedaría con la continua encima.
+    \item 01 condensador cerámico de \qty{1}{\nano\farad} (marcado \texttt{102}), tipo
+          \textbf{NP0/C0G}, para verificar el inductor. Aquí el dieléctrico sí importa,
+          porque su valor es el patrón de la medida.
+    % Alambre: dos bobinas de 27 vueltas sobre 33,4 mm de diametro son 6,2 m; se piden
+    % 7 m para tener margen si hay que rebobinar, que en la primera pasa casi siempre.
+    \item \qty{7}{\metre} de \textbf{alambre de cobre esmaltado AWG~26}
+          (\qty{0.40}{\milli\metre} de diámetro), para bobinar $L_1$ y $L_2$. Los
+          inductores no se compran: se construyen siguiendo el
+          apartado~\ref{sec:varicap}.\ref{sec:bobina}.
+    \item 01 tubo de \textbf{PVC de 1\textquotedbl} (\qty{33}{\milli\metre} de diámetro
+          exterior) de unos \qty{6}{\centi\metre} de largo, que sirve de formador de las
+          bobinas. Vale cualquier cilindro rígido no metálico de diámetro parecido: un
+          trozo de tubo, un frasco o un rollo de cinta.
     \item Lija fina o cúter, para retirar el esmalte de las puntas del alambre.
     \item 01 protoboard.
     \item 01 multímetro.
@@ -623,7 +700,7 @@ y luego tome las medidas solicitadas en la tabla~\ref{tab:conf}.
 \label{sec:varicap}
 %=======================================================================
 % Seccion anadida a la guia original. Los datos de la figura del Bode salen
-% de LAB2.DAT (barrido en alterna exportado por el simulador) y se trazan con
+% de resonador_4800khz.DAT (barrido en alterna exportado por el simulador) y se trazan con
 % herramientas/graficar_bode.py.
 
 % \ref a una subseccion solo imprime su numero (\thesubsection es \arabic), asi
@@ -646,7 +723,7 @@ el protoboard.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.80\textwidth]{circuito_resonador.png}
+    \includegraphics[width=0.80\textwidth]{resonador_4800khz.png}
     \caption{Resonador $LC$ sintonizado por la capacitancia de juntura del diodo $D_1$
              en polarización inversa.}
     \label{fig:resonador}
@@ -655,17 +732,55 @@ el protoboard.
 \noindent Cada componente cumple una función precisa:
 
 \begin{itemize}
-    \item $V_2 = \qty{2}{\volt}$ polariza \textbf{inversamente} a $D_1$ a través de
-          $R_2 = \qty{100}{\kilo\ohm}$. El valor alto de $R_2$ inyecta la continua sin
-          cargar el circuito resonante.
-    \item $C_1 = \qty{10}{\micro\farad}$ acopla la señal y bloquea la continua, de modo
-          que la polarización de $D_1$ no se pierda por la fuente $V_1$.
-    \item $L_1 = \qty{10}{\micro\henry}$ resuena con la capacitancia $C_j$ del diodo.
-    \item $R_1 = \qty{1}{\kilo\ohm}$ fija el factor de calidad del conjunto.
-    \item $V_1$ entrega \qty{0.1}{\volt} eficaces, una amplitud deliberadamente pequeña:
-          si fuese grande, $D_1$ conduciría en los picos y dejaría de portarse como
-          capacitor.
+    \item $R_2 = \qty{68}{\kilo\ohm}$ inyecta la señal de $V_1$ en el tanque.
+    \item $R_1 = \qty{470}{\kilo\ohm}$ lleva la continua de $V_2$ al diodo, que queda
+          así polarizado \textbf{inversamente}, sin cargar el circuito resonante.
+    \item $C_2 = \qty{22}{\nano\farad}$ acopla la señal y bloquea la continua, de modo
+          que la polarización de $D_1$ no se pierda por la fuente $V_1$. Basta con que
+          sea mucho mayor que la capacitancia del diodo --- lo es unas mil veces ---,
+          así que su valor exacto no influye en la frecuencia. Debe ser \emph{cerámico}
+          o de poliéster, nunca electrolítico: este último es polarizado y aquí
+          quedaría con la continua de $V_2$ encima.
+    \item $L_1$ y $L_2$, de \qty{30}{\micro\henry} cada una, suman los
+          \qty{60}{\micro\henry} que resuenan con la capacitancia $C_j$ del diodo. Son
+          las bobinas que se construyen en el apartado~\ref{sec:bobina}.
+    \item $D_1$ es el 1N4007. Su capacitancia de juntura es la que sintoniza el
+          circuito, y varía con $V_2$: ese es todo el objeto del apartado.
+    \item $V_1$ entrega \qty{0.5}{\volt} eficaces, una amplitud deliberadamente pequeña
+          frente a la polarización, porque si fuese comparable a ella $D_1$ conduciría
+          en los picos y dejaría de portarse como capacitor.
 \end{itemize}
+
+\noindent El ancho del pico lo gobiernan las resistencias, no los reactivos. Ambas
+quedan, en alterna, en paralelo con el tanque, de modo que el factor de calidad cargado
+vale
+
+\begin{equation}
+    Q = \frac{R_1 \parallel R_2}{2\pi f_0 (L_1 + L_2)}
+    \qquad\text{y el ancho de banda del pico es}\qquad
+    \Delta f = \frac{f_0}{Q}
+    \label{eq:q}
+\end{equation}
+
+\noindent Con los valores de la figura sale $Q \approx 30$ y un pico de unos
+\qty{160}{\kilo\hertz} de ancho. Si se hubiera dejado $R_1$ en \qty{1}{\kilo\ohm}, el
+$Q$ caería por debajo de la unidad y en lugar de un pico se vería una loma inservible
+para medir. \textbf{Consecuencia práctica:} un pico tan estrecho exige un barrido con
+al menos mil puntos, o se pasa de largo sin verlo.
+
+% El diodo del resonador es el mismo 1N4007 del resto de la practica, y no es una
+% eleccion de comodidad: ver la nota de abajo.
+\begin{notatec}{por qué el resonador usa el 1N4007 y no un diodo de señal}
+La capacitancia que se quiere medir compite con todas las capacidades parásitas del
+montaje: la del propio protoboard, la de los cables y la de la punta del osciloscopio.
+Un diodo de señal como el 1N4148 apenas ofrece unos \qty{2}{\pico\farad}, que quedan
+sepultados bajo esas parásitas. El 1N4007 es un rectificador de juntura mucho mayor y
+llega a unos \qty{39}{\pico\farad} sin polarizar, de modo que \emph{sí} domina el
+circuito y su variación se puede observar. La contrapartida es que su capacitancia no
+está garantizada por el fabricante --- nadie diseña un rectificador pensando en ella ---,
+y la dispersión entre unidades es grande. Por eso el procedimiento empieza midiéndola
+en lugar de darla por buena.
+\end{notatec}
 
 \FloatBarrier
 %-----------------------------------------------------------------------
@@ -678,11 +793,24 @@ el protoboard.
 % solenoide de una capa con nucleo de aire, cuyo valor sale de la geometria y
 % se puede calcular de antemano; ese es justamente el ejercicio.
 
-$L_1$ es el único componente de la práctica que no se compra hecho: se bobina. Un
-solenoide de una sola capa con núcleo de aire tiene la virtud de que su inductancia
-queda fijada por la pura geometría --- diámetro, longitud y número de vueltas ---, sin
-depender de ningún material magnético. Eso permite calcular la bobina antes de dar la
-primera vuelta.
+Las bobinas son los únicos componentes de la práctica que no se compran hechos: se
+bobinan. Un solenoide de una sola capa con núcleo de aire tiene la virtud de que su
+inductancia queda fijada por la pura geometría --- diámetro, longitud y número de
+vueltas ---, sin depender de ningún material magnético. Eso permite calcularla antes de
+dar la primera vuelta.
+
+El circuito pide \qty{60}{\micro\henry}, y se obtienen con \textbf{dos bobinas iguales
+de \qty{30}{\micro\henry} conectadas en serie}, tal como aparecen en la
+figura~\ref{fig:resonador}. En serie las inductancias se suman, de modo que dos de 30
+dan 60. Se reparte así, y no en una sola bobina, porque cada una necesita entonces 27
+vueltas en lugar de las 43 que exigiría el valor completo.
+
+\begin{seguridad}{las dos bobinas no deben acoplarse}
+La suma $L = L_1 + L_2$ solo es exacta si las bobinas no se ven magnéticamente. Si
+quedan cerca y alineadas aparece la inductancia mutua $M$, y el total pasa a ser
+$L_1 + L_2 \pm 2M$ --- más o menos según la orientación ---, con lo que el cálculo deja
+de valer. Sepárelas al menos dos diámetros, o colóquelas perpendiculares entre sí.
+\end{seguridad}
 
 \subsubsection*{La fórmula}
 
@@ -697,52 +825,59 @@ en milímetros:
 \noindent donde $N$ es el número de vueltas, $r$ el \emph{radio medio} del bobinado (el
 del formador más el grosor del alambre) y $\ell$ la longitud que ocupa el bobinado.
 La expresión es exacta dentro del \qty{1}{\percent} mientras la bobina sea más larga
-que \num{0.4} diámetros, condición que el diseño de abajo cumple con holgura.
+que \num{0.4} diámetros; más abajo se indica qué hacer cuando esa condición no se
+cumple.
 
 \subsubsection*{El cálculo}
 
-Se parte de dos decisiones de construcción: un formador de \qty{10}{\milli\metre} de
-diámetro y alambre esmaltado AWG~24, que mide \qty{0.51}{\milli\metre} de cobre y unos
-\qty{0.57}{\milli\metre} con el esmalte. Bobinando las vueltas \emph{juntas}, cada una
-avanza ese paso $p$, de modo que las tres incógnitas se reducen a una sola:
+Se parte de dos decisiones de construcción: un tubo de PVC de 1\textquotedbl{} como
+formador, de \qty{33.4}{\milli\metre} de diámetro exterior, y alambre esmaltado
+AWG~26, que mide \qty{0.40}{\milli\metre} de cobre y unos \qty{0.46}{\milli\metre} con
+el esmalte. Bobinando las vueltas \emph{juntas}, cada una avanza ese paso $p$, de modo
+que las tres incógnitas se reducen a una sola:
 
 \begin{equation}
-    \ell = p\,N = 0.57\,N
+    \ell = p\,N = 0.46\,N
     \qquad\qquad
-    r = \frac{\qty{10}{\milli\metre} + \qty{0.57}{\milli\metre}}{2} = \qty{5.29}{\milli\metre}
+    r = \frac{\qty{33.4}{\milli\metre} + \qty{0.46}{\milli\metre}}{2} = \qty{16.93}{\milli\metre}
     \label{eq:geometria}
 \end{equation}
 
-\noindent Sustituyendo ambas en la ecuación~\eqref{eq:wheeler} e imponiendo
-$L_1 = \qty{10}{\micro\henry}$:
+\noindent Sustituyendo ambas en la ecuación~\eqref{eq:wheeler} e imponiendo los
+\qty{30}{\micro\henry} de cada bobina:
 
 \begin{equation*}
-    10 = \frac{0.03937 \cdot (5.29)^{2} \cdot N^{2}}{9 (5.29) + 10 (0.57\,N)}
-       = \frac{1.102\,N^{2}}{47.6 + 5.70\,N}
+    30 = \frac{0.03937 \cdot (16.93)^{2} \cdot N^{2}}{9 (16.93) + 10 (0.46\,N)}
+       = \frac{11.284\,N^{2}}{152.4 + 4.60\,N}
 \end{equation*}
 
 \noindent que reordenada es una simple ecuación de segundo grado en $N$:
 
 \begin{equation*}
-    1.102\,N^{2} - 57.0\,N - 476 = 0
+    11.284\,N^{2} - 138\,N - 4572 = 0
     \qquad\Longrightarrow\qquad
-    N = \frac{57.0 + \sqrt{57.0^{2} + 4(1.102)(476)}}{2(1.102)} = 59.0
+    N = \frac{138 + \sqrt{138^{2} + 4(11.284)(4572)}}{2(11.284)} = 27.2
 \end{equation*}
 
-\noindent Son, pues, \textbf{59 vueltas}, que ocupan $\ell = 0.57 \times 59 =
-\qty{33.6}{\milli\metre}$. La bobina resulta \num{3.2} veces más larga que ancha, dentro
-del rango de validez de Wheeler. El alambre que hay que cortar es el perímetro medio por
-el número de vueltas, más un margen para las puntas:
+\noindent Son, pues, \textbf{27 vueltas por bobina}, que ocupan $\ell = 0.46 \times 27 =
+\qty{12.4}{\milli\metre}$. El alambre que hay que cortar para las dos es el perímetro
+medio por el número de vueltas, más un margen para las cuatro puntas:
 
 \begin{equation*}
-    \text{longitud} = N \pi d_{\text{medio}} + 2 (\qty{100}{\milli\metre})
-                    = 59 \pi (\qty{10.57}{\milli\metre}) + \qty{200}{\milli\metre}
-                    \approx \qty{2.2}{\metre}
+    \text{longitud} = 2 \left[ N \pi d_{\text{medio}} \right] + 4 (\qty{100}{\milli\metre})
+                    = 2 \left[ 27 \pi (\qty{33.86}{\milli\metre}) \right] + \qty{400}{\milli\metre}
+                    \approx \qty{6.2}{\metre}
 \end{equation*}
+
+\noindent Conviene advertir que con estas proporciones $\ell/d = \num{0.37}$, apenas
+por debajo del \num{0.4} que Wheeler exige: la fórmula queda al borde de su rango y el
+valor real puede desviarse cerca de un \qty{8}{\percent}. No es motivo para cambiar de
+diseño, pero sí para no saltarse la verificación del final del apartado.
 
 \begin{table}[H]
     \centering
-    \caption{Resumen del diseño de $L_1$: solenoide de una capa con núcleo de aire.}
+    \caption{Resumen del diseño de \emph{cada} bobina: solenoide de una capa con núcleo
+             de aire. Hay que construir dos iguales.}
     \label{tab:bobina}
     \small
     \renewcommand{\arraystretch}{1.35}
@@ -752,110 +887,200 @@ el número de vueltas, más un margen para las puntas:
     \hline
     \textbf{Parámetro} & \textbf{Símbolo} & \textbf{Valor}\\
     \hline
-    Diámetro del formador          & $d$    & \qty{10}{\milli\metre} \\ \hline
-    Calibre del alambre            & ---    & AWG 24 (\qty{0.51}{\milli\metre}) \\ \hline
-    Paso entre vueltas, con esmalte& $p$    & \qty{0.57}{\milli\metre} \\ \hline
-    Radio medio del bobinado       & $r$    & \qty{5.29}{\milli\metre} \\ \hline
-    Número de vueltas              & $N$    & 59 \\ \hline
-    Longitud del bobinado          & $\ell$ & \qty{33.6}{\milli\metre} \\ \hline
-    Alambre necesario              & ---    & \qty{2.2}{\metre} \\ \hline
-    Inductancia resultante         & $L_1$  & \qty{10.0}{\micro\henry} \\ \hline
+    Diámetro del formador (PVC 1\textquotedbl) & $d$    & \qty{33.4}{\milli\metre} \\ \hline
+    Calibre del alambre            & ---    & AWG 26 (\qty{0.40}{\milli\metre}) \\ \hline
+    Paso entre vueltas, con esmalte& $p$    & \qty{0.46}{\milli\metre} \\ \hline
+    Radio medio del bobinado       & $r$    & \qty{16.93}{\milli\metre} \\ \hline
+    Número de vueltas              & $N$    & 27 \\ \hline
+    Longitud del bobinado          & $\ell$ & \qty{12.4}{\milli\metre} \\ \hline
+    Alambre para las dos           & ---    & \qty{6.2}{\metre} \\ \hline
+    Inductancia de cada una        & $L$    & \qty{29.7}{\micro\henry} \\ \hline
+    Inductancia en serie           & $L_1{+}L_2$ & \qty{59.4}{\micro\henry} \\ \hline
     \end{tabular}
 \end{table}
 
-\subsubsection*{Por qué AWG 24}
+\subsubsection*{Si se consigue otro tubo}
+
+El formador no tiene por qué ser el de 1\textquotedbl. Cualquier cilindro rígido no
+metálico sirve, resolviendo de nuevo la ecuación~\eqref{eq:wheeler}. Cuanto más ancho
+el tubo, menos vueltas hacen falta:
+
+\begin{table}[H]
+    \centering
+    \caption{Vueltas necesarias por bobina para los \qty{30}{\micro\henry} de cada una,
+             según el tubo y siempre con alambre AWG 26 bobinado junto.}
+    \label{tab:formadores}
+    \small
+    \renewcommand{\arraystretch}{1.3}
+    \begin{tabular}{|>{\centering\arraybackslash}m{2.6cm}|>{\centering\arraybackslash}m{2.2cm}
+                    |>{\centering\arraybackslash}m{2.0cm}|>{\centering\arraybackslash}m{2.2cm}
+                    |>{\centering\arraybackslash}m{3.4cm}|}
+    \hline
+    \textbf{Tubo PVC} & \textbf{Diámetro} & \textbf{Vueltas} & \textbf{Largo}
+      & \textbf{¿Vale Wheeler?}\\
+    \hline
+    1/2\textquotedbl  & \qty{21}{\milli\metre} & 45 & \qty{21}{\milli\metre} & sí \\ \hline
+    3/4\textquotedbl  & \qty{27}{\milli\metre} & 34 & \qty{16}{\milli\metre} & sí \\ \hline
+    \textbf{1\textquotedbl} & \qty{33}{\milli\metre} & \textbf{27} & \qty{12}{\milli\metre} & al límite \\ \hline
+    1 1/4\textquotedbl & \qty{42}{\milli\metre} & 22 & \qty{10}{\milli\metre} & no \\ \hline
+    1 1/2\textquotedbl & \qty{48}{\milli\metre} & 20 & \qty{9}{\milli\metre} & no \\ \hline
+    \end{tabular}
+\end{table}
+
+\noindent Se recomienda el de 1\textquotedbl{} porque equilibra las dos cosas: 27
+vueltas se bobinan en un momento y la fórmula de Wheeler todavía sirve, aunque justo en
+su límite. Con el de 3/4\textquotedbl{} el cálculo es más fiable a costa de siete
+vueltas más; con los tubos más anchos las vueltas bajan aún más, pero la bobina se
+vuelve un anillo plano y hay que corregir el cálculo como se explica enseguida.
+
+\subsubsection*{Por qué AWG 26}
 
 El calibre no se elige aquí por la corriente, que es de apenas unos microamperios, sino
-por dos razones distintas. La primera es mecánica: el AWG~24 es lo bastante rígido para
-que la bobina se sostenga sola al retirar el formador y no cambie de forma --- y con
-ella de inductancia --- al manipularla.
+por dos razones distintas. La primera es mecánica: el AWG~26 es lo bastante rígido para
+que la bobina conserve su forma --- y con ella su inductancia --- al manipularla, y a la
+vez lo bastante fino para que las 27 vueltas quepan en poco más de un centímetro de
+tubo.
 
 La segunda es el \textbf{efecto pelicular}. A frecuencias altas la corriente no ocupa
 toda la sección del conductor, sino una capa superficial de espesor
 
 \begin{equation}
     \delta\,[\unit{\milli\metre}] = \frac{66}{\sqrt{f\,[\unit{\hertz}]}}
-    \qquad\text{que en cobre y a \qty{30}{\mega\hertz} vale}\qquad
-    \delta \approx \qty{12}{\micro\metre}
+    \qquad\text{que en cobre y a \qty{5}{\mega\hertz} vale}\qquad
+    \delta \approx \qty{30}{\micro\metre}
     \label{eq:pelicular}
 \end{equation}
 
-\noindent Es decir: de los \qty{255}{\micro\metre} de radio que tiene el AWG~24, solo los
-\num{12} más externos conducen. Engrosar el alambre no añade cobre útil en proporción a
-su sección, sino a su \emph{perímetro}, y por eso pasar a un calibre mucho mayor apenas
-mejora las pérdidas mientras estorba el bobinado. Un calibre bastante más fino, en
-cambio, sí las empeora y además no se sostiene. El AWG~24 es el punto de equilibrio; el
-AWG~22 y el AWG~26 también sirven, recalculando $p$ y por tanto $N$.
+\noindent Es decir: de los \qty{202}{\micro\metre} de radio que tiene el AWG~26, solo
+los \num{30} más externos conducen. Engrosar el alambre no añade cobre útil en
+proporción a su sección, sino a su \emph{perímetro}, de modo que pasar a un calibre
+mucho mayor apenas mejora las pérdidas mientras estorba el bobinado. El AWG~24 y el
+AWG~28 también sirven, recalculando $p$ y por tanto $N$.
+
+\subsubsection*{Cuando la bobina es corta y ancha: Nagaoka}
+
+Wheeler deja de ser fiable en cuanto $\ell < 0.4\,d$, que es lo que ocurre con los tubos
+de 1 1/4\textquotedbl{} en adelante. Para esos casos se emplea la expresión del
+solenoide corregida por el factor de Nagaoka $k$:
+
+\begin{equation}
+    L = k\,\frac{\mu_0 N^{2} A}{\ell}
+    \qquad\text{con } A = \pi r^{2}
+    \label{eq:nagaoka}
+\end{equation}
+
+\begin{table}[H]
+    \centering
+    \caption{Factor de Nagaoka para bobinas cortas.}
+    \label{tab:nagaoka}
+    \small
+    \begin{tabular}{|c|c|c|c|c|c|c|}
+    \hline
+    $\ell/d$ & \num{0.1} & \num{0.2} & \num{0.3} & \num{0.4} & \num{0.5} & \num{1.0}\\
+    \hline
+    $k$ & \num{0.196} & \num{0.302} & \num{0.429} & \num{0.511} & \num{0.578} & \num{0.688}\\
+    \hline
+    \end{tabular}
+\end{table}
+
+\noindent Omitir $k$ en una bobina plana no es un detalle menor: con $\ell/d = 0.2$ el
+error supera el factor tres.
 
 \subsubsection*{Verificación}
 
-Como el valor depende de lo apretado que quede el bobinado, hay que comprobarlo. Mida la
-longitud real $\ell$ del solenoide terminado y vuelva a evaluar la
-ecuación~\eqref{eq:wheeler} con ella. Después contrástelo por resonancia, que es una
-medida y no una estimación: conecte en paralelo con la bobina el condensador cerámico de
-\qty{1}{\nano\farad}, haga un barrido en alterna y localice el pico. De la frecuencia
-medida se despeja la inductancia:
+Como el valor depende de lo apretado que quede el bobinado, hay que comprobarlo. La vía
+más directa es el instrumento \emph{Impedance Analyzer} de la tarjeta, que entrega la
+inductancia en microhenrios sin necesidad de cálculo alguno.
+
+Si no se dispone de él, se contrasta por resonancia: conecte \emph{las dos bobinas ya
+en serie} en paralelo con el condensador cerámico de \qty{1}{\nano\farad}, haga un
+barrido en alterna y localice el pico. De la frecuencia medida se despeja la
+inductancia:
 
 \begin{equation}
     L_1 = \frac{1}{\left(2\pi f_0\right)^{2} C}
-    \qquad\text{con \qty{1}{\nano\farad} y \qty{10}{\micro\henry} se espera}\qquad
-    f_0 \approx \qty{1.59}{\mega\hertz}
+    \qquad\text{con \qty{1}{\nano\farad} y \qty{60}{\micro\henry} se espera}\qquad
+    f_0 \approx \qty{652}{\kilo\hertz}
     \label{eq:verificacion}
 \end{equation}
 
 \noindent Una diferencia de un \qtyrange{5}{10}{\percent} respecto de los
-\qty{10}{\micro\henry} es normal y no invalida nada: basta con anotar el valor real
+\qty{60}{\micro\henry} es normal y no invalida nada: basta con anotar el valor real
 medido y usar \emph{ese} en los cálculos de la tabla~\ref{tab:resonador}, no el nominal.
 
 \FloatBarrier
 \subsection{Procedimiento}
 
 \begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
-\item Ejecute un análisis en alterna (\emph{AC sweep}) sobre el nodo marcado como
-\texttt{C1(2)}, entre \qty{100}{\kilo\hertz} y \qty{1}{\giga\hertz}, con al menos
-10 puntos por década y el eje vertical en decibelios.
+% Primer paso nuevo: medir antes de disenar. La Cj de un rectificador no esta
+% garantizada por catalogo, asi que partir de la hoja de datos es partir de una
+% suposicion. El Impedance Analyzer de la tarjeta la da directamente.
+\item \textbf{Mida la capacitancia de su diodo antes de nada.} Con el instrumento
+\emph{Impedance Analyzer}, y polarizando $D_1$ en inversa a \qty{2}{\volt}, anote su
+$C_j$. La hoja de datos de un rectificador no garantiza este parámetro --- nadie
+fabrica un 1N4007 pensando en su capacitancia ---, de modo que la dispersión entre
+unidades es grande y conviene trabajar con el valor real y no con el nominal.
 
-\item Exporte el resultado a un archivo de texto. El archivo \texttt{LAB2.DAT} que
+\item Construya y verifique $L_1$ siguiendo el apartado~\ref{sec:bobina}. Si su $C_j$
+medida se aparta mucho de los \qty{20}{\pico\farad} previstos, recalcule la
+inductancia que necesita con $L_1 = 1/\left[(2\pi f_0)^2 C_j\right]$ para que la
+resonancia le caiga hacia los \qty{5}{\mega\hertz}, y vuelva a resolver el número de
+vueltas.
+
+\item Arme el circuito en el simulador y ejecute un análisis en alterna
+(\emph{AC sweep}) sobre el nodo marcado como \texttt{C1(2)}, entre
+\qty{500}{\kilo\hertz} y \qty{20}{\mega\hertz}, con el eje vertical en decibelios.
+% El pico es estrecho (Q ~ 30): con pocos puntos el barrido pasa de largo sin verlo.
+Use \textbf{al menos mil puntos}: con $Q \approx 30$ el pico mide apenas unos
+\qty{160}{\kilo\hertz} de ancho y un barrido grueso se lo salta sin registrarlo.
+
+\item Exporte el resultado a un archivo de texto. El archivo \texttt{resonador\_4800khz.DAT} que
 acompaña a esta guía es una exportación de ese mismo barrido y sirve como referencia.
 
 \item Grafique la curva con Python, como se pide también en la
 sección~\ref{sec:analisis}. El resultado debe parecerse al de la
 figura~\ref{fig:bode}.
 
-% El barrido en alterna de este circuito cae por encima de los 30 MHz, fuera del
-% alcance del instrumental del laboratorio: sobre el montaje real se comprueba la
-% polarizacion continua, que es lo que si se puede medir con el multimetro.
-\item Sobre el circuito montado en el protoboard, mida con el multímetro la tensión
-continua entre el ánodo y el cátodo de $D_1$ y confirme que está polarizado
-inversamente con los \qty{2}{\volt} que entrega $V_2$. Verifique también que por
-$R_2$ prácticamente no circula corriente, que es la señal de que el diodo se
-comporta como el capacitor que este apartado estudia y no como un conductor.
+% El circuito se redimensiono para que la resonancia cayera dentro de lo que mide la
+% tarjeta: su generador llega a 8 MHz, de modo que el barrido se pide hasta 7.
+\item \textbf{Repita la medida sobre el circuito real.} Monte el circuito en el
+protoboard y use el instrumento \emph{Network Analyzer} con un barrido lineal de
+\qtyrange{1}{7}{\mega\hertz}, el canal~1 como referencia y el canal~2 en el nodo del
+diodo. Localice el pico y anótelo en la tabla~\ref{tab:resonador}.
+
+\item Repita el barrido anterior para cada valor de $V_2$ y complete la
+tabla~\ref{tab:resonador}. Deberá ver el pico \textbf{desplazarse hacia la derecha} a
+medida que aumenta la tensión inversa.
 \end{enumerate}
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=\textwidth]{bode_resonador.pdf}
     \caption{Diagrama de Bode (magnitud) del resonador, trazado a partir de
-             \texttt{LAB2.DAT}. Por debajo de $f_0$ la respuesta sube a
+             \texttt{resonador\_4800khz.DAT}. Por debajo de $f_0$ la respuesta sube a
              \qty{20}{\decibel} por década porque domina la reactancia de $L_1$; por
              encima cae a igual ritmo porque domina la de $C_j$.}
     \label{fig:bode}
 \end{figure}
 
-\begin{notatec}{qué se puede y qué no se puede leer en estos datos}
-El barrido tiene 10 puntos por década, suficiente para situar el pico pero no para
-resolverlo con finura: el ancho de banda y el factor $Q$ que se obtengan de él son
-estimaciones. Además, las once columnas que exporta \texttt{LAB2.DAT} son idénticas
-entre sí, de modo que el parámetro del barrido no llegó a afectar al circuito; para
-estudiar cómo cambia $f_0$ con la tensión inversa hay que repetir la simulación
-variando $V_2$ a mano, tal como pide la tabla~\ref{tab:resonador}.
+\begin{notatec}{un barrido por cada tensión, y con suficientes puntos}
+La tensión $V_2$ no es un parámetro que el barrido en alterna pueda recorrer por sí
+solo: cada valor exige \emph{su propio} barrido, tanto en el simulador como en la
+tarjeta. Son, pues, cinco barridos para completar la tabla~\ref{tab:resonador}.
+
+Y todos ellos con resolución suficiente. El pico de este circuito mide unos
+\qty{160}{\kilo\hertz} de ancho sobre una resonancia de varios megahercios: con un
+barrido de diez puntos por década los puntos quedan más separados que el propio pico y
+la curva sale plana, como si no hubiera resonancia. Es el error más común en esta
+medida, y no se manifiesta como un fallo sino como una gráfica sin nada que ver.
 \end{notatec}
 
 \FloatBarrier
 \subsection{Mediciones}
 
-Repita el barrido para cada valor de $V_2$ y complete la tabla~\ref{tab:resonador}.
-La capacitancia se despeja de la frecuencia de resonancia:
+Anote en la tabla~\ref{tab:resonador} las frecuencias obtenidas, tanto en el simulador
+como sobre el montaje real. De cada frecuencia medida se despeja la capacitancia que
+presentaba el diodo:
 
 \begin{equation}
     f_0 = \frac{1}{2\pi\sqrt{L_1\,C_j}}
@@ -874,8 +1099,8 @@ La capacitancia se despeja de la frecuencia de resonancia:
     \begin{tabular}{|>{\centering\arraybackslash}m{2.6cm}|>{\centering\arraybackslash}m{2.8cm}
                     |>{\centering\arraybackslash}m{2.8cm}|>{\centering\arraybackslash}m{3.4cm}|}
     \hline
-    \textbf{Tensión inversa} ($V_2$) & \textbf{Frecuencia de resonancia} ($f_0$)
-      & \textbf{Ganancia en el pico} & \textbf{Capacitancia del diodo} ($C_j$)\\
+    \textbf{Tensión inversa} ($V_2$) & \textbf{$f_0$ simulada}
+      & \textbf{$f_0$ medida} & \textbf{$C_j$ despejada de la medida}\\
     \hline
     \qty{0}{\volt}  & & & \\ \hline
     \qty{1}{\volt}  & & & \\ \hline
@@ -888,19 +1113,27 @@ La capacitancia se despeja de la frecuencia de resonancia:
 \subsection{Preguntas}
 
 \begin{enumerate}[label=\arabic*., leftmargin=2em]
-    \item A partir de la figura~\ref{fig:bode} y de la ecuación~\eqref{eq:resonancia},
-          calcule la capacitancia que presenta $D_1$ con $V_2 = \qty{2}{\volt}$.
-          Compárela con la que indica la hoja de datos del 1N4149.
-    \item La fuente $V_1$ está fijada en \qty{30.4}{\mega\hertz}, pero el pico de la
-          simulación no cae exactamente ahí. ¿A qué se debe la diferencia y qué
-          capacitancia haría que ambas coincidieran?
+    \item A partir de la frecuencia medida y de la ecuación~\eqref{eq:resonancia},
+          calcule la capacitancia que presentaba $D_1$ con $V_2 = \qty{2}{\volt}$.
+          Compárela con la que obtuvo directamente con el \emph{Impedance Analyzer} en
+          el paso a) del procedimiento. ¿Coinciden? Si no, ¿cuál de las dos incluye las
+          capacidades parásitas del montaje?
+    \item La resonancia medida en el protoboard no cae en la misma frecuencia que la
+          simulada. Enumere al menos tres capacidades presentes en el montaje real y
+          ausentes en el simulador, y estime cuánta capacitancia habría que añadir a la
+          simulación para que ambas coincidieran.
     \item Según los valores que anotó en la tabla~\ref{tab:resonador}, ¿la frecuencia
           de resonancia sube o baja al aumentar $V_2$? Explíquelo a partir del ancho de
           la zona de deplexión.
     \item ¿Qué ocurriría si $V_1$ entregase \qty{5}{\volt} eficaces en lugar de
-          \qty{0.1}{\volt}? ¿Seguiría siendo válido el análisis?
-    \item ¿Por qué se emplea aquí un 1N4149 y no el 1N4007 de las secciones
-          anteriores? Compare el tiempo de recuperación inversa de ambos.
+          \qty{0.5}{\volt}? ¿Seguiría siendo válido el análisis?
+    \item ¿Por qué este resonador emplea el 1N4007, que es un diodo rectificador lento,
+          y no un diodo de señal como el 1N4148, mucho más rápido? Compare la
+          capacitancia de juntura de ambos y razone cuál de las dos características
+          --- velocidad o capacitancia --- decide aquí.
+    \item Con $R_1 = \qty{1}{\kilo\ohm}$ en lugar de \qty{470}{\kilo\ohm}, ¿qué factor
+          de calidad tendría el circuito según la ecuación~\eqref{eq:q}? ¿Se podría
+          seguir localizando el pico?
 \end{enumerate}
 
 \FloatBarrier

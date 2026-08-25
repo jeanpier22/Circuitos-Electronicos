@@ -17,10 +17,17 @@ LAB2.DAT es un CSV con la cabecera
 
     "FREQ","C1(2)[X=0.00]", ... ,"C1(2)[X=1.00]"
 
-es decir, la magnitud en dB del nodo C1(2) para once valores del parametro X
-del barrido. Las once columnas resultan identicas: el parametro no llego a
-afectar al circuito en la simulacion que produjo el archivo. Se dibuja una
-sola curva y el script avisa por consola si algun dia dejan de coincidir.
+es decir, la magnitud del nodo C1(2) para once valores del parametro X del
+barrido. Las once columnas resultan identicas: el parametro no llego a afectar
+al circuito en la simulacion que produjo el archivo. Se dibuja una sola curva y
+el script avisa por consola si algun dia dejan de coincidir.
+
+Unidades: el simulador exporta en dB o en magnitud lineal segun como este
+configurado el eje, y las dos cosas han llegado ya en distintas versiones del
+archivo. El script lo detecta solo. El criterio es seguro para este circuito:
+es un divisor pasivo cuya ganancia nunca pasa de 1, de modo que en dB todos los
+valores son negativos o cero. Si aparece alguno positivo, los datos son
+lineales y se convierten con 20*log10.
 """
 
 import csv
@@ -32,10 +39,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 RAIZ = Path(__file__).resolve().parent.parent
-DATOS = RAIZ / 'Laboratorio_2' / 'LaTeX' / 'LAB2.DAT'
+DATOS = RAIZ / 'Laboratorio_2' / 'LaTeX' / 'resonador_4800khz.DAT'
 SALIDA = RAIZ / 'Laboratorio_2' / 'LaTeX' / 'imagenes' / 'bode_resonador.pdf'
 
-L1 = 10e-6      # henrios, la bobina del tanque
+L1 = 60e-6      # henrios, la bobina del tanque (dos de 30 uH en serie)
 CAIDA = 3.0     # dB por debajo del pico que definen el ancho de banda
 
 AZUL = '#1f4e79'
@@ -56,9 +63,17 @@ def leer(ruta):
     # Las once columnas deberian ser la misma curva; si no, hay que mirar el .DAT.
     if not np.allclose(curvas, curvas[:, [0]]):
         print('  AVISO: las columnas del barrido X no coinciden; se dibuja la primera.')
+
+    curva = curvas[:, 0]
+    # Vease la nota sobre unidades en la cabecera del archivo: un valor positivo
+    # es imposible en dB para este divisor pasivo, asi que delata datos lineales.
+    if curva.min() > 0:
+        print('  datos en magnitud lineal; se convierten a dB')
+        curva = 20 * np.log10(curva)
+
     print(f'  {len(frec)} puntos  ·  {len(cabecera) - 1} columnas  ·  '
           f'{frec[0] / 1e6:g} MHz a {frec[-1] / 1e6:g} MHz')
-    return frec, curvas[:, 0]
+    return frec, curva
 
 
 def banda(frec, db, pico):
@@ -107,7 +122,10 @@ def dibujar(frec, db):
         # La cifra del ancho de banda va en la ficha de la esquina: junto a la
         # flecha se cruzaria con la vertical de f0 y con los flancos de la curva.
 
-    ax.axhline(pico_db - CAIDA, color=AZUL, lw=0.7, ls=(0, (5, 4)), alpha=0.6)
+    # xmin recorta la guia por la izquierda: a todo lo ancho tacharia la ficha de
+    # la esquina, que con un pico estrecho cae justo a la altura de los -3 dB.
+    ax.axhline(pico_db - CAIDA, xmin=0.38, color=AZUL, lw=0.7, ls=(0, (5, 4)),
+               alpha=0.6)
     # A la derecha, no a la izquierda: alli la esquina la ocupa la ficha.
     ax.text(frec[-1] * 0.88, pico_db - CAIDA + 0.7, '-3 dB', ha='right',
             fontsize=7.5, color=AZUL, alpha=0.85, va='bottom')
@@ -124,11 +142,18 @@ def dibujar(frec, db):
 
     # Ficha de lectura en la esquina superior izquierda, que queda vacia porque
     # la curva entra por abajo con pendiente de +20 dB/decada.
+    # El valor de L1 se toma de la constante del modulo, no de un literal: antes
+    # estaba escrito a mano y quedo desfasado al cambiar la bobina del circuito.
     ficha = ['Magnitud en el nodo C1(2)',
-             f'$C_{{eq}}$ = {ceq * 1e12:.1f} pF  con  $L_1$ = 10 µH']
+             f'$C_{{eq}}$ = {ceq * 1e12:.1f} pF  con  $L_1$ = {L1 * 1e6:g} µH']
     if bajo and alto:
-        ficha.append(f'BW$_{{-3\\,dB}}$ = {(alto - bajo) / 1e6:.1f} MHz'
-                     f'   ·   Q $\\approx$ {f0 / (alto - bajo):.2f}')
+        # Un pico de Q alto mide decenas de kHz: en MHz con un decimal se veria
+        # como "0.1 MHz" y se perderia la cifra que interesa.
+        ancho = alto - bajo
+        txt = (f'{ancho / 1e6:.2f} MHz' if ancho >= 1e6
+               else f'{ancho / 1e3:.0f} kHz')
+        ficha.append(f'BW$_{{-3\\,dB}}$ = {txt}'
+                     f'   ·   Q $\\approx$ {f0 / ancho:.1f}')
     ax.text(0.015, 0.97, '\n'.join(ficha),
             transform=ax.transAxes, ha='left', va='top', fontsize=8, color=GRIS,
             linespacing=1.5)
