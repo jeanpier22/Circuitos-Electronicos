@@ -78,7 +78,7 @@ export const PRACTICAS = [
     estado: 'disponible',
     duracion: '2 horas',
     resumen:
-      'Estudio experimental del diodo semiconductor: se levanta punto a punto su curva característica en polarización directa e inversa, se contrastan las medidas con la simulación y se analizan configuraciones con LED y motor DC. Cierra estudiando el diodo en inversa como capacitor variable de un resonador LC, con un inductor de núcleo de aire que los alumnos calculan sobre un tubo de PVC y bobinan ellos mismos.',
+      'Estudio experimental del diodo semiconductor: se levanta punto a punto su curva característica en polarización directa e inversa y se contrastan las medidas con la simulación. Cierra estudiando el diodo en inversa como capacitor variable de un resonador LC, con un inductor de núcleo de aire que los alumnos calculan sobre un tubo de PVC y bobinan ellos mismos.',
     objetivos: [
       'Polarizar el diodo en forma directa y representar su curva característica de operación.',
       'Polarizar el diodo en forma inversa y representar su curva característica de operación.',
@@ -86,12 +86,12 @@ export const PRACTICAS = [
       'Contrastar los resultados experimentales con la simulación en Multisim.',
       'Aprovechar la capacitancia de juntura del diodo en inversa para sintonizar un resonador LC.',
     ],
-    temas: ['Diodo 1N4007', 'Curva característica', 'Polarización directa', 'Polarización inversa', 'Multisim', 'LED', 'Varicap', 'Diagrama de Bode'],
+    temas: ['Diodo 1N4007', 'Curva característica', 'Polarización directa', 'Polarización inversa', 'Multisim', 'Varicap', 'Resonador LC', 'Diagrama de Bode'],
     documento: {
       // Visor principal embebido en la pagina
       src: 'practicas/lab2/Laboratorio_2.pdf',
-      paginas: 15,
-      peso: '0.4 MB',
+      paginas: 14,
+      peso: '0.3 MB',
     },
     descargas: [
       {
@@ -100,7 +100,7 @@ export const PRACTICAS = [
         archivo: 'practicas/lab2/Laboratorio_2.pdf',
         nombre: 'Laboratorio_2_Circuitos_Electronicos.pdf',
         tipo: 'PDF',
-        peso: '0.4 MB',
+        peso: '0.3 MB',
         destacado: true,
       },
       {
@@ -109,7 +109,7 @@ export const PRACTICAS = [
         archivo: 'practicas/lab2/Laboratorio_2.tex',
         nombre: 'Laboratorio_2.tex',
         tipo: 'TEX',
-        peso: '57 KB',
+        peso: '54 KB',
         destacado: false,
       },
       {

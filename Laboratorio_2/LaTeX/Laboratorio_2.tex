@@ -149,8 +149,15 @@
 %    - La tabla de resultados gana una columna: f0 simulada y f0 medida, para
 %      que la comparacion entre ambas sea el objeto de las preguntas 1 y 2.
 %
-%  PENDIENTE 1: la seccion VI sigue sin puntaje. Las demas suman ya los 20
-%  puntos, asi que darselo obliga a redistribuir; queda a criterio del docente.
+%  Version 10 - Se retira la seccion "Configuracion de diodos" (la antigua V),
+%  por decision del docente. Con ella salen de la lista de materiales los 02 LED
+%  azules y el motor DC de 12 V, que eran los unicos componentes que usaba, y
+%  quedan sin uso image23.png y la tabla de sus dos conexiones AB / BA.
+%    - Los 4 puntos que valia esa seccion pasan al apartado del varicap, que
+%      hasta ahora no tenia puntaje asignado. Con eso el documento vuelve a
+%      sumar 20 y se resuelve el PENDIENTE 1 que arrastraba desde la version 7.
+%      Si el docente prefiere otro reparto, basta cambiar el \puntos de esa
+%      seccion.
 %
 %  Version 9 - Llegan del simulador el esquema y el barrido del diseno nuevo, y
 %  el texto se alinea con ellos. Queda resuelto el PENDIENTE 2 de la version 8.
@@ -438,8 +445,8 @@ de los siguientes valores:
     % 4,7 - 5,1 - 5,6 - 6,2 - 6,8 - 7,5. Se nombran las dos mas cercanas.
     \item 02 diodos zener de \qty{5.1}{\volt} (1N4733A) o de \qty{6.8}{\volt} (1N4736A).
     \item 02 diodos Schottky 1N5817.
-    \item 02 diodos LED azules.
-    \item 01 motor DC de \qty{12}{\volt} (pequeño).
+    % Los 02 LED azules y el motor DC de 12 V salen de la lista con la seccion V,
+    % que era la unica que los usaba.
     % --- Pasivos.
     % El original dice "1/4 vatio"; se expresa como 0,25 W, igual que en el Laboratorio 1.
     \item 06 resistencias de \qty{1}{\kilo\ohm} (\qty{0.25}{\watt}).
@@ -614,80 +621,7 @@ fuente de alimentación considere lo siguiente:
 
 \FloatBarrier
 %=======================================================================
-\section{Configuración de diodos \puntos{4}}
-%=======================================================================
-\begin{enumerate}[leftmargin=*, labelsep=0.6em, series=confdiodos]
-\item Arme el circuito de la figura~\ref{fig:conf-diodos}.
-
-\item Antes de conectar la fuente revise si la salida positiva de la fuente está conectada en el
-punto A y si el negativo en el punto B, y tome las medidas solicitadas en la
-tabla~\ref{tab:conf}.
-
-\item Luego conecte el polo positivo de la fuente en el punto B y el polo negativo en el punto A,
-y luego tome las medidas solicitadas en la tabla~\ref{tab:conf}.
-\end{enumerate}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.46\textwidth]{image23.png}
-    \caption{Configuración de diodos $D_1$ y $D_2$.}
-    \label{fig:conf-diodos}
-\end{figure}
-
-\begin{table}[H]
-    \centering
-    \caption{Datos de las dos configuraciones de diodos $D_1$ y $D_2$.}
-    \label{tab:conf}
-    \small
-    \renewcommand{\arraystretch}{1.35}
-    \begin{tabular}{|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{1.9cm}
-                    |>{\centering\arraybackslash}m{2.1cm}|>{\centering\arraybackslash}m{2.1cm}
-                    |>{\centering\arraybackslash}m{2.1cm}|>{\centering\arraybackslash}m{2.1cm}|}
-    \hline
-    \multirow{2}{*}{\textbf{Lectura}}
-      & \multirow{2}{1.9cm}{\centering\textbf{Voltaje de la fuente}}
-      & \multicolumn{4}{c|}{\textbf{EXPERIMENTADO}}\\
-    \cline{3-6}
-      & & \textbf{Voltaje en el diodo (1)} & \textbf{Voltaje en el foco}
-        & \textbf{Voltaje en el diodo (2)} & \textbf{Voltaje en el motor}\\
-    \hline
-    \multirow{7}{*}{\textbf{Conexión AB}}
-       & 1,0 & & & & \\ \cline{2-6}
-     & 2,0 & & & & \\ \cline{2-6}
-     & 3,0 & & & & \\ \cline{2-6}
-     & 4,0 & & & & \\ \cline{2-6}
-     & 5,0 & & & & \\ \cline{2-6}
-     & 6,0 & & & & \\ \cline{2-6}
-     & 7,0 & & & & \\
-    \hline
-    \multirow{7}{*}{\textbf{Conexión BA}}
-       & 1,0 & & & & \\ \cline{2-6}
-     & 2,0 & & & & \\ \cline{2-6}
-     & 3,0 & & & & \\ \cline{2-6}
-     & 4,0 & & & & \\ \cline{2-6}
-     & 5,0 & & & & \\ \cline{2-6}
-     & 6,0 & & & & \\ \cline{2-6}
-     & 7,0 & & & & \\
-    \hline
-    \end{tabular}
-\end{table}
-
-\begin{enumerate}[resume*=confdiodos]
-\item Conteste las siguientes preguntas:
-\end{enumerate}
-
-\begin{enumerate}[label=\arabic*., leftmargin=2em]
-    \item Al hacer la conexión del punto 2: ¿qué sucede? ¿Por qué?
-    \item Al hacer la conexión del punto 3: ¿qué sucede? ¿Por qué?
-    \item ¿El voltaje del diodo $D_1$ es positivo o negativo? ¿Por qué?
-    \item ¿El voltaje del diodo $D_2$ es positivo o negativo? ¿Por qué?
-    \item ¿A medida que aumenta el voltaje de la fuente, qué sucede con el LED y con el motor en
-          ambas conexiones?
-\end{enumerate}
-
-\FloatBarrier
-%=======================================================================
-\section{El diodo como capacitor variable}
+\section{El diodo como capacitor variable \puntos{4}}
 \label{sec:varicap}
 %=======================================================================
 % Seccion anadida a la guia original. Los datos de la figura del Bode salen
