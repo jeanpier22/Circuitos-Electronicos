@@ -87,6 +87,33 @@
 %      del circuito de directa (image21.png): solo el esquema, sin cromo de la
 %      aplicacion. La captura sin retocar sigue en image22_original.png.
 %
+%  Version 7 - La seccion VI deja de ser un "ejercicio adicional" de simulador y
+%  pasa a montarse tambien en protoboard, con estas consecuencias:
+%    - Se le quita el rotulo "Ejercicio adicional" al titulo y se le pone la
+%      etiqueta sec:varicap, para poder referenciarla desde los materiales.
+%    - Se elimina la nota tecnica que decia que el apartado no se montaba y que
+%      por eso sus componentes no estaban en la lista. De paso desaparece un
+%      error suyo: afirmaba que D1 era el 1N4007, cuando la figura del circuito
+%      y las preguntas 1 y 5 hablan del 1N4149.
+%    - Sus componentes pasan a "Equipos y materiales": el 1N4149, R2 de 100 k,
+%      C1 de 10 uF, el condensador de 1 nF con que se verifica la bobina, y el
+%      alambre y el formador con que se construye L1. R1 de 1 k ya estaba
+%      cubierto por las 6 unidades que pedia la lista.
+%    - Se anade el apartado VI.2, "Construccion del inductor L1": L1 no se
+%      compra, se bobina. Solenoide de una capa con nucleo de aire porque asi el
+%      valor sale de la geometria y se puede calcular. Lleva la formula de
+%      Wheeler en mm, el despeje completo de N (queda una cuadratica: 59 vueltas
+%      sobre formador de 10 mm, 33,6 mm de largo, 2,2 m de alambre), la
+%      justificacion del calibre AWG 24 por efecto pelicular (a 30 MHz solo
+%      conducen 12 um de los 255 um de radio) y una verificacion por resonancia
+%      con el condensador de 1 nF, que cae en 1,59 MHz y si es medible.
+%    - Se anade un paso d) al procedimiento: el barrido en alterna esta por
+%      encima de los 30 MHz y el instrumental no llega, asi que sobre el montaje
+%      real se mide la polarizacion continua del diodo, que si se puede.
+%
+%  PENDIENTE: la seccion VI sigue sin puntaje. Las demas suman ya los 20 puntos,
+%  asi que darselo obliga a redistribuir; queda a criterio del docente.
+%
 %  Imagenes: image03-image05 provienen de (A); image21-image23 de (B).
 %  Las image06-image11 (condensador) quedan en imagenes/ pero ya no se usan.
 %  La figura 1 de (B) venia en EMF vectorial y se rasterizo a 2094 px.
@@ -343,6 +370,22 @@ de los siguientes valores:
     \item 06 resistencias de \qty{1}{\kilo\ohm} (\qty{0.25}{\watt}).
     \item 02 diodos LED azules.
     \item 01 motor DC de \qty{12}{\volt} (pequeño).
+    % --- Componentes de la seccion VI (el diodo como capacitor variable). Antes no
+    % estaban en esta lista porque aquel apartado se resolvia solo en el simulador;
+    % ahora tambien se monta en protoboard, asi que hay que comprarlos.
+    \item 01 diodo 1N4149 o 1N4148, para la sección~\ref{sec:varicap}. \emph{No} sirve el
+          1N4007 en su lugar (véase la pregunta 5 de esa sección).
+    \item 01 resistencia de \qty{100}{\kilo\ohm} (\qty{0.25}{\watt}).
+    \item 01 condensador electrolítico de \qty{10}{\micro\farad} (\qty{25}{\volt} o más).
+    \item 01 condensador cerámico de \qty{1}{\nano\farad} con tolerancia del
+          \qty{5}{\percent} o mejor, para verificar el inductor.
+    % El alambre calculado son ~2,2 m; se piden 3 m para tener margen de sobra si hay
+    % que rebobinar la primera bobina, que casi siempre queda mal.
+    \item \qty{3}{\metre} de alambre de cobre esmaltado AWG~24 y un cilindro rígido de
+          \qty{10}{\milli\metre} de diámetro que sirva de formador (un tubo de PVC, una
+          broca o el cuerpo de un plumón), para bobinar $L_1$: el inductor no se compra,
+          se construye siguiendo el apartado~\ref{sec:varicap}.\ref{sec:bobina}.
+    \item Lija fina o cúter, para retirar el esmalte de las puntas del alambre.
     \item 01 protoboard.
     \item 01 multímetro.
     \item Cables conectores para protoboard.
@@ -571,9 +614,10 @@ y luego tome las medidas solicitadas en la tabla~\ref{tab:conf}.
 
 \FloatBarrier
 %=======================================================================
-\section{Ejercicio adicional: el diodo como capacitor variable}
+\section{El diodo como capacitor variable}
+\label{sec:varicap}
 %=======================================================================
-% Ejercicio anadido a la guia original. Los datos de la figura del Bode salen
+% Seccion anadida a la guia original. Los datos de la figura del Bode salen
 % de LAB2.DAT (barrido en alterna exportado por el simulador) y se trazan con
 % herramientas/graficar_bode.py.
 
@@ -590,20 +634,10 @@ Si esa capacitancia se conecta a una bobina se obtiene un circuito resonante cuy
 frecuencia central puede ajustarse con una tensión continua. Es el principio con el
 que sintonizan los receptores de radio.
 
-% Los componentes de esta seccion no estan en "Equipos y materiales" a proposito:
-% el ejercicio no se monta en protoboard, asi que no hay nada que comprar.
-\begin{notatec}{este ejercicio se resuelve solo en el simulador}
-Este apartado no se monta en el protoboard, de modo que sus componentes no figuran en
-la lista de materiales que hay que adquirir. Todos ellos se declaran dentro del
-simulador: la bobina $L_1$ de \qty{10}{\micro\henry}, el condensador de acoplamiento
-$C_1$ de \qty{10}{\micro\farad}, las resistencias $R_1$ de \qty{1}{\kilo\ohm} y $R_2$
-de \qty{100}{\kilo\ohm}, la fuente continua $V_2$ de \qty{2}{\volt} y el generador de
-alterna $V_1$. El diodo $D_1$ es el mismo 1N4007 empleado en el resto de la práctica.
-\end{notatec}
-
 \subsection{Circuito propuesto}
 
-Arme en el simulador el circuito de la figura~\ref{fig:resonador}.
+Arme el circuito de la figura~\ref{fig:resonador}, primero en el simulador y después en
+el protoboard.
 
 \begin{figure}[H]
     \centering
@@ -628,6 +662,147 @@ Arme en el simulador el circuito de la figura~\ref{fig:resonador}.
           capacitor.
 \end{itemize}
 
+\FloatBarrier
+%-----------------------------------------------------------------------
+% \texorpdfstring evita el aviso de hyperref al meter el titulo en los marcadores
+% del PDF, donde no se admite modo matematico.
+\subsection{Construcción del inductor \texorpdfstring{$L_1$}{L1}}
+\label{sec:bobina}
+%-----------------------------------------------------------------------
+% Apartado nuevo. El inductor de 10 uH no se compra: se bobina. Se usa un
+% solenoide de una capa con nucleo de aire, cuyo valor sale de la geometria y
+% se puede calcular de antemano; ese es justamente el ejercicio.
+
+$L_1$ es el único componente de la práctica que no se compra hecho: se bobina. Un
+solenoide de una sola capa con núcleo de aire tiene la virtud de que su inductancia
+queda fijada por la pura geometría --- diámetro, longitud y número de vueltas ---, sin
+depender de ningún material magnético. Eso permite calcular la bobina antes de dar la
+primera vuelta.
+
+\subsubsection*{La fórmula}
+
+Para una bobina de una capa se emplea la fórmula de Wheeler, aquí con las longitudes
+en milímetros:
+
+\begin{equation}
+    L\,[\unit{\micro\henry}] = \frac{0.03937\; r^{2} N^{2}}{9\,r + 10\,\ell}
+    \label{eq:wheeler}
+\end{equation}
+
+\noindent donde $N$ es el número de vueltas, $r$ el \emph{radio medio} del bobinado (el
+del formador más el grosor del alambre) y $\ell$ la longitud que ocupa el bobinado.
+La expresión es exacta dentro del \qty{1}{\percent} mientras la bobina sea más larga
+que \num{0.4} diámetros, condición que el diseño de abajo cumple con holgura.
+
+\subsubsection*{El cálculo}
+
+Se parte de dos decisiones de construcción: un formador de \qty{10}{\milli\metre} de
+diámetro y alambre esmaltado AWG~24, que mide \qty{0.51}{\milli\metre} de cobre y unos
+\qty{0.57}{\milli\metre} con el esmalte. Bobinando las vueltas \emph{juntas}, cada una
+avanza ese paso $p$, de modo que las tres incógnitas se reducen a una sola:
+
+\begin{equation}
+    \ell = p\,N = 0.57\,N
+    \qquad\qquad
+    r = \frac{\qty{10}{\milli\metre} + \qty{0.57}{\milli\metre}}{2} = \qty{5.29}{\milli\metre}
+    \label{eq:geometria}
+\end{equation}
+
+\noindent Sustituyendo ambas en la ecuación~\eqref{eq:wheeler} e imponiendo
+$L_1 = \qty{10}{\micro\henry}$:
+
+\begin{equation*}
+    10 = \frac{0.03937 \cdot (5.29)^{2} \cdot N^{2}}{9 (5.29) + 10 (0.57\,N)}
+       = \frac{1.102\,N^{2}}{47.6 + 5.70\,N}
+\end{equation*}
+
+\noindent que reordenada es una simple ecuación de segundo grado en $N$:
+
+\begin{equation*}
+    1.102\,N^{2} - 57.0\,N - 476 = 0
+    \qquad\Longrightarrow\qquad
+    N = \frac{57.0 + \sqrt{57.0^{2} + 4(1.102)(476)}}{2(1.102)} = 59.0
+\end{equation*}
+
+\noindent Son, pues, \textbf{59 vueltas}, que ocupan $\ell = 0.57 \times 59 =
+\qty{33.6}{\milli\metre}$. La bobina resulta \num{3.2} veces más larga que ancha, dentro
+del rango de validez de Wheeler. El alambre que hay que cortar es el perímetro medio por
+el número de vueltas, más un margen para las puntas:
+
+\begin{equation*}
+    \text{longitud} = N \pi d_{\text{medio}} + 2 (\qty{100}{\milli\metre})
+                    = 59 \pi (\qty{10.57}{\milli\metre}) + \qty{200}{\milli\metre}
+                    \approx \qty{2.2}{\metre}
+\end{equation*}
+
+\begin{table}[H]
+    \centering
+    \caption{Resumen del diseño de $L_1$: solenoide de una capa con núcleo de aire.}
+    \label{tab:bobina}
+    \small
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{|>{\raggedright\arraybackslash}m{6.4cm}
+                    |>{\centering\arraybackslash}m{1.8cm}
+                    |>{\centering\arraybackslash}m{3.6cm}|}
+    \hline
+    \textbf{Parámetro} & \textbf{Símbolo} & \textbf{Valor}\\
+    \hline
+    Diámetro del formador          & $d$    & \qty{10}{\milli\metre} \\ \hline
+    Calibre del alambre            & ---    & AWG 24 (\qty{0.51}{\milli\metre}) \\ \hline
+    Paso entre vueltas, con esmalte& $p$    & \qty{0.57}{\milli\metre} \\ \hline
+    Radio medio del bobinado       & $r$    & \qty{5.29}{\milli\metre} \\ \hline
+    Número de vueltas              & $N$    & 59 \\ \hline
+    Longitud del bobinado          & $\ell$ & \qty{33.6}{\milli\metre} \\ \hline
+    Alambre necesario              & ---    & \qty{2.2}{\metre} \\ \hline
+    Inductancia resultante         & $L_1$  & \qty{10.0}{\micro\henry} \\ \hline
+    \end{tabular}
+\end{table}
+
+\subsubsection*{Por qué AWG 24}
+
+El calibre no se elige aquí por la corriente, que es de apenas unos microamperios, sino
+por dos razones distintas. La primera es mecánica: el AWG~24 es lo bastante rígido para
+que la bobina se sostenga sola al retirar el formador y no cambie de forma --- y con
+ella de inductancia --- al manipularla.
+
+La segunda es el \textbf{efecto pelicular}. A frecuencias altas la corriente no ocupa
+toda la sección del conductor, sino una capa superficial de espesor
+
+\begin{equation}
+    \delta\,[\unit{\milli\metre}] = \frac{66}{\sqrt{f\,[\unit{\hertz}]}}
+    \qquad\text{que en cobre y a \qty{30}{\mega\hertz} vale}\qquad
+    \delta \approx \qty{12}{\micro\metre}
+    \label{eq:pelicular}
+\end{equation}
+
+\noindent Es decir: de los \qty{255}{\micro\metre} de radio que tiene el AWG~24, solo los
+\num{12} más externos conducen. Engrosar el alambre no añade cobre útil en proporción a
+su sección, sino a su \emph{perímetro}, y por eso pasar a un calibre mucho mayor apenas
+mejora las pérdidas mientras estorba el bobinado. Un calibre bastante más fino, en
+cambio, sí las empeora y además no se sostiene. El AWG~24 es el punto de equilibrio; el
+AWG~22 y el AWG~26 también sirven, recalculando $p$ y por tanto $N$.
+
+\subsubsection*{Verificación}
+
+Como el valor depende de lo apretado que quede el bobinado, hay que comprobarlo. Mida la
+longitud real $\ell$ del solenoide terminado y vuelva a evaluar la
+ecuación~\eqref{eq:wheeler} con ella. Después contrástelo por resonancia, que es una
+medida y no una estimación: conecte en paralelo con la bobina el condensador cerámico de
+\qty{1}{\nano\farad}, haga un barrido en alterna y localice el pico. De la frecuencia
+medida se despeja la inductancia:
+
+\begin{equation}
+    L_1 = \frac{1}{\left(2\pi f_0\right)^{2} C}
+    \qquad\text{con \qty{1}{\nano\farad} y \qty{10}{\micro\henry} se espera}\qquad
+    f_0 \approx \qty{1.59}{\mega\hertz}
+    \label{eq:verificacion}
+\end{equation}
+
+\noindent Una diferencia de un \qtyrange{5}{10}{\percent} respecto de los
+\qty{10}{\micro\henry} es normal y no invalida nada: basta con anotar el valor real
+medido y usar \emph{ese} en los cálculos de la tabla~\ref{tab:resonador}, no el nominal.
+
+\FloatBarrier
 \subsection{Procedimiento}
 
 \begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
@@ -641,6 +816,15 @@ acompaña a esta guía es una exportación de ese mismo barrido y sirve como ref
 \item Grafique la curva con Python, como se pide también en la
 sección~\ref{sec:analisis}. El resultado debe parecerse al de la
 figura~\ref{fig:bode}.
+
+% El barrido en alterna de este circuito cae por encima de los 30 MHz, fuera del
+% alcance del instrumental del laboratorio: sobre el montaje real se comprueba la
+% polarizacion continua, que es lo que si se puede medir con el multimetro.
+\item Sobre el circuito montado en el protoboard, mida con el multímetro la tensión
+continua entre el ánodo y el cátodo de $D_1$ y confirme que está polarizado
+inversamente con los \qty{2}{\volt} que entrega $V_2$. Verifique también que por
+$R_2$ prácticamente no circula corriente, que es la señal de que el diodo se
+comporta como el capacitor que este apartado estudia y no como un conductor.
 \end{enumerate}
 
 \begin{figure}[H]

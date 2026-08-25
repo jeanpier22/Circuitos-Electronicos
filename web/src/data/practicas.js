@@ -78,7 +78,7 @@ export const PRACTICAS = [
     estado: 'disponible',
     duracion: '2 horas',
     resumen:
-      'Estudio experimental del diodo semiconductor: se levanta punto a punto su curva característica en polarización directa e inversa, se contrastan las medidas con la simulación y se analizan configuraciones con LED y motor DC. Cierra con un ejercicio adicional sobre el diodo en inversa como capacitor variable de un resonador LC.',
+      'Estudio experimental del diodo semiconductor: se levanta punto a punto su curva característica en polarización directa e inversa, se contrastan las medidas con la simulación y se analizan configuraciones con LED y motor DC. Cierra estudiando el diodo en inversa como capacitor variable de un resonador LC, con un inductor de núcleo de aire que los alumnos calculan y bobinan.',
     objetivos: [
       'Polarizar el diodo en forma directa y representar su curva característica de operación.',
       'Polarizar el diodo en forma inversa y representar su curva característica de operación.',
@@ -100,7 +100,7 @@ export const PRACTICAS = [
         archivo: 'practicas/lab2/Laboratorio_2.pdf',
         nombre: 'Laboratorio_2_Circuitos_Electronicos.pdf',
         tipo: 'PDF',
-        peso: '0.3 MB',
+        peso: '0.4 MB',
         destacado: true,
       },
       {
@@ -109,12 +109,12 @@ export const PRACTICAS = [
         archivo: 'practicas/lab2/Laboratorio_2.tex',
         nombre: 'Laboratorio_2.tex',
         tipo: 'TEX',
-        peso: '34 KB',
+        peso: '43 KB',
         destacado: false,
       },
       {
         etiqueta: 'Datos del resonador',
-        detalle: 'Barrido en frecuencia del simulador — para trazar el Bode del ejercicio adicional',
+        detalle: 'Barrido en frecuencia del simulador — para trazar el Bode del resonador LC',
         archivo: 'practicas/lab2/LAB2.DAT',
         nombre: 'LAB2.DAT',
         tipo: 'DAT',
