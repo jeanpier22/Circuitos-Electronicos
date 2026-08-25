@@ -159,6 +159,20 @@
 %      Si el docente prefiere otro reparto, basta cambiar el \puntos de esa
 %      seccion.
 %
+%  Version 11 - Ajustes de la lista de materiales pedidos por el docente:
+%    - Las de 1 k bajan de 06 a 02 unidades: los circuitos de IV.1 y IV.2 usan
+%      una sola cada uno.
+%    - El vatiaje vuelve a escribirse "1/4 W", como en la guia original, en vez
+%      de "0,25 W". Comprobado que es el correcto: el caso peor es la de 1 k en
+%      IV.1 con la fuente a 10 V, que disipa 87 mW, un 35 % del limite. Las de
+%      68 k y 470 k de la seccion del varicap no pasan de 25 uW. Ojo: el
+%      Laboratorio 1 sigue rotulando "0,25 W", asi que las dos guias ya no
+%      coinciden en la notacion.
+%    - Sale de la lista el condensador de 1 nF NP0: solo servia para verificar
+%      la bobina por resonancia, y la tarjeta lo hace con su Impedance Analyzer
+%      sin componente alguno. El metodo de resonancia se conserva en el texto
+%      como alternativa, pero sin exigir un componente concreto.
+%
 %  Version 9 - Llegan del simulador el esquema y el barrido del diseno nuevo, y
 %  el texto se alinea con ellos. Queda resuelto el PENDIENTE 2 de la version 8.
 %    - La figura pasa a resonador_4800khz.png y los datos a
@@ -448,15 +462,19 @@ de los siguientes valores:
     % Los 02 LED azules y el motor DC de 12 V salen de la lista con la seccion V,
     % que era la unica que los usaba.
     % --- Pasivos.
-    % El original dice "1/4 vatio"; se expresa como 0,25 W, igual que en el Laboratorio 1.
-    \item 06 resistencias de \qty{1}{\kilo\ohm} (\qty{0.25}{\watt}).
-    \item 02 resistencias de \qty{68}{\kilo\ohm} (\qty{0.25}{\watt}).
-    \item 02 resistencias de \qty{470}{\kilo\ohm} (\qty{0.25}{\watt}).
+    % Vatiaje comprobado. El caso peor es la de 1 k en la seccion IV.1 con la fuente
+    % a 10 V: circulan 9,3 mA y disipa 87 mW, el 35 % del cuarto de vatio. Las de
+    % 68 k y 470 k no llegan a 25 uW. (A los 30 V de la guia original la de 1 k
+    % disipaba 0,86 W, mas del triple de lo admisible; por eso la tabla se recorto.)
+    \item 02 resistencias de \qty{1}{\kilo\ohm} (1/4\,\unit{\watt}).
+    \item 02 resistencias de \qty{68}{\kilo\ohm} (1/4\,\unit{\watt}).
+    \item 02 resistencias de \qty{470}{\kilo\ohm} (1/4\,\unit{\watt}).
     % Ceramico y no electrolitico: el electrolitico es polarizado y en este circuito
     % quedaria con la continua de V2 encima, ademas de portarse mal en radiofrecuencia.
     \item 02 condensadores cerámicos de \qty{22}{\nano\farad} (marcado \texttt{223}).
-    \item 01 condensador cerámico NP0/C0G de \qty{1}{\nano\farad} (marcado
-          \texttt{102}).
+    % El de 1 nF NP0 salio de la lista: solo servia para verificar la bobina por
+    % resonancia, y eso lo hace el Impedance Analyzer de la tarjeta sin componente
+    % alguno. El metodo de resonancia se conserva en el texto como alternativa.
     % --- Para construir las bobinas.
     % Alambre: dos bobinas de 27 vueltas sobre 33,4 mm de diametro son 6,2 m; se piden
     % 7 m para tener margen si hay que rebobinar, que en la primera pasa casi siempre.
@@ -918,9 +936,9 @@ más directa es el instrumento \emph{Impedance Analyzer} de la tarjeta, que entr
 inductancia en microhenrios sin necesidad de cálculo alguno.
 
 Si no se dispone de él, se contrasta por resonancia: conecte \emph{las dos bobinas ya
-en serie} en paralelo con el condensador cerámico de \qty{1}{\nano\farad}, haga un
-barrido en alterna y localice el pico. De la frecuencia medida se despeja la
-inductancia:
+en serie} en paralelo con un condensador de valor conocido y estable --- uno cerámico
+NP0/C0G de \qty{1}{\nano\farad} sirve bien ---, haga un barrido en alterna y localice el
+pico. De la frecuencia medida se despeja la inductancia:
 
 \begin{equation}
     L_1 = \frac{1}{\left(2\pi f_0\right)^{2} C}
