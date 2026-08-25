@@ -74,7 +74,7 @@ export const PRACTICAS = [
     id: 'lab2',
     numero: 2,
     titulo: 'El diodo semiconductor',
-    subtitulo: 'Curva característica en polarización directa e inversa',
+    subtitulo: 'Curvas características y capacitancia del diodo',
     estado: 'disponible',
     duracion: '2 horas',
     resumen:
@@ -109,7 +109,7 @@ export const PRACTICAS = [
         archivo: 'practicas/lab2/Laboratorio_2.tex',
         nombre: 'Laboratorio_2.tex',
         tipo: 'TEX',
-        peso: '43 KB',
+        peso: '44 KB',
         destacado: false,
       },
       {

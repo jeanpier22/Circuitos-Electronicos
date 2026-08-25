@@ -211,7 +211,7 @@
               Ing. Electrónica y de Telecomunicaciones}
 \fancyhead[R]{\footnotesize 2026-2 Circuitos Electrónicos\\
               Ebert San Román Castillo}
-\fancyfoot[L]{\footnotesize Laboratorio N.\textsuperscript{o} 2 --- Diodos: curva característica}
+\fancyfoot[L]{\footnotesize Laboratorio N.\textsuperscript{o} 2 --- Diodos: curvas características y capacitancia del diodo}
 \fancyfoot[R]{\footnotesize Página \thepage\ de \pageref{LastPage}}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0.4pt}
@@ -224,11 +224,12 @@
 %-------------------------------------------------------- hiperenlaces
 \usepackage[hidelinks,pdfusetitle]{hyperref}
 \hypersetup{
-  pdftitle={Laboratorio 2 - Diodos: curva caracteristica},
+  pdftitle={Laboratorio 2 - Diodos: curvas caracteristicas y capacitancia del diodo},
   pdfsubject={Circuitos Electronicos - Guia de practicas},
   pdfauthor={Ebert San Roman Castillo; Jeanpier Ancori Sanchez},
-  pdfkeywords={electronica, diodo, 1N4007, curva caracteristica, polarizacion directa,
-               polarizacion inversa, Multisim}
+  pdfkeywords={electronica, diodo, 1N4007, 1N4149, curvas caracteristicas,
+               polarizacion directa, polarizacion inversa, capacitancia de juntura,
+               varicap, resonador LC, Multisim}
 }
 
 % babel-spanish rotula las tablas como "Cuadro"; los originales dicen "Tabla"
@@ -259,7 +260,7 @@
 \rule{0pt}{2.1cm}{\fontsize{58}{58}\selectfont\bfseries 2}
     & \begin{minipage}[c]{\linewidth}\centering
           {\large\bfseries Guía de Prácticas}\\[7pt]
-          {\Large\bfseries Diodos --- Curva Característica}
+          {\Large\bfseries Diodos --- Curvas Características\\ y Capacitancia del Diodo}
       \end{minipage}
     & {\Large\bfseries Nota}\\
 \hline
@@ -287,6 +288,10 @@ semiconductor, para lo cual se desarrollan las siguientes actividades:
           de operación.
     \item Análisis del comportamiento externo del diodo semiconductor en sus diferentes
           polarizaciones.
+    % Objetivo anadido junto con el titulo: este cubre la seccion VI, que hasta
+    % ahora no estaba representada en la lista.
+    \item Medición de la capacitancia de juntura del diodo en polarización inversa y su
+          empleo como capacitor variable en un resonador $LC$.
 \end{itemize}
 
 %=======================================================================
