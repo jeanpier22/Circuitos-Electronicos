@@ -657,16 +657,11 @@ el que se levanta su curva característica y el~\subref{fig:diodo-pn-e} la curva
     \label{fig:diodo-pn}
 \end{figure}
 
-\FloatBarrier
-\subsection{Operación del diodo semiconductor y análisis de circuitos}
-
-\begin{itemize}
-    \item Operación interna del diodo semiconductor.
-    \item Operación externa del diodo semiconductor.
-    \item Análisis de circuitos con diodos: modelos de circuito equivalente para el diodo y
-          análisis rápido de circuitos con diodos.
-\end{itemize}
-
+% Se retira la antigua II.2, "Operacion del diodo semiconductor y analisis de
+% circuitos". Era el temario de la seccion II en la guia (B), donde anunciaba lo
+% que el docente iba a explicar; aqui se quedo en tres vinetas que enuncian temas
+% sin desarrollar ninguno. Los modelos equivalentes que citaba ya estan dibujados
+% en los paneles (b) y (c) de la figura 3. Nada la referenciaba.
 \FloatBarrier
 %=======================================================================
 \section{Equipos y materiales}
@@ -745,6 +740,7 @@ de los siguientes valores:
 \section{Procedimiento}
 %=======================================================================
 \subsection{Polarización directa \puntos{4}}
+\label{sec:directa}
 
 \begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
 \item Arme el circuito de la figura~\ref{fig:pol-directa} y, en el simulador, tome las
@@ -763,9 +759,10 @@ fuente de alimentación considere lo siguiente:
           el diodo ($V_D$), en paralelo con el diodo (DC V), tal como se muestra en la figura.
     \item Encender la fuente de alimentación y fijar el voltaje de salida según la
           tabla~\ref{tab:directa-exp}. Para cada voltaje medir el voltaje del diodo ($V_D$) y la
-          corriente del diodo ($I_D$); luego anotar las medidas en dicha tabla, expresando los
-          valores en \unit{\milli\volt} y \unit{\micro\ampere} para el voltaje o la corriente del
-          diodo respectivamente.
+          corriente del diodo ($I_D$); luego anotar las medidas en dicha tabla, con el voltaje en
+          \unit{\milli\volt} y la corriente acompañada de su unidad, porque recorre dos órdenes de
+          magnitud: por debajo de la rodilla circulan microamperios y en la última lectura, unos
+          \qty{23}{\milli\ampere}.
 \end{itemize}
 
 \begin{figure}[H]
@@ -789,7 +786,7 @@ fuente de alimentación considere lo siguiente:
       & \multirow{2}{1.3cm}{\centering\textbf{$V_1$} (\unit{\volt})}
       & \multicolumn{2}{c|}{\textbf{1N4007}}
       & \multicolumn{2}{c|}{\textbf{1N5817 (Schottky)}}
-      & \multicolumn{2}{c|}{\textbf{Zener 1N4733A}}\\
+      & \multicolumn{2}{c|}{\textbf{Zener}}\\
     \cline{3-8}
       & & \textbf{$V_D$} & \textbf{$I_D$} & \textbf{$V_D$} & \textbf{$I_D$}
         & \textbf{$V_D$} & \textbf{$I_D$}\\
@@ -833,7 +830,7 @@ fuente de alimentación considere lo siguiente:
       & \multirow{2}{1.3cm}{\centering\textbf{$V_1$} (\unit{\volt})}
       & \multicolumn{2}{c|}{\textbf{1N4007}}
       & \multicolumn{2}{c|}{\textbf{1N5817 (Schottky)}}
-      & \multicolumn{2}{c|}{\textbf{Zener 1N4733A}}\\
+      & \multicolumn{2}{c|}{\textbf{Zener}}\\
     \cline{3-8}
       & & \textbf{$V_D$} & \textbf{$I_D$} & \textbf{$V_D$} & \textbf{$I_D$}
         & \textbf{$V_D$} & \textbf{$I_D$}\\
@@ -871,21 +868,19 @@ fuente de alimentación considere lo siguiente:
 \item Arme el circuito de la figura~\ref{fig:pol-inversa} en el simulador y tome las
 medidas solicitadas en la tabla~\ref{tab:inversa-sim} para los mismos tres diodos.
 
-\item En el protoboard, arme el circuito de la figura~\ref{fig:pol-inversa}. Antes de encender la
-fuente de alimentación considere lo siguiente:
+% Las tres precauciones eran las mismas de IV.1: la del conexionado de los
+% multimetros estaba repetida letra por letra y las otras dos solo cambiaban
+% "anodo" por "catodo" y el numero de tabla. Se remite alli en vez de repetirlas.
+\item En el protoboard, arme el circuito de la figura~\ref{fig:pol-inversa}. Tenga en cuenta
+las mismas precauciones del apartado \emph{Polarización directa} (\ref{sec:directa}), esta vez
+con el \textbf{cátodo} conectado a la salida positiva de la fuente, y anote las medidas en la
+tabla~\ref{tab:inversa-exp}, con el voltaje en \unit{\milli\volt} y la corriente acompañada de su
+unidad: los tres diodos se quedan en microamperios de fuga, salvo el zener, que al entrar en
+ruptura alcanza unos \qty{19}{\milli\ampere}. La tabla cubre los dos zener de la lista de
+materiales: los puntos de \qtyrange{4.5}{5.5}{\volt} rodean la ruptura del 1N4733A
+(\qty{5.1}{\volt}) y los de \qtyrange{6.3}{7.3}{\volt} la del 1N4736A (\qty{6.8}{\volt}).
+Anote en la tabla cuál de los dos empleó.
 \end{enumerate}
-
-\begin{itemize}
-    \item Revisar que el cátodo del diodo esté conectado a la salida positiva de la fuente de
-          alimentación.
-    \item Revisar que los multímetros estén bien conectados. Para medir la corriente del diodo
-          ($I_D$) colocar el multímetro en serie con el diodo (DC A) y para medir el voltaje en
-          el diodo ($V_D$), en paralelo con el diodo (DC V), tal como se muestra en la figura.
-    \item Encender la fuente de alimentación y fijar el voltaje de salida según la
-          tabla~\ref{tab:inversa-exp}. Para cada voltaje medir el voltaje del diodo ($V_D$) y la
-          corriente del diodo ($I_D$). Anotar las medidas en la tabla~\ref{tab:inversa-exp} (todo
-          expresado en \unit{\milli\volt} o \unit{\micro\ampere}).
-\end{itemize}
 
 \begin{figure}[H]
     \centering
@@ -899,43 +894,48 @@ fuente de alimentación considere lo siguiente:
     \caption{Lecturas de la polarización inversa: valores \textbf{simulados}.}
     \label{tab:inversa-sim}
     \small
-    \setlength{\tabcolsep}{4pt}
+    \setlength{\tabcolsep}{2pt}
     \renewcommand{\arraystretch}{1.35}
-    \begin{tabular}{|>{\centering\arraybackslash}m{1.4cm}|>{\centering\arraybackslash}m{1.3cm}
-                    |*{6}{>{\centering\arraybackslash}m{1.75cm}|}}
-    \hline
-    \multirow{2}{*}{\textbf{Lectura}}
-      & \multirow{2}{1.3cm}{\centering\textbf{$V_1$} (\unit{\volt})}
-      & \multicolumn{2}{c|}{\textbf{1N4007}}
-      & \multicolumn{2}{c|}{\textbf{1N5817 (Schottky)}}
-      & \multicolumn{2}{c|}{\textbf{Zener 1N4733A}}\\
-    \cline{3-8}
-      & & \textbf{$V_D$} & \textbf{$I_D$} & \textbf{$V_D$} & \textbf{$I_D$}
-        & \textbf{$V_D$} & \textbf{$I_D$}\\
-    \hline
-    % El recorrido acaba en 24 V, a peticion expresa. OJO con el 1N5817: su
-    % V_RRM de hoja de datos es de 20 V, asi que la ultima lectura lo deja
-    % fuera de especificacion. El 1N4007 (1000 V) y el zener (limitado por
-    % R1) no tienen problema a esa tension.
-    % Los puntos 4,5 - 4,8 - 5,0 - 5,2 - 5,5 V densifican la rodilla de
-    % ruptura del 1N4733A (V_Z = 5,1 V); con el 1N4736A (6,8 V) la rodilla
-    % cae entre los puntos de 6,0 y 9,0 V. A 24 V el zener conduce 18,6 mA:
-    % disipa 95 mW de 1 W, y R1 se queda en 0,35 W, por encima del 1/4 W.
-    1  & 0,2 & & & & & & \\ \hline
-    2  & 0,5 & & & & & & \\ \hline
-    3  & 1,0 & & & & & & \\ \hline
-    4  & 2,0 & & & & & & \\ \hline
-    5  & 3,0 & & & & & & \\ \hline
-    6  & 4,0 & & & & & & \\ \hline
-    7  & 4,5 & & & & & & \\ \hline
-    8  & 4,8 & & & & & & \\ \hline
-    9  & 5,0 & & & & & & \\ \hline
-    10 & 5,2 & & & & & & \\ \hline
-    11 & 5,5 & & & & & & \\ \hline
-    12 & 6,0 & & & & & & \\ \hline
-    13 & 9,0 & & & & & & \\ \hline
-    14 & 16  & & & & & & \\ \hline
-    15 & 24  & & & & & & \\ \hline
+    \begin{tabular}{|>{\centering\arraybackslash}m{1.4cm}
+                    |>{\centering\arraybackslash}m{1.15cm}
+                    |*{4}{>{\centering\arraybackslash}m{1.75cm}|}
+                    >{\centering\arraybackslash}m{1.15cm}
+                    |*{2}{>{\centering\arraybackslash}m{1.75cm}|}}
+\hline
+\multirow{2}{*}{\textbf{Lectura}}
+  & \multirow{2}{1.15cm}{\centering\textbf{$V_1$} (\unit{\volt})}
+  & \multicolumn{2}{c|}{\textbf{1N4007}}
+  & \multicolumn{2}{c|}{\textbf{1N5817 (Schottky)}}
+  & \multirow{2}{1.15cm}{\centering\textbf{$V_1$} (\unit{\volt})}
+  & \multicolumn{2}{c|}{\textbf{Zener}}\\
+\cline{3-6}\cline{8-9}
+  & & \textbf{$V_D$} & \textbf{$I_D$} & \textbf{$V_D$} & \textbf{$I_D$}
+    & & \textbf{$V_D$} & \textbf{$I_D$}\\
+\hline
+    % Dos escaleras de V1 en la misma tabla. El 1N4007 y el 1N5817 no tienen
+    % ninguna rodilla en inversa: solo fugan unos pocos uA, asi que su V1 se
+    % reparte por todo el rango. El zener si la tiene, y su columna la rodea:
+    %   4,5 - 4,8 - 5,0 - 5,2 - 5,5 V  para el 1N4733A (V_Z = 5,1 V)
+    %   6,3 - 6,6 - 6,8 - 7,0 - 7,3 V  para el 1N4736A (V_Z = 6,8 V)
+    % OJO con el 1N5817: su V_RRM de hoja de datos es de 20 V, de modo que las
+    % lecturas de 21 y 24 V lo dejan fuera de especificacion. El 1N4007 (1000 V)
+    % y el zener (limitado por R1) no tienen problema. A 24 V el zener conduce
+    % 18,6 mA: disipa 95 mW de 1 W, y R1 se queda en 0,35 W, por encima del 1/4 W.
+    1  & 0,5 & & & & & 0,5 & & \\ \hline
+    2  & 1   & & & & & 2   & & \\ \hline
+    3  & 2   & & & & & 4   & & \\ \hline
+    4  & 3   & & & & & 4,5 & & \\ \hline
+    5  & 4   & & & & & 4,8 & & \\ \hline
+    6  & 5   & & & & & 5,0 & & \\ \hline
+    7  & 6   & & & & & 5,2 & & \\ \hline
+    8  & 8   & & & & & 5,5 & & \\ \hline
+    9  & 10  & & & & & 6,3 & & \\ \hline
+    10 & 12  & & & & & 6,6 & & \\ \hline
+    11 & 14  & & & & & 6,8 & & \\ \hline
+    12 & 16  & & & & & 7,0 & & \\ \hline
+    13 & 18  & & & & & 7,3 & & \\ \hline
+    14 & 21  & & & & & 16  & & \\ \hline
+    15 & 24  & & & & & 24  & & \\ \hline
     \end{tabular}
 \end{table}
 
@@ -944,43 +944,48 @@ fuente de alimentación considere lo siguiente:
     \caption{Lecturas de la polarización inversa: valores \textbf{experimentales}.}
     \label{tab:inversa-exp}
     \small
-    \setlength{\tabcolsep}{4pt}
+    \setlength{\tabcolsep}{2pt}
     \renewcommand{\arraystretch}{1.35}
-    \begin{tabular}{|>{\centering\arraybackslash}m{1.4cm}|>{\centering\arraybackslash}m{1.3cm}
-                    |*{6}{>{\centering\arraybackslash}m{1.75cm}|}}
-    \hline
-    \multirow{2}{*}{\textbf{Lectura}}
-      & \multirow{2}{1.3cm}{\centering\textbf{$V_1$} (\unit{\volt})}
-      & \multicolumn{2}{c|}{\textbf{1N4007}}
-      & \multicolumn{2}{c|}{\textbf{1N5817 (Schottky)}}
-      & \multicolumn{2}{c|}{\textbf{Zener 1N4733A}}\\
-    \cline{3-8}
-      & & \textbf{$V_D$} & \textbf{$I_D$} & \textbf{$V_D$} & \textbf{$I_D$}
-        & \textbf{$V_D$} & \textbf{$I_D$}\\
-    \hline
-    % El recorrido acaba en 24 V, a peticion expresa. OJO con el 1N5817: su
-    % V_RRM de hoja de datos es de 20 V, asi que la ultima lectura lo deja
-    % fuera de especificacion. El 1N4007 (1000 V) y el zener (limitado por
-    % R1) no tienen problema a esa tension.
-    % Los puntos 4,5 - 4,8 - 5,0 - 5,2 - 5,5 V densifican la rodilla de
-    % ruptura del 1N4733A (V_Z = 5,1 V); con el 1N4736A (6,8 V) la rodilla
-    % cae entre los puntos de 6,0 y 9,0 V. A 24 V el zener conduce 18,6 mA:
-    % disipa 95 mW de 1 W, y R1 se queda en 0,35 W, por encima del 1/4 W.
-    1  & 0,2 & & & & & & \\ \hline
-    2  & 0,5 & & & & & & \\ \hline
-    3  & 1,0 & & & & & & \\ \hline
-    4  & 2,0 & & & & & & \\ \hline
-    5  & 3,0 & & & & & & \\ \hline
-    6  & 4,0 & & & & & & \\ \hline
-    7  & 4,5 & & & & & & \\ \hline
-    8  & 4,8 & & & & & & \\ \hline
-    9  & 5,0 & & & & & & \\ \hline
-    10 & 5,2 & & & & & & \\ \hline
-    11 & 5,5 & & & & & & \\ \hline
-    12 & 6,0 & & & & & & \\ \hline
-    13 & 9,0 & & & & & & \\ \hline
-    14 & 16  & & & & & & \\ \hline
-    15 & 24  & & & & & & \\ \hline
+    \begin{tabular}{|>{\centering\arraybackslash}m{1.4cm}
+                    |>{\centering\arraybackslash}m{1.15cm}
+                    |*{4}{>{\centering\arraybackslash}m{1.75cm}|}
+                    >{\centering\arraybackslash}m{1.15cm}
+                    |*{2}{>{\centering\arraybackslash}m{1.75cm}|}}
+\hline
+\multirow{2}{*}{\textbf{Lectura}}
+  & \multirow{2}{1.15cm}{\centering\textbf{$V_1$} (\unit{\volt})}
+  & \multicolumn{2}{c|}{\textbf{1N4007}}
+  & \multicolumn{2}{c|}{\textbf{1N5817 (Schottky)}}
+  & \multirow{2}{1.15cm}{\centering\textbf{$V_1$} (\unit{\volt})}
+  & \multicolumn{2}{c|}{\textbf{Zener}}\\
+\cline{3-6}\cline{8-9}
+  & & \textbf{$V_D$} & \textbf{$I_D$} & \textbf{$V_D$} & \textbf{$I_D$}
+    & & \textbf{$V_D$} & \textbf{$I_D$}\\
+\hline
+    % Dos escaleras de V1 en la misma tabla. El 1N4007 y el 1N5817 no tienen
+    % ninguna rodilla en inversa: solo fugan unos pocos uA, asi que su V1 se
+    % reparte por todo el rango. El zener si la tiene, y su columna la rodea:
+    %   4,5 - 4,8 - 5,0 - 5,2 - 5,5 V  para el 1N4733A (V_Z = 5,1 V)
+    %   6,3 - 6,6 - 6,8 - 7,0 - 7,3 V  para el 1N4736A (V_Z = 6,8 V)
+    % OJO con el 1N5817: su V_RRM de hoja de datos es de 20 V, de modo que las
+    % lecturas de 21 y 24 V lo dejan fuera de especificacion. El 1N4007 (1000 V)
+    % y el zener (limitado por R1) no tienen problema. A 24 V el zener conduce
+    % 18,6 mA: disipa 95 mW de 1 W, y R1 se queda en 0,35 W, por encima del 1/4 W.
+    1  & 0,5 & & & & & 0,5 & & \\ \hline
+    2  & 1   & & & & & 2   & & \\ \hline
+    3  & 2   & & & & & 4   & & \\ \hline
+    4  & 3   & & & & & 4,5 & & \\ \hline
+    5  & 4   & & & & & 4,8 & & \\ \hline
+    6  & 5   & & & & & 5,0 & & \\ \hline
+    7  & 6   & & & & & 5,2 & & \\ \hline
+    8  & 8   & & & & & 5,5 & & \\ \hline
+    9  & 10  & & & & & 6,3 & & \\ \hline
+    10 & 12  & & & & & 6,6 & & \\ \hline
+    11 & 14  & & & & & 6,8 & & \\ \hline
+    12 & 16  & & & & & 7,0 & & \\ \hline
+    13 & 18  & & & & & 7,3 & & \\ \hline
+    14 & 21  & & & & & 16  & & \\ \hline
+    15 & 24  & & & & & 24  & & \\ \hline
     \end{tabular}
 \end{table}
 
@@ -1104,14 +1109,11 @@ cumple y puede usarse tal cual.
           \dotfill\ $L = \qty{27}{\micro\henry}$
 \end{itemize}
 
-\noindent Con las vueltas bobinadas \emph{juntas}, la geometría queda en función de $N$:
-
-\begin{itemize}[leftmargin=1.4em, itemsep=1pt, topsep=4pt]
-    \item Radio medio del bobinado, $(d + p)/2$
-          \dotfill\ $r = \qty{16.99}{\milli\metre}$
-    \item Longitud del bobinado, $p\,N$
-          \dotfill\ $\ell = \num{0.57}\,N$
-\end{itemize}
+% Iban en dos vinetas con \dotfill, como los datos de partida. Se pasan a texto
+% corrido: son dos expresiones intermedias, no datos que el alumno deba buscar.
+\noindent Con las vueltas bobinadas \emph{juntas}, la geometría queda en función de $N$: el
+radio medio del bobinado es $r = (d + p)/2 = \qty{16.99}{\milli\metre}$ y su longitud,
+$\ell = p\,N = \num{0.57}\,N$.
 
 \noindent Sustituyendo en la ecuación~\eqref{eq:wheeler} e imponiendo los
 \qty{27}{\micro\henry}:
@@ -1126,15 +1128,8 @@ cumple y puede usarse tal cual.
     \num{11.359}\,N^{2} - \num{153.9}\,N - \num{4128} = 0
 \end{gather*}
 
-\noindent Se resuelve con la fórmula general. De las dos raíces solo la positiva tiene
-sentido físico:
-
-\begin{equation*}
-    N = \frac{\num{153.9} + \sqrt{\num{153.9}^{2} + 4 \cdot \num{11.359} \cdot \num{4128}}}
-             {2 \cdot \num{11.359}}
-      = \frac{\num{153.9} + \num{459.6}}{\num{22.718}}
-      = \num{27.0}
-\end{equation*}
+\noindent Resuélvala con la fórmula general: de las dos raíces solo la positiva tiene sentido
+físico, y vale $N = \num{27.0}$.
 
 \noindent La bobina lleva \textbf{27 vueltas}, que ocupan
 $\ell = \qty{15.4}{\milli\metre}$ y dan $\ell/d = \num{0.45}$: la fórmula vale sin
@@ -1230,7 +1225,7 @@ alterna} que se coloca sobre el propio esquema:
           (figura~\ref{fig:proteus}\subref{fig:proteus-f}).
 \end{enumerate}
 
-\begin{figure}[H]
+\begin{figure}[htbp]
     \centering
     \begin{subfigure}{0.30\textwidth}
         \centering
@@ -1319,6 +1314,14 @@ Sobre el circuito montado en el protoboard, el mismo barrido se levanta con el
           Compárela con la que mida directamente sobre el diodo con el
           \emph{Impedance Analyzer}. ¿Coinciden? Si no, ¿cuál de las dos incluye las
           capacidades parásitas del montaje?
+% Pregunta anadida para cerrar la ecuacion eq:q, que hasta ahora se enunciaba y
+% no se usaba: el alumno leia Q ~ 49 en la pagina del circuito y BW = 146 kHz
+% anotado en la figura del Bode, pero nunca lo comprobaba con sus propios datos.
+% No exige barridos nuevos: se leen dos frecuencias sobre una curva ya trazada.
+    \item Sobre uno de los barridos del simulador, mida el ancho del pico a
+          $-3$~dB: las dos frecuencias en que la magnitud cae a $\num{0.707}$ del
+          máximo. Compare ese ancho con el $\Delta f = f_0/Q$ que predice la
+          ecuación~\eqref{eq:q}. ¿Concuerdan?
     \item ¿Por qué este resonador emplea el 1N4007, que es un diodo rectificador lento,
           y no un diodo de señal como el 1N4148, mucho más rápido? Compare la
           capacitancia de juntura de ambos y razone cuál de las dos características
