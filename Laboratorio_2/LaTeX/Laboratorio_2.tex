@@ -470,6 +470,9 @@
 %------------------------------------------------------- numeracion
 \renewcommand{\thesection}{\Roman{section}}
 \renewcommand{\thesubsection}{\arabic{subsection}}
+% Los subapartados cuelgan del numero de su apartado: 2.1, 2.2, 3.1, 3.2...
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+\setcounter{secnumdepth}{3}
 
 %-------------------------------------------------------- hiperenlaces
 \usepackage[hidelinks,pdfusetitle]{hyperref}
@@ -1061,7 +1064,7 @@ $L_1$ no se compra: se bobina. En un solenoide de una capa con núcleo de aire l
 inductancia depende solo de la geometría, de modo que puede calcularse antes de dar la
 primera vuelta.
 
-\subsubsection*{La fórmula}
+\subsubsection{La fórmula}
 
 Se emplea la de Wheeler, aquí ya convertida a milímetros ---en su forma original las
 longitudes van en \emph{pulgadas}, y ese es el error más común con ella---:
@@ -1088,7 +1091,7 @@ diámetro sobre el que se bobina. Cuanto más plana es la bobina, más se aparta
 fórmula del valor real. El diseño de abajo sale con $\ell/d = \num{0.45}$, así que la
 cumple y puede usarse tal cual.
 
-\subsubsection*{El cálculo}
+\subsubsection{El cálculo}
 
 \noindent Datos de partida:
 
@@ -1201,7 +1204,7 @@ diodo:
     \label{fig:bode}
 \end{figure}
 
-\subsubsection*{El barrido en Proteus}
+\subsubsection{El barrido en Proteus}
 
 En Proteus la curva no sale de un instrumento, sino de un \emph{gráfico de barrido en
 alterna} que se coloca sobre el propio esquema:
@@ -1274,6 +1277,18 @@ alterna} que se coloca sobre el propio esquema:
     \label{fig:proteus}
 \end{figure}
 
+
+\subsubsection{El barrido con la tarjeta}
+
+Sobre el circuito montado en el protoboard, el mismo barrido se levanta con el
+\emph{Network Analyzer} de la Analog Discovery Studio. Para configurarlo:
+
+\begin{itemize}[leftmargin=1.4em, itemsep=1pt, topsep=4pt]
+    \item Guía del \emph{Network Analyzer} de WaveForms:\\
+          \url{https://digilent.com/reference/test-and-measurement/guides/waveforms-network-analyzer}
+    \item Vídeo de referencia: \url{https://www.youtube.com/watch?v=31tq_A_2TcY}
+\end{itemize}
+
 % Tres tensiones y no cinco: el barrido se hace ahora sobre el equipo y cada
 % uno exige su propia captura. Se toman 0, 1 y 3 V porque la capacitancia varia
 % deprisa al principio y despacio despues; con L1 = 27 uH la resonancia cruza los
@@ -1283,15 +1298,6 @@ alterna} que se coloca sobre el propio esquema:
 \marcobarrido{\qty{1}{\volt}}
 
 \marcobarrido{\qty{3}{\volt}}
-
-\vspace{4pt}
-\noindent\textbf{Para configurar el instrumento:}
-
-\begin{itemize}[leftmargin=1.4em, itemsep=1pt, topsep=4pt]
-    \item Guía del \emph{Network Analyzer} de WaveForms:\\
-          \url{https://digilent.com/reference/test-and-measurement/guides/waveforms-network-analyzer}
-    \item Vídeo de referencia: \url{https://www.youtube.com/watch?v=31tq_A_2TcY}
-\end{itemize}
 
 \subsection{Preguntas}
 
