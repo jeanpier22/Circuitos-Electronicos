@@ -1281,7 +1281,17 @@ alterna} que se coloca sobre el propio esquema:
 \subsubsection{El barrido con la tarjeta}
 
 Sobre el circuito montado en el protoboard, el mismo barrido se levanta con el
-\emph{Network Analyzer} de la Analog Discovery Studio. Para configurarlo:
+\emph{Network Analyzer} de la Analog Discovery Studio:
+
+\begin{itemize}[leftmargin=1.4em, itemsep=1pt, topsep=4pt]
+    \item Amplitud del generador \dotfill\ \qty{0.5}{\volt}
+    \item Canal~1, referencia \dotfill\ salida del generador (\texttt{W1})
+    \item Canal~2, medida \dotfill\ nodo del diodo
+    \item Barrido \dotfill\ \qtyrange{1}{7}{\mega\hertz}, lineal
+    \item Muestras \dotfill\ \num{1000} o más
+\end{itemize}
+
+\noindent Para manejar el instrumento:
 
 \begin{itemize}[leftmargin=1.4em, itemsep=1pt, topsep=4pt]
     \item Guía del \emph{Network Analyzer} de WaveForms:\\
