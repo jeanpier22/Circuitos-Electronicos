@@ -1,0 +1,988 @@
+%=======================================================================
+%  LABORATORIO N.o 3 - DISENO DE UNA FUENTE DE ALIMENTACION DC
+%  Curso : Circuitos Electronicos  (2026-2)
+%  UCSP  - Facultad de Ingenieria - Ing. Electronica y de Telecomunicaciones
+%  Docente     : Ebert San Roman Castillo
+%  Laboratorio : Ing. Jeanpier Ancori Sanchez
+%
+%  Guia escrita por partes. El documento NO procede de un .doc del docente:
+%  el circuito lo aporto el autor, ya simulado en Proteus.
+%
+%  Version 1 - Solo la cabecera. El preambulo se toma del Laboratorio 2 para que
+%  las tres guias se vean iguales: misma fuente (Trebuchet MS, de ahi que haya
+%  que compilar con XeLaTeX), misma geometria de pagina, mismo encabezado/pie y
+%  la misma numeracion en romanos de las secciones. De aquel archivo se conserva
+%  lo que es formato y se deja fuera todo lo que era contenido del diodo: los
+%  circuitikz de las figuras 1 y 3, la curva de pgfplots y el macro
+%  \marcobarrido del resonador.
+%
+%  Version 2 - Marco teorico en dos hojas, una subseccion por etapa. Las cuatro
+%  figuras se recortan de los dos libros de consulta que hay en Libros/:
+%    - bloques_fuente_es.png    Saber Electronica N.o 40, leccion 6, figura 5.
+%    - puente_semiciclo_*.png   Floyd, Electronic Devices 10 ed., figura 2-38.
+%    - rizado_filtro.png        Floyd, figura 2-44.
+%    - fuente_regulada.png      Floyd, figura 2-51.
+%  La atribucion va en una nota al pie, no repetida en cada pie de figura.
+%
+%  Version 3 - Circuito propuesto y lista de materiales. circuito_fuente.png se
+%  saca de "Fuente DC.png", la captura de Proteus del autor: se le quita el fondo
+%  beige y la reticula. Ojo, los puntos de la reticula son pixeles negros sueltos
+%  y borrarlos por aislamiento se comia los decimales de "0.1uF" y "4.7k"; se
+%  borran solo las motas que no tienen otra tinta en un radio de 6 px.
+%
+%  Version 4 - Los componentes que pueden quemarse van por duplicado en la lista
+%  de materiales, por peticion del autor. El transformador, el interruptor, el
+%  cable y el disipador siguen en 01: son los caros y no estan en el camino de
+%  la averia.
+%
+%  Version 5 - Seccion de construccion, paso a paso y por etapas, con la tabla
+%  de puesta en marcha (calculado / simulado / medido). La figura del cableado
+%  es del folleto de Saber Electronica, leccion 6, figura 4, panel (B).
+%
+%  Version 6 - Se fija el instrumental: Analog Discovery Studio. Sus entradas
+%  admiten +-25 V y comparten masa con el PC, asi que NO puede tocar el primario
+%  y ni siquiera los 32,6 V del filtro sin punta 10:1. Queda en una nota tecnica.
+%  Ademas el montaje pasa a protoboard (salvo el primario) y el circuito de la
+%  figura 5 se recuadra por etapas con TikZ, en coordenadas relativas a la
+%  imagen para que los recuadros la sigan si cambia el ancho.
+%
+%  Version 7 - Repaso de formato: needspace y penalizaciones para que ningun
+%  titulo quede solo al pie, "Paso N." en las listas de la construccion para que
+%  no choquen con el numero de subseccion, y \textasciitilde -> $\sim$, que en
+%  Trebuchet se leia como un guion.
+%
+%  Version 8 - Se cierra la guia. Entra la seccion I de objetivos, que faltaba y
+%  que si tienen los laboratorios 1 y 2, y se reparten los 20 puntos: 6 la
+%  construccion, 8 la caracterizacion, 3 el cuestionario y 3 las conclusiones.
+%
+%  Lo nuevo de fondo es la seccion VI. Hasta la version 7 el alumno montaba la
+%  fuente, la veia dar 26 V en vacio y terminaba: las formulas de regulacion del
+%  marco teorico no se usaban en ningun sitio. Ahora se mide con carga.
+%    - La regulacion de LINEA se saca de la propia tabla de carga y no con un
+%      variac, que el laboratorio no tiene: al cargar la fuente, la continua del
+%      filtro cae sola y ese es el DeltaV_IN. Da una cota, no el dato de la hoja
+%      de datos, y la guia lo dice.
+%    - Las cargas son 470, 220, 100 y 47 ohm. Con la salida en 12 V dan 26, 55,
+%      120 y 255 mA: ninguna llega a 0,3 A, muy por debajo del amperio que
+%      aguantan los contactos de un protoboard.
+%    - La disipacion es el unico punto donde este diseno falla de verdad, asi que
+%      se trabaja aunque el alumno no sepa derivar (ver version 9).
+%
+%  Version 9 - Se baja el nivel: son alumnos de tercer semestre que no han visto
+%  rizado ni valor eficaz. Nada se recorta del temario, se apuntala.
+%    - Entra II.1.1, "Valor eficaz y valor de pico", con la figura 2 en pgfplots:
+%      Vp, Vpp y Vrms sobre una senoide, y la nota de por que eso decide los
+%      componentes (C1 se carga al pico, no al valor del rotulo). Lo pidio el
+%      autor y tenia razon: sin esto, el 1,414 de la ecuacion 1 sale de la nada.
+%      OJO: en esa figura no se puede escribir la flecha "<->", porque babel
+%      spanish deja activos < y > para las comillas latinas y rompe la
+%      compilacion. Va con {Stealth}-{Stealth}.
+%    - Entra un ejemplo resuelto del rizado con los valores de esta fuente y
+%      R_L = 100 ohm (1,23 V de rizado, 31,9 V de continua, r = 3,9 %). El alumno
+%      repite ese patron en la seccion VI en vez de despejar de cero. Usa la caja
+%      \ejemplo, que estaba definida en el preambulo desde el Laboratorio 2 y sin
+%      estrenar.
+%    - Se retira la derivada de P_D respecto de V_OUT. En su lugar, la tabla 3 da
+%      cinco tensiones de salida con la primera fila resuelta: el alumno rellena,
+%      mira la columna y ve el maximo. Misma conclusion, sin calculo diferencial.
+%      Se cambia R_L a 100 ohm para que la corriente no pase de 0,26 A y siga
+%      cuadrando con la caja de seguridad de los 0,3 A.
+%    - Se retira el calculo de resistencias termicas (R_thetaJC, JC, SA y T_J):
+%      es nivel hoja de datos. Se sustituye por comparar P_D con el vatio escaso
+%      que evacua un TO-220 sin disipador, mas la comprobacion de tocarlo.
+%    - La regulacion de linea pasa a tres pasos a), b), c) en vez de un parrafo.
+%
+%  Ademas se dibuja el patillaje del LM317 (figura 6). Se dibuja aqui con TikZ
+%  porque Floyd solo trae el del 78xx, que es justo el que NO hay que usar, y
+%  confundirlos es lo que mas reguladores destruye. Y se anade una nota tecnica
+%  de averias al final de la construccion: sin ella el alumno se quedaba mirando
+%  el protoboard cuando una etapa no daba lo esperado.
+%=======================================================================
+
+\documentclass[11pt,a4paper]{article}
+
+%------------------------------------------------------------- idioma
+% Compilar con XeLaTeX (no con pdflatex): Trebuchet MS es una fuente TrueType
+% del sistema y solo fontspec, bajo XeLaTeX o LuaLaTeX, sabe cargarla.
+% inputenc y fontenc se omiten a proposito: XeLaTeX trabaja en UTF-8 de forma
+% nativa y esos paquetes dan error con este motor.
+\usepackage{fontspec}
+\setmainfont{Trebuchet MS}[
+  Path            = C:/Windows/Fonts/,
+  Extension       = .ttf,
+  UprightFont     = trebuc,
+  BoldFont        = trebucbd,
+  ItalicFont      = trebucit,
+  BoldItalicFont  = trebucbi,
+  Ligatures       = TeX
+]
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{microtype}
+
+%----------------------------------------------------------- geometria
+\usepackage[left=2.4cm,right=2.4cm,top=3.1cm,bottom=2.6cm,headheight=30pt,
+            footskip=1.2cm]{geometry}
+
+%------------------------------------------------------------ graficos
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\usepackage{subcaption}
+\captionsetup{subrefformat=parens}
+\usepackage{circuitikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta}
+\ctikzset{diode=empty, diodes/scale=1.35, bipoles/length=1.25cm}
+\graphicspath{{imagenes/}}
+
+%-------------------------------------------------------------- tablas
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{booktabs}
+\usepackage{multirow}
+
+%----------------------------------------------------- matematicas / SI
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\sisetup{
+  output-decimal-marker = {,},
+  per-mode              = symbol,
+  range-phrase          = { a },
+  range-units           = single,
+  % Sin esto siunitx compone los numeros en modo matematico, y como la fuente
+  % matematica no es Trebuchet salian en Computer Modern: dentro de una misma
+  % linea, "02 resistencias" en Trebuchet y el "68" en CM. Con "match" el
+  % numero toma la fuente del entorno: la del texto en los parrafos y la
+  % matematica dentro de las ecuaciones, que es donde si debe ir en CM.
+  mode                  = match,
+  detect-weight         = true,
+  detect-family         = true
+}
+
+%--------------------------------------------------------------- listas
+\usepackage{enumitem}
+\setlist[itemize]{itemsep=3pt,topsep=4pt,parsep=0pt}
+\setlist[enumerate]{itemsep=8pt,topsep=4pt,parsep=0pt}
+
+%--------------------------------------------------------------- cajas
+\usepackage[most]{tcolorbox}
+\usepackage{pgffor}
+
+\newtcolorbox{notatec}[1]{enhanced,breakable,
+  colback=blue!3!white, colframe=blue!55!black,
+  fonttitle=\bfseries\small, title={Nota técnica --- #1},
+  boxrule=0.6pt, arc=2pt, left=6pt,right=6pt,top=4pt,bottom=4pt}
+
+\newtcolorbox{seguridad}[1]{enhanced,breakable,
+  colback=red!3!white, colframe=red!60!black,
+  fonttitle=\bfseries\small, title={Seguridad --- #1},
+  boxrule=0.6pt, arc=2pt, left=6pt,right=6pt,top=4pt,bottom=4pt}
+
+\newtcolorbox{ejemplo}[1]{enhanced,breakable,
+  colback=green!3!white, colframe=green!45!black,
+  fonttitle=\bfseries\small, title={Ejemplo de diseño --- #1},
+  boxrule=0.6pt, arc=2pt, left=6pt,right=6pt,top=4pt,bottom=4pt}
+
+%------------------------------------------------------------ comandos
+% Lineas punteadas para respuestas del alumno: \lineasresp{n}
+\newcommand{\lineasresp}[1]{%
+  \par\vspace{6pt}%
+  \foreach \i in {1,...,#1}{\noindent\rule{\linewidth}{0.4pt}\par\vspace{11pt}}%
+}
+
+% Puntaje al final del titulo de una seccion calificada.
+\newcommand{\puntos}[1]{\normalfont\normalsize\textmd{(#1 puntos)}}
+
+%----------------------------------------------------- compaginacion
+% Sin esto, "2. Rectificador" quedaba solo al pie de la pagina 1 con dos
+% lineas debajo. Se exige un minimo de espacio antes de cada titulo y se
+% prohiben viudas y huerfanas.
+\usepackage{needspace}
+\usepackage{etoolbox}
+\pretocmd{\section}{\needspace{5\baselineskip}}{}{}
+\pretocmd{\subsection}{\needspace{4\baselineskip}}{}{}
+\widowpenalty=10000
+\clubpenalty=10000
+
+%--------------------------------------------------- colores de etapa
+% Un color por etapa de la fuente. Se usan en los recuadros que se dibujan
+% encima de la captura del circuito.
+\definecolor{etapaA}{HTML}{1F6FB2}   % transformador
+\definecolor{etapaB}{HTML}{C0392B}   % rectificador
+\definecolor{etapaC}{HTML}{B7791F}   % filtro
+\definecolor{etapaD}{HTML}{2E7D32}   % regulador
+
+%------------------------------------------------------------ espaciado
+% El marco teorico es casi todo figuras y ecuaciones, y con los valores por
+% defecto se desbordaba a una tercera hoja por unos pocos centimetros de aire.
+% Se recorta el blanco alrededor de ambas, no su tamano: las figuras siguen
+% igual de grandes. amsmath fija los saltos de display al empezar el documento,
+% de ahi el \AtBeginDocument.
+\setlength{\intextsep}{9pt}
+\setlength{\abovecaptionskip}{6pt}
+\AtBeginDocument{%
+  \setlength{\abovedisplayskip}{7pt}%
+  \setlength{\belowdisplayskip}{7pt}%
+  \setlength{\abovedisplayshortskip}{4pt}%
+  \setlength{\belowdisplayshortskip}{4pt}%
+}
+
+%---------------------------------------------------- encabezado / pie
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize UCSP --- Facultad de Ingeniería\\
+              Ing. Electrónica y de Telecomunicaciones}
+\fancyhead[R]{\footnotesize 2026-2 Circuitos Electrónicos\\
+              Ebert San Román Castillo}
+\fancyfoot[L]{\footnotesize Laboratorio N.\textsuperscript{o} 3 --- Diseño de una fuente de alimentación DC}
+\fancyfoot[R]{\footnotesize Página \thepage\ de \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\usepackage{lastpage}
+
+%------------------------------------------------------- numeracion
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\arabic{subsection}}
+% Los subapartados cuelgan del numero de su apartado: 2.1, 2.2, 3.1, 3.2...
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+\setcounter{secnumdepth}{3}
+
+%-------------------------------------------------------- hiperenlaces
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+\usepackage{xurl}
+\hypersetup{
+  pdftitle={Laboratorio 3 - Diseno de una fuente de alimentacion DC},
+  pdfsubject={Circuitos Electronicos - Guia de practicas},
+  pdfauthor={Ebert San Roman Castillo; Jeanpier Ancori Sanchez},
+  pdfkeywords={electronica, fuente de alimentacion DC, transformador 220/24,
+               rectificador en puente, GBU6B, filtro por condensador, rizado,
+               regulador LM317, Proteus, protoboard, Analog Discovery Studio}
+}
+
+% babel-spanish rotula las tablas como "Cuadro"; los originales dicen "Tabla".
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+\begin{document}
+
+%=======================================================================
+%  CABECERA DE LA GUIA
+%=======================================================================
+% El documento es de 11 pt, asi que \normalsize son los 11 pt del Word original.
+\begin{center}
+    {\normalsize\bfseries PRIMERA UNIDAD: DIODOS Y APLICACIONES BÁSICAS}
+\end{center}
+
+\vspace{0.55cm}
+
+% Cabecera identica a la de los laboratorios 1 y 2.
+\begingroup
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\renewcommand{\arraystretch}{2.0}
+\setlength{\tabcolsep}{12pt}
+\noindent
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}X|>{\centering\arraybackslash}m{3.0cm}|}
+\hline
+\rule{0pt}{2.1cm}{\fontsize{58}{58}\selectfont\bfseries 3}
+    & \begin{minipage}[c]{\linewidth}\centering
+          {\large\bfseries Guía de Prácticas}\\[7pt]
+          {\Large\bfseries Diseño de una Fuente\\ de Alimentación DC}
+      \end{minipage}
+    & {\Large\bfseries Nota}\\
+\hline
+\multicolumn{3}{|l|}{\rule{0pt}{1.3cm}\large\textbf{Grupo:}~\rule{4.6cm}{0.4pt}%
+    \hfill\large\textbf{Fecha:}~\rule{4.6cm}{0.4pt}\hspace{2mm}}\\
+\hline
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\large\textbf{Alumno(s):}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\phantom{\large\textbf{Alumno(s):}}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
+\hline
+\end{tabularx}
+\endgroup
+
+\vspace{0.8cm}
+
+%=======================================================================
+\section{Objetivos}
+%=======================================================================
+El objetivo de esta práctica es diseñar, construir y caracterizar una fuente de
+alimentación DC de salida ajustable. Para ello se desarrollan las siguientes actividades:
+
+\begin{itemize}
+    \item Reconocer las cuatro etapas de una fuente DC y la función de cada una.
+    \item Calcular la tensión de pico, la tensión continua y el rizado de un rectificador
+          en puente con filtro por condensador, y contrastarlos con la simulación y con la
+          medida.
+    \item Montar la fuente por etapas, verificando cada una antes de pasar a la siguiente.
+    \item Ajustar la salida con el regulador LM317 y comprobar que el rango medido
+          coincide con el que predice su ecuación.
+    \item Caracterizar la fuente con carga: regulación de línea, regulación de carga y
+          rizado.
+    \item Evaluar la potencia que disipa el regulador y decidir si el disipador elegido
+          es suficiente.
+\end{itemize}
+
+\FloatBarrier
+%=======================================================================
+\section{Marco teórico}
+%=======================================================================
+Una fuente de alimentación DC convierte la tensión alterna de la red en una tensión
+continua estable. El trabajo se reparte en etapas y cada una entrega a la siguiente una
+señal más parecida a la continua ideal (figura~\ref{fig:bloques}). Esta práctica
+construye las cuatro primeras: la etapa de protección queda fuera del proyecto.\footnote{%
+Las figuras de esta sección proceden de Floyd, \emph{Electronic Devices},
+10.\textsuperscript{a}~ed., capítulo 2, y de Vallejo y Lopardo, \emph{Curso de electrónica
+para principiantes}, lección 6.}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.82\linewidth]{bloques_fuente_es.png}
+  \caption[Etapas de una fuente de alimentación DC]{Etapas de una fuente de alimentación
+  DC. La de esta práctica llega hasta el bloque de regulación.}
+  \label{fig:bloques}
+\end{figure}
+
+%-----------------------------------------------------------------------
+\subsection{Transformador}
+%-----------------------------------------------------------------------
+Reduce los \qty{220}{\volt} de la red a los \qty{24}{\volt} que necesita el resto del
+circuito y, de paso, aísla el montaje de la línea. La relación entre ambas tensiones la
+fija la relación de vueltas de los dos bobinados. Ambas son tensiones eficaces, pero lo
+que ven los diodos es el valor de pico:
+\begin{equation}
+  \frac{V_{\text{sec}}}{V_{\text{pri}}}=\frac{N_{\text{sec}}}{N_{\text{pri}}}
+  \qquad\qquad
+  V_{p(\text{sec})}=\sqrt{2}\,V_{\text{rms}}=1{,}414\times\qty{24}{\volt}=\qty{33.9}{\volt}
+\end{equation}
+
+%-----------------------------------------------------------------------
+\subsubsection{Valor eficaz y valor de pico}
+%-----------------------------------------------------------------------
+Una tensión alterna no vale lo mismo en todo instante, así que hace falta acordar con qué
+número se la nombra. Se usan tres, y conviene no confundirlos
+(figura~\ref{fig:rms}):
+
+\begin{itemize}
+  \item El \textbf{valor de pico} $V_p$ es lo máximo que alcanza la onda. Es el que
+        soportan de verdad los componentes.
+  \item El \textbf{valor pico a pico} $V_{pp}=2V_p$ es lo que se lee de frente en la
+        pantalla del osciloscopio.
+  \item El \textbf{valor eficaz} o \textbf{rms} $V_{\text{rms}}$ es el valor de continua
+        que calentaría una resistencia igual que esa alterna. Es el que mide el multímetro
+        y con el que se rotulan la red y los transformadores.
+\end{itemize}
+
+Para una onda senoidal, y solo para ella, los tres están ligados por
+\begin{equation}
+  V_p=\sqrt{2}\,V_{\text{rms}}\approx 1{,}414\,V_{\text{rms}}
+  \qquad
+  V_{\text{rms}}=\frac{V_p}{\sqrt{2}}\approx 0{,}707\,V_p
+  \qquad
+  V_{pp}=2V_p
+  \label{eq:rms}
+\end{equation}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}
+  \begin{axis}[
+      width=11.5cm, height=5.0cm,
+      axis lines=middle, axis line style={-},
+      xmin=0, xmax=6.6, ymin=-1.45, ymax=1.45,
+      xtick=\empty, ytick={-1,-0.707,0.707,1},
+      yticklabels={$-V_p$,,,$V_p$},
+      xlabel={$t$}, xlabel style={at={(axis description cs:1,0.5)}, anchor=west},
+      tick label style={font=\footnotesize}, clip=false,
+  ]
+  \addplot[blue!65!black, line width=1.2pt, samples=200, domain=0:6.4] {sin(deg(x))};
+  % lineas de pico y de eficaz
+  \addplot[gray, dashed, samples=2, domain=0:6.4] {1};
+  \addplot[gray, dashed, samples=2, domain=0:6.4] {-1};
+  \addplot[red!70!black, densely dotted, line width=1pt, samples=2, domain=0:6.4] {0.707};
+  \node[red!70!black, font=\footnotesize, anchor=west] at (axis cs:6.45,0.707)
+       {$V_{\text{rms}}=0{,}707\,V_p$};
+  % Flecha pico a pico. Ojo: no se puede escribir "<->" porque babel-spanish deja
+  % activos los caracteres < y > para las comillas latinas y rompe la compilacion.
+  \draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, black, line width=0.8pt]
+       (axis cs:1.571,1) -- (axis cs:1.571,-1);
+  \node[fill=white, inner sep=1pt, font=\footnotesize] at (axis cs:1.571,0.28) {$V_{pp}$};
+  \end{axis}
+  \end{tikzpicture}
+  \caption[Valor de pico, pico a pico y eficaz]{Los tres valores de una senoide. El
+  multímetro en alterna mostraría \qty{24}{\volt} en nuestro secundario; el osciloscopio,
+  \qty{33.9}{\volt} de pico y \qty{67.9}{\volt} de pico a pico.}
+  \label{fig:rms}
+\end{figure}
+
+\begin{notatec}{por qué esto decide los componentes}
+El transformador dice \qty{24}{\volt} porque es su valor eficaz, pero el condensador se
+carga hasta el \textbf{pico}, \qty{33.9}{\volt}. Si eligiera C1 pensando en los
+\qty{24}{\volt} del rótulo, se quedaría corto. Lo mismo pasa con la tensión inversa que
+aguantan los diodos: también se calcula sobre el pico, nunca sobre el eficaz.
+\end{notatec}
+
+%-----------------------------------------------------------------------
+\subsection{Rectificador}
+%-----------------------------------------------------------------------
+Cuatro diodos en puente invierten el semiciclo negativo en lugar de descartarlo, de modo
+que la carga recibe los dos semiciclos (figura~\ref{fig:puente}) y la ondulación sale al
+doble de la frecuencia de red, \qty{120}{\hertz}. En cada semiciclo la corriente atraviesa
+dos diodos en serie con la carga, así que el pico a la salida queda \qty{1.4}{\volt} por
+debajo del pico del secundario. La PIV es la tensión inversa que soporta cada diodo, y es
+el dato con el que se elige el componente:
+\begin{equation}
+  V_{p(\text{out})}=V_{p(\text{sec})}-\qty{1.4}{\volt}
+  \qquad\qquad
+  \text{PIV}=V_{p(\text{out})}+\qty{0.7}{\volt}
+\end{equation}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}{0.49\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{puente_semiciclo_pos.png}
+    \caption{Semiciclo positivo: conducen $D_1$ y $D_2$.}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.49\linewidth}
+    \centering
+    \includegraphics[width=\linewidth]{puente_semiciclo_neg.png}
+    \caption{Semiciclo negativo: conducen $D_3$ y $D_4$.}
+  \end{subfigure}
+  \caption[Funcionamiento del rectificador en puente]{Funcionamiento del rectificador en
+  puente: en los dos semiciclos la corriente recorre $R_L$ en el mismo sentido.}
+  \label{fig:puente}
+\end{figure}
+
+%-----------------------------------------------------------------------
+\subsection{Filtro}
+%-----------------------------------------------------------------------
+La salida del puente es continua pero pulsante. Un condensador en paralelo con la carga se
+carga en cada pico y se descarga entre pico y pico, con lo que la tensión ya no baja hasta
+cero: lo que queda es el \emph{rizado} (figura~\ref{fig:rizado}). Cuanto mayor sea $C$ o
+$R_L$, menor es el rizado y mejor el factor de rizado $r=V_{r(pp)}/V_{\text{DC}}$:
+\begin{equation}
+  V_{r(pp)}\approx\left(\frac{1}{f\,R_L\,C}\right)V_{p(\text{rect})}
+  \qquad
+  V_{\text{DC}}\approx\left(1-\frac{1}{2f\,R_L\,C}\right)V_{p(\text{rect})}
+  \label{eq:rizado}
+\end{equation}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.88\linewidth]{rizado_filtro.png}
+  \caption[Rizado a la salida del filtro]{Rizado (línea continua) sobre la señal
+  rectificada (línea de trazos). A la derecha, el mismo circuito con más capacidad.}
+  \label{fig:rizado}
+\end{figure}
+
+% Ejemplo resuelto con los valores de ESTA fuente. Va aqui a proposito: el
+% alumno de tercer semestre no ha visto rizado antes, y con un caso numerico
+% delante repite el patron en la seccion VI sin tener que despejar nada.
+\begin{ejemplo}{el rizado de nuestra fuente con una carga de \qty{100}{\ohm}}
+Partimos del secundario, \qty{24}{\volt} eficaces, con $C=\qty{2200}{\micro\farad}$ y
+$f=\qty{120}{\hertz}$. El pico del secundario y el de la señal rectificada son
+\[
+  V_{p(\text{sec})}=1{,}414\times\qty{24}{\volt}=\qty{33.9}{\volt}
+  \qquad
+  V_{p(\text{rect})}=\qty{33.9}{\volt}-\qty{1.4}{\volt}=\qty{32.5}{\volt}
+\]
+Sustituyendo en las dos fórmulas de arriba, con $R_L=\qty{100}{\ohm}$:
+\[
+  V_{r(pp)}\approx\frac{\qty{32.5}{\volt}}{120\times100\times2200\times10^{-6}}
+  =\frac{\qty{32.5}{\volt}}{26{,}4}=\qty{1.23}{\volt}
+\]
+\[
+  V_{\text{DC}}\approx\left(1-\frac{1}{2\times120\times100\times2200\times10^{-6}}\right)
+  \qty{32.5}{\volt}=0{,}981\times\qty{32.5}{\volt}=\qty{31.9}{\volt}
+\]
+El factor de rizado resulta $r=\qty{1.23}{\volt}/\qty{31.9}{\volt}=0{,}039$, es decir un
+\qty{3.9}{\percent}. \textbf{Este es el patrón de cálculo que se repite en la
+sección~\ref{sec:caracterizacion}}, cambiando solo $R_L$.
+\end{ejemplo}
+
+%-----------------------------------------------------------------------
+\subsection{Regulador}
+%-----------------------------------------------------------------------
+El filtro reduce el rizado, pero la salida sigue moviéndose cuando cambia la red o la
+carga. El regulador la mantiene fija (figura~\ref{fig:regulada}) y su calidad se mide con
+dos cifras:
+\begin{equation}
+  \text{Reg. de línea}=\left(\frac{\Delta V_{\text{OUT}}}{\Delta V_{\text{IN}}}\right)100\%
+  \qquad
+  \text{Reg. de carga}=\left(\frac{V_{\text{NL}}-V_{\text{FL}}}{V_{\text{FL}}}\right)100\%
+\end{equation}
+donde $V_{\text{NL}}$ es la salida sin carga y $V_{\text{FL}}$ la salida a plena carga.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.88\linewidth]{fuente_regulada.png}
+  \caption[Fuente DC regulada completa]{Las cuatro etapas en un mismo esquema, aquí con
+  red de \qty{120}{\volt} y regulador de \qty{5}{\volt}.}
+  \label{fig:regulada}
+\end{figure}
+
+\FloatBarrier
+%=======================================================================
+\section{Circuito propuesto}
+%=======================================================================
+La figura~\ref{fig:circuito} es el circuito que se va a montar, con las tensiones que
+entrega la simulación. El transformador TR1 baja los \qty{220}{\volt} de la red a
+\qty{24}{\volt}; el puente BR1 los rectifica y C1 los filtra, con lo que a la entrada del
+regulador hay \qty{32.6}{\volt} de continua. El regulador es un LM317, que no da una
+tensión fija sino ajustable: R1 y el potenciómetro RV1 fijan la salida según
+\begin{equation}
+  V_{\text{OUT}}=\qty{1.25}{\volt}\left(1+\frac{R_{V1}}{R_1}\right)
+  \label{eq:lm317}
+\end{equation}
+Con $R_1=\qty{240}{\ohm}$ y RV1 al máximo la salida llega a los \qty{26}{\volt} de la
+simulación, y con RV1 a cero baja hasta \qty{1.25}{\volt}: ese es el rango de ajuste de la
+fuente.
+
+\begin{figure}[H]
+  \centering
+  % Los recuadros de etapa se dibujan encima de la captura con TikZ, en coordenadas
+  % relativas a la propia imagen (de 0 a 1): si la figura se reescala, las cajas la
+  % siguen. Asi no hay que retocar el PNG cada vez que cambie el ancho.
+  \begin{tikzpicture}
+    \node[anchor=south west, inner sep=0] (esq) at (0,0)
+      {\includegraphics[width=\linewidth]{circuito_fuente.png}};
+    \begin{scope}[x={(esq.south east)}, y={(esq.north west)}]
+      \foreach \xa/\xb/\col/\etq in {%
+          0.000/0.305/etapaA/{1. Transformador},
+          0.305/0.462/etapaB/{2. Rectificador},
+          0.462/0.660/etapaC/{3. Filtro},
+          0.660/1.000/etapaD/{4. Regulador}}
+      {
+        \draw[\col, dashed, line width=1pt, rounded corners=3pt]
+             ({\xa+0.004}, 0.015) rectangle ({\xb-0.004}, 0.975);
+        \node[\col, font=\bfseries\footnotesize, anchor=south]
+             at ({(\xa+\xb)/2}, 0.99) {\etq};
+      }
+    \end{scope}
+  \end{tikzpicture}
+  \caption[Circuito de la fuente DC ajustable]{Circuito de la fuente, simulado en Proteus,
+  con sus cuatro etapas recuadradas. El interruptor de red no aparece en el esquema: va en
+  serie con el primario de TR1, antes del transformador.}
+  \label{fig:circuito}
+\end{figure}
+
+\FloatBarrier
+%=======================================================================
+\section{Equipos y materiales}
+%=======================================================================
+\noindent\textbf{Equipos y dispositivos:}
+\begin{itemize}
+    \item Tarjeta Analog Discovery Studio, con el instrumento \emph{Osciloscopio}.
+    % Sus entradas llegan a +-25 V y en esta fuente hay 32,6 V: sin puntas 10x la
+    % traza sale recortada. Ver la nota tecnica de mas abajo.
+    \item 02 puntas de osciloscopio con atenuación 10:1.
+    \item Multímetro.
+\end{itemize}
+
+\begin{notatec}{la tarjeta no mide la red, y tampoco los \qty{32.6}{\volt} en directo}
+Las entradas del osciloscopio de la Analog Discovery Studio admiten
+\textbf{\qty{\pm25}{\volt}} y están protegidas hasta \qty{\pm50}{\volt}; además comparten
+masa con el PC por el USB, es decir, no están aisladas.
+\begin{itemize}
+    \item \textbf{Nunca} conecte la tarjeta al primario. Los \qty{220}{\volt} eficaces son
+          \qty{311}{\volt} de pico: destruiría la tarjeta y probablemente el computador,
+          con riesgo para quien lo manipule.
+    \item El secundario (\qty{34}{\volt} de pico) y la salida del filtro
+          (\qty{32.6}{\volt}) \emph{también} superan los \qty{25}{\volt}. Mídalos con
+          punta 10:1, que los deja en \qty{3.4}{\volt} y \qty{3.3}{\volt}, o
+          con el multímetro.
+    \item El osciloscopio comparte canales con el \emph{Network Analyzer} y el
+          \emph{Impedance Analyzer}: no se pueden usar a la vez.
+\end{itemize}
+\end{notatec}
+
+\noindent\textbf{Software:}
+\begin{itemize}
+    \item Simulador de circuitos: Proteus o Multisim.
+\end{itemize}
+
+\vspace{0.25cm}
+\noindent\textbf{Materiales y fungibles} (deben ser adquiridos por los alumnos). Los
+componentes que pueden quemarse en el montaje van \textbf{por duplicado}: son baratos y
+así una avería no deja el laboratorio a medias.
+\begin{itemize}
+    % --- Etapa de red y transformador. Ni el transformador ni el interruptor se
+    % duplican: son los dos componentes caros y no estan en el camino de la averia.
+    \item 01 transformador de \qty{220}{\volt} a \qty{24}{\volt}, de \qty{2}{\ampere}
+          (TR1).
+    % El alumno olvido dibujarlo en el esquema; va en el primario, antes de TR1.
+    \item 01 interruptor de red para \qty{220}{\volt}, de 2 a \qty{3}{\ampere}.
+    \item 01 cable de alimentación con enchufe.
+    % --- Rectificacion. El GBU6B es de 6 A y 100 V; la PIV que exige el circuito es
+    % de solo 33,4 V, asi que va sobrado. Aun asi se duplica: un corto a la salida o
+    % un electrolitico al reves se lo llevan por delante.
+    \item \textbf{02} puentes rectificadores GBU6B (\qty{6}{\ampere}, \qty{100}{\volt})
+          (BR1).
+    % --- Filtro. C1 ve los 32,6 V de pico: la regla practica pide un condensador de
+    % al menos un 50 % mas, y el valor normalizado que sigue es 50 V.
+    % Los electroliticos son polarizados: montarlos al reves es el error clasico y
+    % terminan reventando. Por eso van dobles.
+    \item \textbf{02} condensadores electrolíticos de \qty{2200}{\micro\farad} /
+          \qty{50}{\volt} (C1).
+    \item \textbf{02} condensadores cerámicos de \qty{0.1}{\micro\farad} /
+          \qty{50}{\volt} (C2).
+    \item \textbf{02} condensadores electrolíticos de \qty{1}{\micro\farad} /
+          \qty{50}{\volt} (C3).
+    % --- Regulacion. El LM317 es el que mas se quema: se lleva toda la diferencia
+    % entre la entrada y la salida en forma de calor.
+    \item \textbf{02} reguladores LM317T (U1).
+    % Por R1 y RV1 circulan 5,2 mA: disipan milivatios, de ahi el 1/4 W. Se duplican
+    % porque si cualquiera de los dos se abre, la salida salta al maximo y arrastra
+    % a lo que este conectado.
+    \item \textbf{02} resistencias de \qty{240}{\ohm} (1/4\,\unit{\watt}) (R1).
+    \item \textbf{02} potenciómetros de \qty{4.7}{\kilo\ohm} (RV1).
+    % El LM317 se lleva la diferencia entre sus 32,6 V de entrada y la salida: en el
+    % extremo bajo del ajuste eso son decenas de vatios. Sin disipador no aguanta.
+    \item 01 disipador para el LM317T, con su tornillo y su mica aislante.
+    % --- Cargas de la seccion VI. Con la salida en 12 V dan 26, 55, 120 y 255 mA:
+    % ninguna llega a los 0,3 A, muy por debajo del amperio que aguanta un
+    % protoboard. El vatiaje es el del caso peor de cada una, ya redondeado.
+    \item 01 resistencia de \qty{470}{\ohm} y 01 de \qty{220}{\ohm}
+          (1\,\unit{\watt}), para las pruebas con carga.
+    \item 01 resistencia de \qty{100}{\ohm} y 01 de \qty{47}{\ohm}
+          (5\,\unit{\watt}), para las pruebas con carga.
+    % --- Montaje. Se arma en protoboard, pero el primario NO: ver la caja de
+    % seguridad. De ahi la bornera y el aislante, que son solo para ese tramo.
+    \item 01 protoboard.
+    \item Cables conectores para protoboard.
+    \item 01 bornera de conexión y cinta aislante o tubo termorretráctil, para cablear
+          el primario fuera del protoboard.
+    \item Mandil (obligatorio).
+\end{itemize}
+
+\begin{seguridad}{el primario no va en el protoboard}
+La fuente se arma en protoboard \textbf{a partir del secundario}. El tramo enchufe --
+interruptor -- primario de TR1 está a \qty{220}{\volt} y sus contactos quedarían
+accesibles: cablee ese tramo aparte, con bornera y las uniones aisladas, y déjelo
+desconectado mientras trabaja. Desde el secundario en adelante todo es baja tensión y se
+maneja con normalidad, siempre con la fuente desenchufada.
+\end{seguridad}
+
+\FloatBarrier
+%=======================================================================
+\section{Construcción \puntos{6}}
+%=======================================================================
+El montaje se hace \textbf{en clase} y sobre \textbf{protoboard}, salvo el primario. La
+fuente se arma y se comprueba \textbf{por etapas}: no pase a la siguiente hasta que la
+anterior entregue la tensión que le corresponde. Anote cada medida en la
+tabla~\ref{tab:puesta-marcha}.
+
+%-----------------------------------------------------------------------
+\subsection{Antes de montar}
+%-----------------------------------------------------------------------
+\begin{enumerate}[label=\textbf{Paso \arabic*.}, leftmargin=*, labelsep=0.6em]
+\item Compruebe cada componente con el multímetro: los cuatro diodos del puente en la
+escala de prueba de diodos, la continuidad del interruptor, el valor de R1 y el recorrido
+de RV1 de extremo a extremo.
+\item Identifique los terminales. El puente lleva marcados los dos de alterna
+($\sim$) y los de continua ($+$ y $-$). El LM317 se lee como en la
+figura~\ref{fig:lm317}: su orden \emph{no} es el de un 78xx, y montarlo por analogía lo
+destruye.
+\end{enumerate}
+
+\begin{figure}[H]
+  \centering
+  % Encapsulado TO-220 visto de frente, con la cara metalica hacia atras. Se
+  % dibuja aqui y no se toma de ningun libro: Floyd solo trae el pinout del 78xx,
+  % que es justo el que NO hay que usar.
+  \begin{tikzpicture}[line width=0.9pt, scale=1.0]
+    % cuerpo
+    \draw[fill=black!12, rounded corners=1.5pt] (0,0) rectangle (2.6,2.0);
+    % pestana metalica con su agujero
+    \draw[fill=black!25, rounded corners=1.5pt] (0,2.0) rectangle (2.6,2.9);
+    \draw[fill=white] (1.3,2.45) circle (0.22);
+    \node[font=\scriptsize\itshape, anchor=west] at (2.85,2.45) {cara metálica (atrás)};
+    \node[font=\small\bfseries] at (1.3,1.0) {LM317T};
+    % patas
+    \foreach \x/\n/\r in {0.55/1/ADJ, 1.30/2/{V\textsubscript{OUT}}, 2.05/3/{V\textsubscript{IN}}}{
+      \draw (\x,0) -- (\x,-0.75);
+      \node[font=\scriptsize, anchor=north] at (\x,-0.80) {\n};
+      \node[font=\scriptsize\bfseries, anchor=north, rotate=90, anchor=east]
+           at (\x,-1.15) {\r};
+    }
+  \end{tikzpicture}
+  \caption[Patillaje del LM317T]{Patillaje del LM317T en cápsula TO-220, visto de frente
+  con la cara metálica hacia atrás. La pestaña metálica está unida internamente a
+  V\textsubscript{OUT}: por eso el disipador necesita mica aislante.}
+  \label{fig:lm317}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=0.78\linewidth]{armado_puente_terminales.png}
+  \caption[Cableado de las tres primeras etapas]{Cableado de las tres primeras etapas, que
+  son iguales a las de nuestra fuente. El folleto lo resuelve sobre un puente de
+  terminales; nosotros haremos lo mismo en protoboard, con una salvedad: el tramo enchufe
+  -- interruptor -- primario va cableado aparte. Tomado del folleto de Saber Electrónica.}
+  \label{fig:armado}
+\end{figure}
+
+%-----------------------------------------------------------------------
+\subsection{Etapa de red y transformador}
+%-----------------------------------------------------------------------
+\begin{enumerate}[label=\textbf{Paso \arabic*.}, leftmargin=*, labelsep=0.6em, start=3]
+\item Cablee enchufe $\rightarrow$ interruptor $\rightarrow$ primario de TR1 \textbf{fuera
+del protoboard}, con bornera y las uniones aisladas. Deje el transformador apoyado en la
+mesa, nunca sobre la placa.
+\item Lleve los dos hilos del secundario al protoboard. Conecte, accione el interruptor y
+mida el secundario con el \textbf{multímetro en alterna}. Desconecte.
+\end{enumerate}
+
+%-----------------------------------------------------------------------
+\subsection{Rectificador}
+%-----------------------------------------------------------------------
+\begin{enumerate}[label=\textbf{Paso \arabic*.}, leftmargin=*, labelsep=0.6em, start=5]
+\item Con la fuente desconectada, pinche el puente en el protoboard y una a sus terminales
+$\sim$ los dos hilos del secundario. Todavía sin condensador.
+\item Conecte y mida en \textbf{continua} entre $+$ y $-$: obtendrá el valor medio de la
+señal rectificada. Con la tarjeta y la punta 10:1 verá los dos semiciclos a
+\qty{120}{\hertz}.
+\end{enumerate}
+
+%-----------------------------------------------------------------------
+\subsection{Filtro}
+%-----------------------------------------------------------------------
+\begin{enumerate}[label=\textbf{Paso \arabic*.}, leftmargin=*, labelsep=0.6em, start=7]
+\item Monte C1 entre $+$ y $-$ \textbf{respetando la polaridad}, y C2 en paralelo con él.
+\item Mida de nuevo en continua: la tensión sube hasta el valor de pico. Con la punta
+10:1 y el osciloscopio en acoplamiento AC, mida el rizado $V_{r(pp)}$.
+\end{enumerate}
+
+%-----------------------------------------------------------------------
+\subsection{Regulador}
+%-----------------------------------------------------------------------
+\begin{enumerate}[label=\textbf{Paso \arabic*.}, leftmargin=*, labelsep=0.6em, start=9]
+\item Atornille el LM317 al disipador con su mica aislante antes de pincharlo en el
+protoboard.
+\item Lleve el $+$ del filtro a V\textsubscript{IN}. Monte R1 entre V\textsubscript{OUT} y
+ADJ, RV1 entre ADJ y el negativo, y C3 a la salida.
+\item Conecte y gire RV1 de un extremo al otro midiendo la salida. Anote el mínimo y el
+máximo, y contrástelos con la ecuación~\eqref{eq:lm317}.
+\end{enumerate}
+
+\begin{table}[H]
+  \centering
+  \caption{Puesta en marcha por etapas.}
+  \label{tab:puesta-marcha}
+  \small
+  % Filas altas: el alumno tiene que poder anotar a mano en cada casilla.
+  \renewcommand{\arraystretch}{2.3}
+  \begin{tabularx}{\linewidth}{@{}|>{\raggedright\arraybackslash}X
+                                 |>{\centering\arraybackslash}m{2.5cm}
+                                 |>{\centering\arraybackslash}m{2.5cm}
+                                 |>{\centering\arraybackslash}m{2.5cm}|@{}}
+    \hline
+    \textbf{Punto de medida} & \textbf{Calculado} & \textbf{Simulado} & \textbf{Medido}\\
+    \hline
+    Secundario de TR1 (AC)                    & & & \\ \hline
+    Salida del puente, sin C1 (DC)            & & & \\ \hline
+    Salida del filtro (DC)                    & & & \\ \hline
+    Rizado $V_{r(pp)}$ a la salida del filtro & & & \\ \hline
+    Salida mínima de la fuente                & & & \\ \hline
+    Salida máxima de la fuente                & & & \\ \hline
+  \end{tabularx}
+\end{table}
+
+\begin{seguridad}{descargue C1 antes de tocar el montaje}
+C1 queda cargado a más de \qty{30}{\volt} después de desconectar y no se descarga solo.
+Antes de modificar el circuito, descárguelo con una resistencia y compruebe con el
+multímetro que la tensión ha bajado a cero.
+\end{seguridad}
+
+\begin{notatec}{si una etapa no entrega lo que debe}
+Desconecte antes de cambiar nada. El síntoma dice casi siempre dónde está el fallo:
+\begin{itemize}
+    \item \textbf{Sin tensión en el secundario.} Interruptor, cableado del primario o el
+          propio transformador. Verifique continuidad con la fuente desenchufada.
+    \item \textbf{El rizado sale a \qty{60}{\hertz} en vez de \qty{120}{\hertz}, y la
+          continua es la mitad.} Un diodo del puente está abierto: solo rectifica media
+          onda. Sustituya el puente.
+    \item \textbf{C1 se calienta, se hincha o huele.} Está montado al revés. Desconecte de
+          inmediato y no lo reutilice.
+    \item \textbf{La salida no baja del máximo y no responde al potenciómetro.} RV1 está
+          abierto o conectado por el terminal equivocado: el cursor debe ir a ADJ.
+    \item \textbf{La salida es igual a la entrada.} El LM317 está mal orientado o
+          destruido; compruébelo contra la figura~\ref{fig:lm317}.
+    \item \textbf{La salida cae en cuanto conecta la carga.} Corriente excesiva para el
+          protoboard o para el transformador. Reduzca la carga.
+\end{itemize}
+\end{notatec}
+
+\FloatBarrier
+%=======================================================================
+\section{Caracterización de la fuente \puntos{8}}
+\label{sec:caracterizacion}
+%=======================================================================
+Construir la fuente es la mitad del trabajo; la otra mitad es saber qué tan buena es. Una
+fuente no se juzga por lo que marca en vacío, sino por lo que hace cuando se le pide
+corriente. Ajuste la salida a \qty{12}{\volt} y no la vuelva a tocar durante los
+apartados~1 a~3.
+
+\begin{seguridad}{no pase de \qty{0.5}{\ampere}}
+Los contactos de un protoboard admiten alrededor de \qty{1}{\ampere}. Las cargas de esta
+sección se han elegido para no pasar de \qty{0.3}{\ampere}; no las sustituya por otras de
+menor valor.
+\end{seguridad}
+
+%-----------------------------------------------------------------------
+\subsection{Regulación de carga}
+%-----------------------------------------------------------------------
+Conecte cada resistencia de carga entre la salida y el negativo, y mida en cada caso la
+tensión de salida $V_{\text{OUT}}$, la tensión continua a la entrada del regulador
+$V_{\text{IN}}$ y el rizado $V_{r(pp)}$ sobre C1. Complete la tabla~\ref{tab:carga}.
+
+\begin{table}[H]
+  \centering
+  \caption{Comportamiento con carga, con la salida ajustada a \qty{12}{\volt}.}
+  \label{tab:carga}
+  \small
+  \renewcommand{\arraystretch}{2.1}
+  \begin{tabularx}{\linewidth}{@{}|>{\centering\arraybackslash}m{2.1cm}
+                                 |>{\centering\arraybackslash}X
+                                 |>{\centering\arraybackslash}X
+                                 |>{\centering\arraybackslash}X
+                                 |>{\centering\arraybackslash}X|@{}}
+    \hline
+    \textbf{$R_L$} & \textbf{$I_{\text{OUT}}$ (mA)} & \textbf{$V_{\text{OUT}}$ (V)}
+      & \textbf{$V_{\text{IN}}$ (V)} & \textbf{$V_{r(pp)}$ (V)}\\
+    \hline
+    Sin carga           & 0 & & & \\ \hline
+    \qty{470}{\ohm}     & & & & \\ \hline
+    \qty{220}{\ohm}     & & & & \\ \hline
+    \qty{100}{\ohm}     & & & & \\ \hline
+    \qty{47}{\ohm}      & & & & \\ \hline
+  \end{tabularx}
+\end{table}
+
+Con la primera fila y la última calcule la regulación de carga:
+\begin{equation}
+  \text{Reg. de carga}=\left(\frac{V_{\text{NL}}-V_{\text{FL}}}{V_{\text{FL}}}\right)100\%
+\end{equation}
+
+\lineasresp{2}
+
+%-----------------------------------------------------------------------
+\subsection{Regulación de línea}
+%-----------------------------------------------------------------------
+La regulación de línea dice cuánto se mueve la salida cuando se mueve la entrada. En el
+laboratorio no hay forma de subir o bajar los \qty{220}{\volt} de la red, pero
+\textbf{no hace falta}: en la tabla~\ref{tab:carga} la entrada del regulador ya cambió
+sola, porque al pedir más corriente el condensador se descarga más y $V_{\text{IN}}$ cae.
+Aproveche ese cambio en tres pasos, entre la fila sin carga y la de \qty{47}{\ohm}:
+
+\begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
+  \item Reste las dos entradas: $\Delta V_{\text{IN}}=V_{\text{IN,sin carga}}-V_{\text{IN},47\,\Omega}$.
+  \item Reste las dos salidas: $\Delta V_{\text{OUT}}=V_{\text{OUT,sin carga}}-V_{\text{OUT},47\,\Omega}$.
+  \item Divida y multiplique por cien.
+\end{enumerate}
+
+\begin{equation}
+  \text{Reg. de línea}=\left(\frac{\Delta V_{\text{OUT}}}{\Delta V_{\text{IN}}}\right)100\%
+\end{equation}
+
+Anote el resultado. ¿Le parece un valor bueno o malo? Justifíquelo.
+
+\lineasresp{3}
+
+%-----------------------------------------------------------------------
+\subsection{Rizado en función de la carga}
+%-----------------------------------------------------------------------
+Con la columna $V_{r(pp)}$ de la tabla~\ref{tab:carga}, compare cada medida con lo que
+predice la ecuación~\eqref{eq:rizado}, tomando $R_L$ como la resistencia equivalente que
+ve el filtro. Comente si el rizado crece como esperaba y a qué atribuye la diferencia.
+
+\lineasresp{3}
+
+%-----------------------------------------------------------------------
+\subsection{Disipación del regulador}
+%-----------------------------------------------------------------------
+Todo lo que el LM317 no entrega a la carga lo disipa en calor:
+\begin{equation}
+  P_D=(V_{\text{IN}}-V_{\text{OUT}})\,I_{\text{OUT}}
+  =\frac{(V_{\text{IN}}-V_{\text{OUT}})\,V_{\text{OUT}}}{R_L}
+  \label{eq:disipacion}
+\end{equation}
+
+Deje puesta la carga de \qty{100}{\ohm} y tome $V_{\text{IN}}=\qty{32.6}{\volt}$. Ajuste
+la salida a cada valor de la tabla~\ref{tab:disipacion}, mida la corriente y calcule
+$P_D$ con la ecuación~\eqref{eq:disipacion}. La primera fila va resuelta como ejemplo.
+
+\begin{table}[H]
+  \centering
+  \caption{Potencia disipada por el LM317 con $R_L=\qty{100}{\ohm}$.}
+  \label{tab:disipacion}
+  \small
+  \renewcommand{\arraystretch}{2.1}
+  \begin{tabularx}{\linewidth}{@{}|>{\centering\arraybackslash}m{2.6cm}
+                                 |>{\centering\arraybackslash}X
+                                 |>{\centering\arraybackslash}X
+                                 |>{\centering\arraybackslash}X|@{}}
+    \hline
+    \textbf{$V_{\text{OUT}}$ (V)} & \textbf{$V_{\text{IN}}-V_{\text{OUT}}$ (V)}
+      & \textbf{$I_{\text{OUT}}$ (mA)} & \textbf{$P_D$ (W)}\\
+    \hline
+    5   & 27,6 & 50 & 1,38 \\ \hline
+    10  & & & \\ \hline
+    16  & & & \\ \hline
+    22  & & & \\ \hline
+    26  & & & \\ \hline
+  \end{tabularx}
+\end{table}
+
+Mire la última columna: \textbf{¿en qué fila sale mayor $P_D$?} No es ni en la salida más
+baja ni en la más alta. Explique con sus palabras por qué ocurre eso, fijándose en que al
+subir $V_{\text{OUT}}$ la corriente crece pero la caída sobre el regulador se achica.
+
+\lineasresp{3}
+
+\subsubsection{¿Basta el disipador?}
+Un LM317 en cápsula TO-220 \textbf{sin disipador} no puede evacuar más de
+\qty{1}{\watt} aproximadamente antes de entrar en protección térmica. Compare ese
+\qty{1}{\watt} con el $P_D$ máximo de su tabla y responda si el disipador es opcional o
+imprescindible. Después, con la fuente en ese punto durante cinco minutos, compruebe con
+cuidado si el disipador se puede tocar o no.
+
+\lineasresp{3}
+
+\FloatBarrier
+%=======================================================================
+\section{Cuestionario \puntos{3}}
+%=======================================================================
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, labelsep=0.6em]
+\item El rizado que midió está a \qty{120}{\hertz}. Si uno de los cuatro diodos del puente
+se abriera, ¿a qué frecuencia pasaría y qué le ocurriría a la tensión continua? Explique
+el porqué a partir de la figura~\ref{fig:puente}.
+\lineasresp{3}
+
+\item C1 vale \qty{2200}{\micro\farad} y ya filtra. ¿Para qué sirve entonces C2, de solo
+\qty{0.1}{\micro\farad}?
+\lineasresp{3}
+
+\item El LM317 necesita una corriente mínima circulando por su salida para regular bien.
+Sabiendo que entre V\textsubscript{OUT} y ADJ hay siempre \qty{1.25}{\volt}, calcule la
+corriente que impone $R_1=\qty{240}{\ohm}$ y explique por qué no serviría una de
+\qty{10}{\kilo\ohm}.
+\lineasresp{3}
+
+\item Si duplicara C1, ¿qué le pasaría al rizado y qué le pasaría a la corriente de pico
+que atraviesa los diodos? ¿Por qué no conviene subir C1 sin más?
+\lineasresp{3}
+\end{enumerate}
+
+\FloatBarrier
+%=======================================================================
+\section{Conclusiones \puntos{3}}
+%=======================================================================
+Redacte sus conclusiones. Al menos dos deben ser \textbf{cuantitativas}, citando valores
+medidos, y al menos una debe pronunciarse sobre si esta fuente sirve tal cual o qué le
+cambiaría.
+
+\lineasresp{7}
+
+\end{document}

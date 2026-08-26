@@ -135,16 +135,47 @@ export const PRACTICAS = [
   {
     id: 'lab3',
     numero: 3,
-    titulo: 'Laboratorio 3',
+    titulo: 'Diseño de una fuente de alimentación DC',
     subtitulo: 'Laboratorio propedéutico — EEB',
-    estado: 'proximamente',
+    estado: 'disponible',
     duracion: '2 horas',
     resumen:
-      'La transcripción a LaTeX de esta práctica todavía está en preparación. El documento original ya se encuentra en el repositorio.',
-    objetivos: [],
-    temas: [],
-    documento: null,
-    descargas: [],
+      'Diseño, construcción y caracterización de una fuente de alimentación DC ajustable de cuatro etapas: transformador de 220 a 24 V, rectificador en puente, filtro por condensador y regulador LM317 de 1,25 a 26 V. Se arma en protoboard por etapas y se mide con carga: regulación de línea, regulación de carga, rizado y disipación del regulador.',
+    objetivos: [
+      'Reconocer las cuatro etapas de una fuente DC y la función de cada una.',
+      'Calcular la tensión de pico, la tensión continua y el rizado de un rectificador en puente con filtro por condensador, y contrastarlos con la simulación y con la medida.',
+      'Montar la fuente por etapas, verificando cada una antes de pasar a la siguiente.',
+      'Ajustar la salida con el regulador LM317 y comprobar que el rango medido coincide con el que predice su ecuación.',
+      'Caracterizar la fuente con carga: regulación de línea, regulación de carga y rizado.',
+      'Evaluar la potencia que disipa el regulador y decidir si el disipador elegido es suficiente.',
+    ],
+    temas: ['Fuente DC', 'Protoboard', 'Transformador 220/24', 'Rectificador en puente', 'Filtro por condensador', 'Valor eficaz y de pico', 'Rizado', 'LM317', 'Regulación de carga', 'Disipación térmica'],
+    documento: {
+      // Visor principal embebido en la pagina
+      src: 'practicas/lab3/Laboratorio_3.pdf',
+      paginas: 12,
+      peso: '0.4 MB',
+    },
+    descargas: [
+      {
+        etiqueta: 'Práctica en PDF',
+        detalle: 'Documento compilado desde LaTeX — versión completa',
+        archivo: 'practicas/lab3/Laboratorio_3.pdf',
+        nombre: 'Laboratorio_3_Circuitos_Electronicos.pdf',
+        tipo: 'PDF',
+        peso: '0.4 MB',
+        destacado: true,
+      },
+      {
+        etiqueta: 'Fuente LaTeX',
+        detalle: 'Código .tex para recompilar o reutilizar el formato',
+        archivo: 'practicas/lab3/Laboratorio_3.tex',
+        nombre: 'Laboratorio_3.tex',
+        tipo: 'TEX',
+        peso: '47 KB',
+        destacado: false,
+      },
+    ],
   },
 ]
 
