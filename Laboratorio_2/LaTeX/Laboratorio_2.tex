@@ -49,9 +49,9 @@
 %  capacitor variable", que no procede de ninguna de las dos guias. Prolonga la
 %  polarizacion inversa (IV.2): el diodo en inversa presenta una capacitancia de
 %  juntura que, con L1, forma un resonador sintonizable por tension.
-%    - resonador_4800khz.png   es el esquema del simulador.
+%    - resonador_7100khz.png   es el esquema del simulador.
 %    - bode_resonador.pdf      lo genera herramientas/graficar_bode.py leyendo
-%                              resonador_4800khz.DAT, el barrido exportado por el
+%                              resonador_7100khz.DAT, el barrido exportado por el
 %                              simulador. Va en PDF, no en PNG: una curva es
 %                              vectorial y asi no pixela ni engorda el archivo.
 %  Esta seccion todavia NO tiene puntaje asignado; las demas suman ya los 20.
@@ -72,7 +72,7 @@
 %  que pedia la guia original (tiene fuentes programables de 1 a 5 V, railes
 %  fijos de 12/5/3,3 V y un generador W1 de +-5 V).
 %    - Tabla 1 (directa): de 18 a 13 lecturas, ahora 0,2..10 V. Las ocho
-%      primeras cubren el codo (0,2 a 1,0 V), donde V_D va de 199 a 529 mV; las
+%      primeras cubren la rodilla (0,2 a 1,0 V), donde V_D va de 199 a 529 mV; las
 %      cinco ultimas (2, 4, 6, 8 y 10 V) el tramo saturado, donde V_D apenas
 %      sube de 583 a 683 mV. El recorte no es solo instrumental: a 30 V
 %      circulaban 29 mA y R1, de 0,25 W, disipaba 0,86 W.
@@ -127,7 +127,7 @@
 %      un corrimiento del 90 % entero por debajo del techo del generador.
 %    - R1 sube a 470 k porque el Q cargado lo fijan las resistencias, no los
 %      reactivos: con 1 k salia Q < 1, una loma inservible. Ahora Q ~ 30 y el
-%      pico mide 160 kHz, lo que a su vez OBLIGA a barrer con >= 1000 puntos.
+%      pico mide 146 kHz, lo que a su vez OBLIGA a barrer con >= 1000 puntos.
 %      Se anade la ecuacion eq:q y la nota tecnica lo advierte.
 %    - C1 debe ser ceramico y no electrolitico: el electrolitico es polarizado y
 %      en este circuito queda con la continua de V2 encima. Ademas su valor no
@@ -173,10 +173,51 @@
 %      sin componente alguno. El metodo de resonancia se conserva en el texto
 %      como alternativa, pero sin exigir un componente concreto.
 %
+%  Version 12 - Llega del simulador un tercer diseno: UNA sola bobina de 27 uH
+%  en lugar de las dos de 30 en serie, y el nodo sondeado pasa de C1(2) a R1(1).
+%  Archivos nuevos: resonador_7100khz.png y resonador_7100khz.DAT, que sustituyen
+%  a los de 4800 kHz. El barrido da pico en 7,146 MHz, Q = 45 y Cj = 18,4 pF,
+%  esta ultima igual que en el diseno anterior, como debe ser.
+%    - El apartado de la bobina se rehace para una sola de 27 uH: 25 vueltas de
+%      AWG 26 sobre el tubo de 1", 11,5 mm de largo, 2,9 m de alambre. Desaparece
+%      la caja de seguridad sobre la inductancia mutua, que ya no aplica.
+%    - El alambre baja de 7 a 4 m en la lista de materiales. Es el unico cambio
+%      que la lista necesitaba.
+%    - Con 25 vueltas la bobina queda en l/d = 0,34, fuera del rango de Wheeler.
+%      El texto lo dice y contrasta los dos calculos: Wheeler da 26,4 uH y
+%      Nagaoka 28,4. En la tabla de formadores el recomendado pasa a ser el de
+%      3/4", el unico donde la formula vale sin correccion.
+%
+%  OJO - LIMITACION DEL DISENO DE 27 uH: la resonancia sube al aumentar V2 y
+%  cruza los 8 MHz del generador a partir de V2 = 3,5 V. Con 27 uH solo se puede
+%  medir de 0 a 3 V (de 5,1 a 7,7 MHz); los puntos de 5 y 10 V quedan fuera del
+%  alcance del equipo. La tabla de resultados se recorta a 0, 1, 2, 2,5 y 3 V.
+%  Para recuperar el barrido completo hasta 10 V harian falta unos 56 uH, que es
+%  lo que tenia el diseno anterior de 60 uH.
+%
+%  Version 13 - Dos correcciones al apartado de la bobina, la segunda de un error
+%  propio que venia desde la version 7:
+%    - El calibre pasa de AWG 26 a AWG 24 (0,51 mm). Con el hilo mas grueso el
+%      bobinado se alarga y la bobina queda en l/d = 0,45, POR ENCIMA del 0,4 que
+%      Wheeler exige; con AWG 26 caia en 0,34 y habia que corregir. Salen 27
+%      vueltas y 3,1 m de alambre. Ademas se maneja mejor al bobinar. En la lista
+%      de materiales cambia solo el calibre; los 4 m se mantienen.
+%    - CORREGIDA la tabla del factor de Nagaoka, que tenia valores equivocados de
+%      hasta un 10 %: decia 0,429 / 0,511 / 0,578 para l/d = 0,3 / 0,4 / 0,5
+%      cuando los correctos son 0,403 / 0,472 / 0,526. El error se detecto al
+%      comprobar que Wheeler y Nagaoka no cuadraban en la misma geometria; con
+%      los valores buenos coinciden, como debe ser, porque Wheeler no es mas que
+%      Nagaoka con la aproximacion k = 1/(1+0,45 d/l). Eso se explica ahora en el
+%      texto y de paso justifica de donde sale su rango de validez.
+%    - Se anade una caja de seguridad advirtiendo que la forma habitual de la
+%      formula de Wheeler esta en PULGADAS: meterle centimetros sin convertir
+%      infla el resultado 2,54 veces y deja la bobina con la mitad de vueltas.
+%      Es el error mas comun con esta formula.
+%
 %  Version 9 - Llegan del simulador el esquema y el barrido del diseno nuevo, y
 %  el texto se alinea con ellos. Queda resuelto el PENDIENTE 2 de la version 8.
-%    - La figura pasa a resonador_4800khz.png y los datos a
-%      resonador_4800khz.DAT. El pico cae en 4,797 MHz con Q = 32, ancho de
+%    - La figura pasa a resonador_7100khz.png y los datos a
+%      resonador_7100khz.DAT. El pico cae en 4,797 MHz con Q = 32, ancho de
 %      banda de 146 kHz y una Cj implicita de 18,3 pF: los tres valores
 %      confirman el dimensionado de la version 8 (se preveian ~5 MHz y Q ~ 30).
 %    - Los papeles de las resistencias van al reves de como los describia el
@@ -231,6 +272,13 @@
 \usepackage{float}
 \usepackage{placeins}
 \usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\usepackage{subcaption}
+\captionsetup{subrefformat=parens}
+\usepackage{circuitikz}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usetikzlibrary{arrows.meta}
+\ctikzset{diode=empty, diodes/scale=1.35, bipoles/length=1.25cm}
 \graphicspath{{imagenes/}}
 
 %-------------------------------------------------------------- tablas
@@ -247,6 +295,12 @@
   per-mode              = symbol,
   range-phrase          = { a },
   range-units           = single,
+  % Sin esto siunitx compone los numeros en modo matematico, y como la fuente
+  % matematica no es Trebuchet salian en Computer Modern: dentro de una misma
+  % linea, "02 resistencias" en Trebuchet y el "68" en CM. Con "match" el
+  % numero toma la fuente del entorno: la del texto en los parrafos y la
+  % matematica dentro de las ecuaciones, que es donde si debe ir en CM.
+  mode                  = match,
   detect-weight         = true,
   detect-family         = true
 }
@@ -285,6 +339,120 @@
 % Puntaje al final del titulo de una seccion calificada.
 \newcommand{\puntos}[1]{\normalfont\normalsize\textmd{(#1 puntos)}}
 
+% Huecos donde el alumno pega los dos barridos de una misma tension: el de la
+% simulacion en Proteus y el del Network Analyzer sobre el circuito real.
+\newcommand{\marcobarrido}[1]{%
+  \begin{center}
+  \fbox{\parbox[c][34mm][c]{0.44\linewidth}{\centering\small\color{black!45}
+        (barrido en Proteus)}}\hfill
+  \fbox{\parbox[c][34mm][c]{0.44\linewidth}{\centering\small\color{black!45}
+        (barrido con la tarjeta)}}\\[5pt]
+  \small $V_2 = #1$\qquad
+  $f_0$ simulada $=$\rule{2.4cm}{0.4pt}\qquad
+  $f_0$ medida $=$\rule{2.4cm}{0.4pt}
+  \end{center}}
+
+% Circuito de la figura 1, una lampara LED alimentada a traves de un diodo.
+% #1 vacio o "invert" (sentido del diodo) | #2 y #3 rotulos de sus terminales
+% #4 relleno del LED (verde si enciende, gris si no) | #5 1 si conduce, 0 si no
+\newcommand{\circuitodiodo}[5]{%
+\begin{circuitikz}[american, line width=0.9pt]
+    % malla
+    \draw (0,0) -- (0,1.0);
+    \draw (0,2.2) -- (0,3.2) -- (1.75,3.2);
+    \draw (4.25,3.2) -- (6,3.2) -- (6,2.4);
+    \draw (6,1.0) -- (6,0) -- (0,0);
+    % fuente
+    % invert: sin el, battery1 deja la barra larga (el +) abajo
+    \draw (0,1.0) to[battery1, invert] (0,2.2);
+    \node[anchor=east, font=\large] at (-0.3,2.15) {$+$};
+    \node[anchor=east, font=\large] at (-0.3,1.05) {$-$};
+    % diodo
+    \draw (1.75,3.2) to[D, #1, fill=red!45!black] (4.25,3.2);
+    \node[anchor=south east, font=\footnotesize] at (2.1,3.4) {#2};
+    \node[anchor=south west, font=\footnotesize] at (3.9,3.4) {#3};
+    % LED
+    \draw (6,2.4) to[leD, fill=#4] (6,1.0);
+    % corriente
+    \ifnum#5=1
+        \draw[-{Stealth[length=5mm,width=4.5mm]}, blue!60!black, line width=3.2pt]
+              (1.7,1.9) -- (3.7,1.9);
+        \node[blue!60!black, font=\large] at (4.2,1.95) {$I$};
+        \node[font=\large] at (2.7,1.1) {Sí};
+    \else
+        \draw[-{Stealth[length=5mm,width=4.5mm]}, blue!60!black, line width=3.2pt,
+              dash pattern=on 7pt off 5pt] (1.7,1.9) -- (3.7,1.9);
+        \node[font=\large] at (2.7,1.1) {No};
+    \fi
+\end{circuitikz}}
+
+% --- Paneles de la figura 3 (antes eran cuadrantes de image05.png).
+% Modelo equivalente del diodo: conduce como una fuente de 0,7 V (directa) o
+% se comporta como un interruptor abierto (inversa).
+\newcommand{\modelodirecta}{%
+\begin{circuitikz}[american, line width=0.9pt]
+    \draw (0,1.7) node[ocirc]{} to[D, fill=red!45!black] (3.6,1.7) node[ocirc]{};
+    \node[anchor=south east] at (0.2,1.8) {$+$};
+    \node[anchor=south west] at (3.4,1.8) {$-$};
+    \draw (0,0) node[ocirc]{} to[battery1, l=\qty{0.7}{\volt}] (3.6,0) node[ocirc]{};
+    \node[anchor=north east] at (0.2,-0.1) {$+$};
+    \node[anchor=north west] at (3.4,-0.1) {$-$};
+\end{circuitikz}}
+
+\newcommand{\modeloinversa}{%
+\begin{circuitikz}[american, line width=0.9pt]
+    \draw (0,1.7) node[ocirc]{} to[D, invert, fill=red!45!black] (3.6,1.7) node[ocirc]{};
+    \node[anchor=south east] at (0.2,1.8) {$+$};
+    \node[anchor=south west] at (3.4,1.8) {$-$};
+    \draw (0,0) node[ocirc]{} to[nos] (3.6,0) node[ocirc]{};
+    \node[anchor=north east] at (0.2,-0.1) {$+$};
+    \node[anchor=north west] at (3.4,-0.1) {$-$};
+\end{circuitikz}}
+
+% Montaje de medida: fuente variable, voltimetro en paralelo con el diodo y
+% miliamperimetro en serie; R_S limita la corriente.
+\newcommand{\circuitomedida}{%
+\begin{circuitikz}[american, line width=0.9pt]
+    \draw (0,1.3) to[battery1, invert] (0,2.9);
+    \node[anchor=east] at (-0.3,2.9) {$+$};
+    \node[anchor=east] at (-0.3,1.3) {$-$};
+    \node[anchor=east] at (-0.75,2.1) {$V$};
+    \draw[-{Stealth[length=3mm]}, orange!85!black, line width=1.1pt]
+          (-0.45,1.5) -- (0.55,2.9);
+    \draw (0,0) -- (0,1.3);
+    \draw (0,2.9) -- (0,4.2) -- (1.5,4.2);
+    \draw (1.5,4.2) node[circ]{} to[D, fill=red!45!black] (4.5,4.2) node[circ]{};
+    \draw (4.5,4.2) -- (6.2,4.2) -- (6.2,3.4);
+    \draw[-{Stealth[length=3.5mm]}, blue!60!black, line width=2pt] (2.4,4.9) -- (3.8,4.9);
+    \node[blue!60!black, anchor=east] at (2.3,4.95) {$I_F$};
+    \draw (1.5,4.2) -- (1.5,3.0) to[voltmeter, l_=$V_F$] (4.5,3.0) -- (4.5,4.2);
+    \draw (6.2,3.4) to[ammeter, l=\footnotesize mA] (6.2,1.6);
+    \draw (6.2,1.6) -- (6.2,0);
+    \draw (0,0) -- (2,0) to[R, l=$R_S$] (4.2,0) -- (6.2,0);
+\end{circuitikz}}
+
+% Curva caracteristica en directa, trazada con la ecuacion de Shockley
+% I = Is (e^{V/(n V_T)} - 1) con n = 2, V_T = 25,85 mV e Is = 13 nA, valores
+% que sitúan la rodilla en los 0,7 V tipicos del silicio.
+\newcommand{\curvadirecta}{%
+\begin{tikzpicture}
+\begin{axis}[
+    width=6.7cm, height=5.1cm,
+    axis lines=left,
+    xlabel={$V_F$ (\unit{\volt})}, ylabel={$I_F$ (\unit{\milli\ampere})},
+    xmin=0, xmax=1, ymin=0, ymax=10,
+    xtick={0,0.1,...,1}, ytick={0,2,...,10},
+    xticklabel style={/pgf/number format/.cd, fixed, precision=1, use comma},
+    grid=both, grid style={gray!25, line width=0.3pt},
+    axis background/.style={fill=cyan!6},
+    tick label style={font=\footnotesize}, label style={font=\small},
+    restrict y to domain=0:11, clip=true,
+]
+\addplot[red!85!black, line width=1.4pt, samples=500, domain=0:1]
+        {1.3e-8*(exp(x/0.0517)-1)*1000};
+\end{axis}
+\end{tikzpicture}}
+
 %---------------------------------------------------- encabezado / pie
 \usepackage{fancyhdr}
 \pagestyle{fancy}
@@ -305,6 +473,9 @@
 
 %-------------------------------------------------------- hiperenlaces
 \usepackage[hidelinks,pdfusetitle]{hyperref}
+% xurl permite partir las URL largas en cualquier punto: sin el, la guia del
+% Network Analyzer se salia del margen.
+\usepackage{xurl}
 \hypersetup{
   pdftitle={Laboratorio 2 - Diodos: curvas caracteristicas y capacitancia del diodo},
   pdfsubject={Circuitos Electronicos - Guia de practicas},
@@ -384,20 +555,42 @@ semiconductor, para lo cual se desarrollan las siguientes actividades:
 Los semiconductores han revolucionado el mundo de la electrónica y han permitido grandes avances
 en casi todas las ciencias; el más simple de los semiconductores es el diodo. El diodo solo
 permite la circulación de la corriente en un único sentido, como se aprecia en la
-figura~\ref{fig:diodo-func}, donde en la primera configuración permite el paso de corriente y en
-la segunda la evita, principio del rectificador.
+figura~\ref{fig:diodo-func}, donde en la configuración \subref{fig:diodo-func-a} permite el
+paso de corriente y en la \subref{fig:diodo-func-b} lo evita, principio del rectificador.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.75\textwidth]{image03.png}
-    \caption{Funcionamiento del diodo.}
+    % Dibujada con circuitikz en vez de la imagen original (image03.png): alli
+    % la carga era una lampara roja generica y el diodo no tenia rotulados sus
+    % terminales.
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{\circuitodiodo{}{Ánodo}{Cátodo}{green!65!black}{1}}
+        \caption{Polarización directa.}
+        \label{fig:diodo-func-a}
+    \end{subfigure}\hfill
+    \begin{subfigure}{0.48\textwidth}
+        \centering
+        \resizebox{\textwidth}{!}{\circuitodiodo{invert}{Cátodo}{Ánodo}{black!10}{0}}
+        \caption{Polarización inversa.}
+        \label{fig:diodo-func-b}
+    \end{subfigure}
+    \caption{Polarización directa e inversa del diodo.}
     \label{fig:diodo-func}
 \end{figure}
 
-Los semiconductores son elementos que en condiciones normales son aislantes, pero con cierta
-modificación en su organización molecular pueden convertirse en conductores. Esta modificación
-consiste básicamente en el dopado con otros elementos que poseen enlaces covalentes incompletos;
-ejemplos de semiconductores son el silicio, el selenio y el germanio. El símbolo del diodo y el
+Los semiconductores ---el silicio, el germanio o el selenio--- son elementos que en condiciones
+normales se comportan como aislantes, pero con cierta modificación de su estructura cristalina
+pueden convertirse en conductores. Esa modificación es el \textbf{dopado}: al cristal puro, cuyos
+átomos tienen cuatro electrones de valencia y forman una red de enlaces covalentes completos, se
+le añaden impurezas de otro elemento.
+
+Si la impureza es \textbf{pentavalente} (fósforo, arsénico o antimonio), aporta cinco electrones
+de valencia donde solo hacen falta cuatro: el quinto queda sin enlace y libre para conducir. El
+cristal resultante es de \textbf{tipo N} y tiene electrones de sobra. Si la impureza es
+\textbf{trivalente} (boro, galio o indio), aporta solo tres electrones y deja un enlace covalente
+incompleto: ese sitio vacante se llama \emph{hueco} y se comporta como una carga positiva. El
+cristal es entonces de \textbf{tipo P} y tiene electrones de menos. El símbolo del diodo y el
 dispositivo se pueden apreciar en la figura~\ref{fig:diodo-simb}.
 
 \begin{figure}[H]
@@ -407,13 +600,56 @@ dispositivo se pueden apreciar en la figura~\ref{fig:diodo-simb}.
     \label{fig:diodo-simb}
 \end{figure}
 
-El diodo está compuesto por la unión de un cristal tipo P con otro tipo N, en donde las cargas
-opuestas de la unión AB crean una pequeña barrera de oposición, que con una mínima tensión de
-polarización entre \qtyrange{0.2}{0.7}{\volt} logra la conducción de corriente en el diodo.
+El diodo está compuesto por la unión de un cristal tipo P con otro tipo N: el cristal tipo P es
+el \textbf{ánodo} y el tipo N el \textbf{cátodo}, y la corriente solo circula del ánodo al cátodo.
+Las cargas opuestas de la unión AB crean una pequeña barrera de oposición
+(figura~\ref{fig:diodo-pn-a}), que con una mínima tensión de polarización
+logra la conducción de corriente en el diodo. Esa tensión, llamada
+tensión de rodilla o de umbral ($V_\gamma$), depende del material con el que está fabricada la
+unión: unos \qty{0.3}{\volt} en los diodos de germanio, \qty{0.7}{\volt} en los de silicio ---los
+más habituales, como el 1N4007 de esta práctica--- y \qty{1.2}{\volt} en los de arseniuro de
+galio (GaAs). Los paneles \subref{fig:diodo-pn-b} y~\subref{fig:diodo-pn-c} de la figura~\ref{fig:diodo-pn}
+muestran los modelos equivalentes del diodo, el~\subref{fig:diodo-pn-d} el montaje con
+el que se levanta su curva característica y el~\subref{fig:diodo-pn-e} la curva resultante.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.95\textwidth]{image05.png}
+    % image05a.png es el cuadrante de la union PN recortado de image05.png; los
+    % otros cuatro paneles se redibujaron con circuitikz y pgfplots.
+    \begin{subfigure}{0.60\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{image05a.png}
+        \caption{Barrera de potencial en la unión PN.}
+        \label{fig:diodo-pn-a}
+    \end{subfigure}
+
+    \vspace{12pt}
+    \begin{subfigure}{0.46\textwidth}
+        \centering
+        \modelodirecta
+        \caption{Modelo en polarización directa.}
+        \label{fig:diodo-pn-b}
+    \end{subfigure}\hfill
+    \begin{subfigure}{0.46\textwidth}
+        \centering
+        \modeloinversa
+        \caption{Modelo en polarización inversa.}
+        \label{fig:diodo-pn-c}
+    \end{subfigure}
+
+    \vspace{14pt}
+    \begin{subfigure}{0.54\textwidth}
+        \centering
+        \circuitomedida
+        \caption{Circuito para levantar la curva.}
+        \label{fig:diodo-pn-d}
+    \end{subfigure}\hfill
+    \begin{subfigure}{0.44\textwidth}
+        \centering
+        \curvadirecta
+        \caption{Curva de polarización directa.}
+        \label{fig:diodo-pn-e}
+    \end{subfigure}
     \caption{Esquema eléctrico del funcionamiento del diodo.}
     \label{fig:diodo-pn}
 \end{figure}
@@ -441,7 +677,7 @@ polarización entre \qtyrange{0.2}{0.7}{\volt} logra la conducción de corriente
 \begin{itemize}
     % El procedimiento de IV.1 y IV.2 pedia "Proteus" mientras esta lista decia
     % "Multisim". El circuito es el mismo en ambos, asi que se admiten los dos.
-    \item Simulador de circuitos: Multisim o Proteus.
+    \item Simulador de circuitos: Proteus o Multisim.
     % La guia exige Python dos veces (seccion VI.3 y analisis de resultados) pero
     % el original no lo listaba.
     \item Python~3 con las bibliotecas \texttt{numpy} y \texttt{matplotlib}.
@@ -462,26 +698,31 @@ de los siguientes valores:
     % Los 02 LED azules y el motor DC de 12 V salen de la lista con la seccion V,
     % que era la unica que los usaba.
     % --- Pasivos.
-    % Vatiaje comprobado. El caso peor es la de 1 k en la seccion IV.1 con la fuente
-    % a 10 V: circulan 9,3 mA y disipa 87 mW, el 35 % del cuarto de vatio. Las de
-    % 68 k y 470 k no llegan a 25 uW. (A los 30 V de la guia original la de 1 k
-    % disipaba 0,86 W, mas del triple de lo admisible; por eso la tabla se recorto.)
-    \item 02 resistencias de \qty{1}{\kilo\ohm} (1/4\,\unit{\watt}).
+    % Vatiaje comprobado. El caso peor es la de 1 k en la seccion IV.1 con la
+    % fuente en su ultima lectura, 24 V: caen 23,3 V en ella, circulan 23,3 mA
+    % y disipa 0,54 W. De ahi el vatio: una de 1/4 W se quemaria. Las de 68 k y
+    % 470 k trabajan en microvatios y siguen en 1/4 W.
+    \item 02 resistencias de \qty{1}{\kilo\ohm} (1\,\unit{\watt}).
     \item 02 resistencias de \qty{68}{\kilo\ohm} (1/4\,\unit{\watt}).
     \item 02 resistencias de \qty{470}{\kilo\ohm} (1/4\,\unit{\watt}).
     % Ceramico y no electrolitico: el electrolitico es polarizado y en este circuito
     % quedaria con la continua de V2 encima, ademas de portarse mal en radiofrecuencia.
-    \item 02 condensadores cerámicos de \qty{22}{\nano\farad} (marcado \texttt{223}).
+    % El marcado iba en \texttt y salia en monoespaciada, otra fuente distinta
+    % dentro de la misma linea. Es una inscripcion del componente, no codigo.
+    \item 02 condensadores cerámicos de \qty{22}{\nano\farad} (223).
     % El de 1 nF NP0 salio de la lista: solo servia para verificar la bobina por
     % resonancia, y eso lo hace el Impedance Analyzer de la tarjeta sin componente
     % alguno. El metodo de resonancia se conserva en el texto como alternativa.
     % --- Para construir las bobinas.
-    % Alambre: dos bobinas de 27 vueltas sobre 33,4 mm de diametro son 6,2 m; se piden
-    % 7 m para tener margen si hay que rebobinar, que en la primera pasa casi siempre.
-    \item \qty{7}{\metre} de alambre de cobre esmaltado AWG~26
-          (\qty{0.40}{\milli\metre} de diámetro).
+    % Alambre: una bobina de 27 vueltas sobre 33,4 mm de diametro son 3,0 m con puntas
+    % de 5 cm; se piden 3 m, que cubren el bobinado pero sin sobrante para rehacerlo.
+    \item \qty{3}{\metre} de alambre de cobre esmaltado AWG~24
+          (\qty{0.51}{\milli\metre} de diámetro).
     \item 01 tubo de PVC de 1\textquotedbl{} (\qty{33}{\milli\metre} de diámetro
           exterior), de unos \qty{6}{\centi\metre} de largo.
+    % Cinta de papel y no pegamento: el alumno tiene que poder corregir las vueltas
+    % despues de medir la bobina, y con pegamento eso ya no se puede.
+    \item Cinta de papel (\emph{masking}).
     % --- Herramientas y varios.
     \item Tijeras o cúter.
     \item 01 protoboard.
@@ -498,7 +739,8 @@ de los siguientes valores:
 
 \begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
 \item Arme el circuito de la figura~\ref{fig:pol-directa} y, en el simulador, tome las
-medidas solicitadas en la tabla~\ref{tab:directa}.
+medidas solicitadas en la tabla~\ref{tab:directa-sim} para cada uno de los tres
+diodos: el 1N4007, el Schottky 1N5817 y el zener.
 
 \item En el protoboard, arme el circuito de la figura~\ref{fig:pol-directa}. Antes de encender la
 fuente de alimentación considere lo siguiente:
@@ -511,7 +753,7 @@ fuente de alimentación considere lo siguiente:
           ($I_D$) colocar el multímetro en serie con el diodo (DC A) y para medir el voltaje en
           el diodo ($V_D$), en paralelo con el diodo (DC V), tal como se muestra en la figura.
     \item Encender la fuente de alimentación y fijar el voltaje de salida según la
-          tabla~\ref{tab:directa}. Para cada voltaje medir el voltaje del diodo ($V_D$) y la
+          tabla~\ref{tab:directa-exp}. Para cada voltaje medir el voltaje del diodo ($V_D$) y la
           corriente del diodo ($I_D$); luego anotar las medidas en dicha tabla, expresando los
           valores en \unit{\milli\volt} y \unit{\micro\ampere} para el voltaje o la corriente del
           diodo respectivamente.
@@ -526,43 +768,89 @@ fuente de alimentación considere lo siguiente:
 
 \begin{table}[H]
     \centering
-    \caption{Tabla de lecturas para el diodo en polarización directa.}
-    \label{tab:directa}
+    \caption{Lecturas de la polarización directa: valores \textbf{simulados}.}
+    \label{tab:directa-sim}
     \small
+    \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.35}
-    \begin{tabular}{|>{\centering\arraybackslash}m{1.5cm}|>{\centering\arraybackslash}m{2.0cm}
-                    |>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.3cm}
-                    |>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.3cm}|}
+    \begin{tabular}{|>{\centering\arraybackslash}m{1.4cm}|>{\centering\arraybackslash}m{1.3cm}
+                    |*{6}{>{\centering\arraybackslash}m{1.75cm}|}}
     \hline
     \multirow{2}{*}{\textbf{Lectura}}
-      & \multirow{2}{2.0cm}{\centering\textbf{Voltaje de la fuente} ($V_1$)}
-      & \multicolumn{2}{c|}{\textbf{SIMULADO}}
-      & \multicolumn{2}{c|}{\textbf{EXPERIMENTADO}}\\
-    \cline{3-6}
-      & & \textbf{Voltaje en el diodo} ($V_2$) & \textbf{Corriente en el diodo} ($I_D$)
-        & \textbf{Voltaje en el diodo} ($V_2$) & \textbf{Corriente en el diodo} ($I_D$)\\
+      & \multirow{2}{1.3cm}{\centering\textbf{$V_1$} (\unit{\volt})}
+      & \multicolumn{2}{c|}{\textbf{1N4007}}
+      & \multicolumn{2}{c|}{\textbf{1N5817 (Schottky)}}
+      & \multicolumn{2}{c|}{\textbf{Zener 1N4733A}}\\
+    \cline{3-8}
+      & & \textbf{$V_D$} & \textbf{$I_D$} & \textbf{$V_D$} & \textbf{$I_D$}
+        & \textbf{$V_D$} & \textbf{$I_D$}\\
     \hline
-    % Tabla acortada de 18 a 13 lecturas, con el muestreo repartido en dos tramos:
-    %  - Lecturas 1 a 8 (0,2 a 1,0 V): el codo del diodo. Es donde V_D cambia de
-    %    verdad -- de 199 mV a 529 mV -- y donde esta toda la forma de la curva.
-    %  - Lecturas 9 a 13 (2 a 10 V): el tramo de conduccion, ya saturado. V_D solo
-    %    sube de 583 mV a 683 mV, asi que basta con puntos espaciados.
-    % El original llegaba a 30 V, donde circulaban 29 mA y R1 disipaba 0,86 W, muy
-    % por encima de los 0,25 W de la resistencia que pide la lista de materiales.
-    % A 10 V son 9,3 mA y 87 mW, holgadamente dentro de especificacion.
-    1  & 0,2 & & & & \\ \hline
-    2  & 0,4 & & & & \\ \hline
-    3  & 0,5 & & & & \\ \hline
-    4  & 0,6 & & & & \\ \hline
-    5  & 0,7 & & & & \\ \hline
-    6  & 0,8 & & & & \\ \hline
-    7  & 0,9 & & & & \\ \hline
-    8  & 1,0 & & & & \\ \hline
-    9  & 2,0 & & & & \\ \hline
-    10 & 4,0 & & & & \\ \hline
-    11 & 6,0 & & & & \\ \hline
-    12 & 8,0 & & & & \\ \hline
-    13 & 10  & & & & \\ \hline
+    % Los tres diodos comparten escala de V1 para que las curvas se puedan
+    % superponer. El tramo denso 0,2 - 1,2 V cubre las tres rodillas: la del
+    % 1N5817 esta hacia 0,25 V y los del 1N4007 y el zener en directa hacia
+    % 0,7 V. De 2 a 24 V el tramo saturado, donde V_D ya casi no cambia.
+    % OJO con el vatiaje: a 24 V circulan 23 mA por R1 = 1 k, que disipa
+    % 0,54 W. La lista de materiales pide 1/4 W, asi que los ultimos puntos
+    % necesitan una resistencia de 1 W (mejor 2 W).
+    1  & 0,2 & & & & & & \\ \hline
+    2  & 0,4 & & & & & & \\ \hline
+    3  & 0,5 & & & & & & \\ \hline
+    4  & 0,6 & & & & & & \\ \hline
+    5  & 0,7 & & & & & & \\ \hline
+    6  & 0,8 & & & & & & \\ \hline
+    7  & 1,0 & & & & & & \\ \hline
+    8  & 1,2 & & & & & & \\ \hline
+    9  & 2,0 & & & & & & \\ \hline
+    10 & 4,0 & & & & & & \\ \hline
+    11 & 6,0 & & & & & & \\ \hline
+    12 & 9,0 & & & & & & \\ \hline
+    13 & 14  & & & & & & \\ \hline
+    14 & 19  & & & & & & \\ \hline
+    15 & 24  & & & & & & \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Lecturas de la polarización directa: valores \textbf{experimentales}.}
+    \label{tab:directa-exp}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{|>{\centering\arraybackslash}m{1.4cm}|>{\centering\arraybackslash}m{1.3cm}
+                    |*{6}{>{\centering\arraybackslash}m{1.75cm}|}}
+    \hline
+    \multirow{2}{*}{\textbf{Lectura}}
+      & \multirow{2}{1.3cm}{\centering\textbf{$V_1$} (\unit{\volt})}
+      & \multicolumn{2}{c|}{\textbf{1N4007}}
+      & \multicolumn{2}{c|}{\textbf{1N5817 (Schottky)}}
+      & \multicolumn{2}{c|}{\textbf{Zener 1N4733A}}\\
+    \cline{3-8}
+      & & \textbf{$V_D$} & \textbf{$I_D$} & \textbf{$V_D$} & \textbf{$I_D$}
+        & \textbf{$V_D$} & \textbf{$I_D$}\\
+    \hline
+    % Los tres diodos comparten escala de V1 para que las curvas se puedan
+    % superponer. El tramo denso 0,2 - 1,2 V cubre las tres rodillas: la del
+    % 1N5817 esta hacia 0,25 V y los del 1N4007 y el zener en directa hacia
+    % 0,7 V. De 2 a 24 V el tramo saturado, donde V_D ya casi no cambia.
+    % OJO con el vatiaje: a 24 V circulan 23 mA por R1 = 1 k, que disipa
+    % 0,54 W. La lista de materiales pide 1/4 W, asi que los ultimos puntos
+    % necesitan una resistencia de 1 W (mejor 2 W).
+    1  & 0,2 & & & & & & \\ \hline
+    2  & 0,4 & & & & & & \\ \hline
+    3  & 0,5 & & & & & & \\ \hline
+    4  & 0,6 & & & & & & \\ \hline
+    5  & 0,7 & & & & & & \\ \hline
+    6  & 0,8 & & & & & & \\ \hline
+    7  & 1,0 & & & & & & \\ \hline
+    8  & 1,2 & & & & & & \\ \hline
+    9  & 2,0 & & & & & & \\ \hline
+    10 & 4,0 & & & & & & \\ \hline
+    11 & 6,0 & & & & & & \\ \hline
+    12 & 9,0 & & & & & & \\ \hline
+    13 & 14  & & & & & & \\ \hline
+    14 & 19  & & & & & & \\ \hline
+    15 & 24  & & & & & & \\ \hline
     \end{tabular}
 \end{table}
 
@@ -572,7 +860,7 @@ fuente de alimentación considere lo siguiente:
 
 \begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
 \item Arme el circuito de la figura~\ref{fig:pol-inversa} en el simulador y tome las
-medidas solicitadas en la tabla~\ref{tab:inversa}.
+medidas solicitadas en la tabla~\ref{tab:inversa-sim} para los mismos tres diodos.
 
 \item En el protoboard, arme el circuito de la figura~\ref{fig:pol-inversa}. Antes de encender la
 fuente de alimentación considere lo siguiente:
@@ -585,8 +873,8 @@ fuente de alimentación considere lo siguiente:
           ($I_D$) colocar el multímetro en serie con el diodo (DC A) y para medir el voltaje en
           el diodo ($V_D$), en paralelo con el diodo (DC V), tal como se muestra en la figura.
     \item Encender la fuente de alimentación y fijar el voltaje de salida según la
-          tabla~\ref{tab:inversa}. Para cada voltaje medir el voltaje del diodo ($V_D$) y la
-          corriente del diodo ($I_D$). Anotar las medidas en la tabla~\ref{tab:inversa} (todo
+          tabla~\ref{tab:inversa-exp}. Para cada voltaje medir el voltaje del diodo ($V_D$) y la
+          corriente del diodo ($I_D$). Anotar las medidas en la tabla~\ref{tab:inversa-exp} (todo
           expresado en \unit{\milli\volt} o \unit{\micro\ampere}).
 \end{itemize}
 
@@ -599,41 +887,91 @@ fuente de alimentación considere lo siguiente:
 
 \begin{table}[H]
     \centering
-    \caption{Tabla de lecturas para el diodo en polarización inversa.}
-    \label{tab:inversa}
+    \caption{Lecturas de la polarización inversa: valores \textbf{simulados}.}
+    \label{tab:inversa-sim}
     \small
+    \setlength{\tabcolsep}{4pt}
     \renewcommand{\arraystretch}{1.35}
-    \begin{tabular}{|>{\centering\arraybackslash}m{1.5cm}|>{\centering\arraybackslash}m{2.0cm}
-                    |>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.3cm}
-                    |>{\centering\arraybackslash}m{2.3cm}|>{\centering\arraybackslash}m{2.3cm}|}
+    \begin{tabular}{|>{\centering\arraybackslash}m{1.4cm}|>{\centering\arraybackslash}m{1.3cm}
+                    |*{6}{>{\centering\arraybackslash}m{1.75cm}|}}
     \hline
     \multirow{2}{*}{\textbf{Lectura}}
-      & \multirow{2}{2.0cm}{\centering\textbf{Voltaje de la fuente} ($V_1$)}
-      & \multicolumn{2}{c|}{\textbf{SIMULADO}}
-      & \multicolumn{2}{c|}{\textbf{EXPERIMENTADO}}\\
-    \cline{3-6}
-      & & \textbf{Voltaje en el diodo} ($V_D$) & \textbf{Corriente en el diodo} ($I_D$)
-        & \textbf{Voltaje en el diodo} ($V_D$) & \textbf{Corriente en el diodo} ($I_D$)\\
+      & \multirow{2}{1.3cm}{\centering\textbf{$V_1$} (\unit{\volt})}
+      & \multicolumn{2}{c|}{\textbf{1N4007}}
+      & \multicolumn{2}{c|}{\textbf{1N5817 (Schottky)}}
+      & \multicolumn{2}{c|}{\textbf{Zener 1N4733A}}\\
+    \cline{3-8}
+      & & \textbf{$V_D$} & \textbf{$I_D$} & \textbf{$V_D$} & \textbf{$I_D$}
+        & \textbf{$V_D$} & \textbf{$I_D$}\\
     \hline
-    % Mismos valores de V1 que la tabla 1, a proposito: al recorrer las dos
-    % polarizaciones con la misma escala, la curva conjunta del analisis de
-    % resultados queda simetrica respecto al origen y cada punto de directa
-    % tiene su pareja en inversa. El recorrido acaba en 10 V y no en los 20 V
-    % del original; el limite no lo pone el 1N4007, que aguanta 1000 V
-    % inversos, sino la instrumentacion disponible.
-    1  & 0,2  & & & & \\ \hline
-    2  & 0,4  & & & & \\ \hline
-    3  & 0,5  & & & & \\ \hline
-    4  & 0,6  & & & & \\ \hline
-    5  & 0,7  & & & & \\ \hline
-    6  & 0,8  & & & & \\ \hline
-    7  & 0,9  & & & & \\ \hline
-    8  & 1,0  & & & & \\ \hline
-    9  & 2,0  & & & & \\ \hline
-    10 & 4,0  & & & & \\ \hline
-    11 & 6,0  & & & & \\ \hline
-    12 & 8,0  & & & & \\ \hline
-    13 & 10   & & & & \\ \hline
+    % El recorrido acaba en 24 V, a peticion expresa. OJO con el 1N5817: su
+    % V_RRM de hoja de datos es de 20 V, asi que la ultima lectura lo deja
+    % fuera de especificacion. El 1N4007 (1000 V) y el zener (limitado por
+    % R1) no tienen problema a esa tension.
+    % Los puntos 4,5 - 4,8 - 5,0 - 5,2 - 5,5 V densifican la rodilla de
+    % ruptura del 1N4733A (V_Z = 5,1 V); con el 1N4736A (6,8 V) la rodilla
+    % cae entre los puntos de 6,0 y 9,0 V. A 24 V el zener conduce 18,6 mA:
+    % disipa 95 mW de 1 W, y R1 se queda en 0,35 W, por encima del 1/4 W.
+    1  & 0,2 & & & & & & \\ \hline
+    2  & 0,5 & & & & & & \\ \hline
+    3  & 1,0 & & & & & & \\ \hline
+    4  & 2,0 & & & & & & \\ \hline
+    5  & 3,0 & & & & & & \\ \hline
+    6  & 4,0 & & & & & & \\ \hline
+    7  & 4,5 & & & & & & \\ \hline
+    8  & 4,8 & & & & & & \\ \hline
+    9  & 5,0 & & & & & & \\ \hline
+    10 & 5,2 & & & & & & \\ \hline
+    11 & 5,5 & & & & & & \\ \hline
+    12 & 6,0 & & & & & & \\ \hline
+    13 & 9,0 & & & & & & \\ \hline
+    14 & 16  & & & & & & \\ \hline
+    15 & 24  & & & & & & \\ \hline
+    \end{tabular}
+\end{table}
+
+\begin{table}[H]
+    \centering
+    \caption{Lecturas de la polarización inversa: valores \textbf{experimentales}.}
+    \label{tab:inversa-exp}
+    \small
+    \setlength{\tabcolsep}{4pt}
+    \renewcommand{\arraystretch}{1.35}
+    \begin{tabular}{|>{\centering\arraybackslash}m{1.4cm}|>{\centering\arraybackslash}m{1.3cm}
+                    |*{6}{>{\centering\arraybackslash}m{1.75cm}|}}
+    \hline
+    \multirow{2}{*}{\textbf{Lectura}}
+      & \multirow{2}{1.3cm}{\centering\textbf{$V_1$} (\unit{\volt})}
+      & \multicolumn{2}{c|}{\textbf{1N4007}}
+      & \multicolumn{2}{c|}{\textbf{1N5817 (Schottky)}}
+      & \multicolumn{2}{c|}{\textbf{Zener 1N4733A}}\\
+    \cline{3-8}
+      & & \textbf{$V_D$} & \textbf{$I_D$} & \textbf{$V_D$} & \textbf{$I_D$}
+        & \textbf{$V_D$} & \textbf{$I_D$}\\
+    \hline
+    % El recorrido acaba en 24 V, a peticion expresa. OJO con el 1N5817: su
+    % V_RRM de hoja de datos es de 20 V, asi que la ultima lectura lo deja
+    % fuera de especificacion. El 1N4007 (1000 V) y el zener (limitado por
+    % R1) no tienen problema a esa tension.
+    % Los puntos 4,5 - 4,8 - 5,0 - 5,2 - 5,5 V densifican la rodilla de
+    % ruptura del 1N4733A (V_Z = 5,1 V); con el 1N4736A (6,8 V) la rodilla
+    % cae entre los puntos de 6,0 y 9,0 V. A 24 V el zener conduce 18,6 mA:
+    % disipa 95 mW de 1 W, y R1 se queda en 0,35 W, por encima del 1/4 W.
+    1  & 0,2 & & & & & & \\ \hline
+    2  & 0,5 & & & & & & \\ \hline
+    3  & 1,0 & & & & & & \\ \hline
+    4  & 2,0 & & & & & & \\ \hline
+    5  & 3,0 & & & & & & \\ \hline
+    6  & 4,0 & & & & & & \\ \hline
+    7  & 4,5 & & & & & & \\ \hline
+    8  & 4,8 & & & & & & \\ \hline
+    9  & 5,0 & & & & & & \\ \hline
+    10 & 5,2 & & & & & & \\ \hline
+    11 & 5,5 & & & & & & \\ \hline
+    12 & 6,0 & & & & & & \\ \hline
+    13 & 9,0 & & & & & & \\ \hline
+    14 & 16  & & & & & & \\ \hline
+    15 & 24  & & & & & & \\ \hline
     \end{tabular}
 \end{table}
 
@@ -643,7 +981,7 @@ fuente de alimentación considere lo siguiente:
 \label{sec:varicap}
 %=======================================================================
 % Seccion anadida a la guia original. Los datos de la figura del Bode salen
-% de resonador_4800khz.DAT (barrido en alterna exportado por el simulador) y se trazan con
+% de resonador_7100khz.DAT (barrido en alterna exportado por el simulador) y se trazan con
 % herramientas/graficar_bode.py.
 
 % \ref a una subseccion solo imprime su numero (\thesubsection es \arabic), asi
@@ -666,7 +1004,7 @@ el protoboard.
 
 \begin{figure}[H]
     \centering
-    \includegraphics[width=0.80\textwidth]{resonador_4800khz.png}
+    \includegraphics[width=0.80\textwidth]{resonador_7100khz.png}
     \caption{Resonador $LC$ sintonizado por la capacitancia de juntura del diodo $D_1$
              en polarización inversa.}
     \label{fig:resonador}
@@ -674,24 +1012,18 @@ el protoboard.
 
 \noindent Cada componente cumple una función precisa:
 
-\begin{itemize}
-    \item $R_2 = \qty{68}{\kilo\ohm}$ inyecta la señal de $V_1$ en el tanque.
-    \item $R_1 = \qty{470}{\kilo\ohm}$ lleva la continua de $V_2$ al diodo, que queda
-          así polarizado \textbf{inversamente}, sin cargar el circuito resonante.
-    \item $C_2 = \qty{22}{\nano\farad}$ acopla la señal y bloquea la continua, de modo
-          que la polarización de $D_1$ no se pierda por la fuente $V_1$. Basta con que
-          sea mucho mayor que la capacitancia del diodo --- lo es unas mil veces ---,
-          así que su valor exacto no influye en la frecuencia. Debe ser \emph{cerámico}
-          o de poliéster, nunca electrolítico: este último es polarizado y aquí
-          quedaría con la continua de $V_2$ encima.
-    \item $L_1$ y $L_2$, de \qty{30}{\micro\henry} cada una, suman los
-          \qty{60}{\micro\henry} que resuenan con la capacitancia $C_j$ del diodo. Son
-          las bobinas que se construyen en el apartado~\ref{sec:bobina}.
-    \item $D_1$ es el 1N4007. Su capacitancia de juntura es la que sintoniza el
-          circuito, y varía con $V_2$: ese es todo el objeto del apartado.
-    \item $V_1$ entrega \qty{0.5}{\volt} eficaces, una amplitud deliberadamente pequeña
-          frente a la polarización, porque si fuese comparable a ella $D_1$ conduciría
-          en los picos y dejaría de portarse como capacitor.
+\begin{itemize}[leftmargin=1.4em, itemsep=1pt, topsep=4pt]
+    \item $R_2 = \qty{68}{\kilo\ohm}$ --- inyecta la señal de $V_1$ en el tanque.
+    \item $R_1 = \qty{470}{\kilo\ohm}$ --- lleva la continua de $V_2$ al diodo, que
+          queda polarizado \textbf{inversamente}, sin cargar el resonador.
+    \item $C_2 = \qty{22}{\nano\farad}$ --- acopla la señal y bloquea la continua;
+          cerámico o de poliéster, nunca electrolítico.
+    \item $L_1 = \qty{27}{\micro\henry}$ --- resuena con la capacitancia $C_j$ del
+          diodo; se construye en el apartado~\ref{sec:bobina}.
+    \item $D_1$, el 1N4007 --- su capacitancia de juntura sintoniza el circuito y varía
+          con $V_2$: ese es todo el objeto del apartado.
+    \item $V_1 = \qty{0.5}{\volt}$ eficaces --- amplitud pequeña frente a la
+          polarización, para que $D_1$ no conduzca en los picos.
 \end{itemize}
 
 \noindent El ancho del pico lo gobiernan las resistencias, no los reactivos. Ambas
@@ -699,31 +1031,14 @@ quedan, en alterna, en paralelo con el tanque, de modo que el factor de calidad 
 vale
 
 \begin{equation}
-    Q = \frac{R_1 \parallel R_2}{2\pi f_0 (L_1 + L_2)}
+    Q = \frac{R_1 \parallel R_2}{2\pi f_0 L_1}
     \qquad\text{y el ancho de banda del pico es}\qquad
     \Delta f = \frac{f_0}{Q}
     \label{eq:q}
 \end{equation}
 
-\noindent Con los valores de la figura sale $Q \approx 30$ y un pico de unos
-\qty{160}{\kilo\hertz} de ancho. Si se hubiera dejado $R_1$ en \qty{1}{\kilo\ohm}, el
-$Q$ caería por debajo de la unidad y en lugar de un pico se vería una loma inservible
-para medir. \textbf{Consecuencia práctica:} un pico tan estrecho exige un barrido con
-al menos mil puntos, o se pasa de largo sin verlo.
-
-% El diodo del resonador es el mismo 1N4007 del resto de la practica, y no es una
-% eleccion de comodidad: ver la nota de abajo.
-\begin{notatec}{por qué el resonador usa el 1N4007 y no un diodo de señal}
-La capacitancia que se quiere medir compite con todas las capacidades parásitas del
-montaje: la del propio protoboard, la de los cables y la de la punta del osciloscopio.
-Un diodo de señal como el 1N4148 apenas ofrece unos \qty{2}{\pico\farad}, que quedan
-sepultados bajo esas parásitas. El 1N4007 es un rectificador de juntura mucho mayor y
-llega a unos \qty{39}{\pico\farad} sin polarizar, de modo que \emph{sí} domina el
-circuito y su variación se puede observar. La contrapartida es que su capacitancia no
-está garantizada por el fabricante --- nadie diseña un rectificador pensando en ella ---,
-y la dispersión entre unidades es grande. Por eso el procedimiento empieza midiéndola
-en lugar de darla por buena.
-\end{notatec}
+\noindent Con los valores de la figura sale $Q \approx 49$ y un pico de unos
+\qty{146}{\kilo\hertz} de ancho.
 
 \FloatBarrier
 %-----------------------------------------------------------------------
@@ -736,91 +1051,99 @@ en lugar de darla por buena.
 % solenoide de una capa con nucleo de aire, cuyo valor sale de la geometria y
 % se puede calcular de antemano; ese es justamente el ejercicio.
 
-Las bobinas son los únicos componentes de la práctica que no se compran hechos: se
-bobinan. Un solenoide de una sola capa con núcleo de aire tiene la virtud de que su
-inductancia queda fijada por la pura geometría --- diámetro, longitud y número de
-vueltas ---, sin depender de ningún material magnético. Eso permite calcularla antes de
-dar la primera vuelta.
-
-El circuito pide \qty{60}{\micro\henry}, y se obtienen con \textbf{dos bobinas iguales
-de \qty{30}{\micro\henry} conectadas en serie}, tal como aparecen en la
-figura~\ref{fig:resonador}. En serie las inductancias se suman, de modo que dos de 30
-dan 60. Se reparte así, y no en una sola bobina, porque cada una necesita entonces 27
-vueltas en lugar de las 43 que exigiría el valor completo.
-
-\begin{seguridad}{las dos bobinas no deben acoplarse}
-La suma $L = L_1 + L_2$ solo es exacta si las bobinas no se ven magnéticamente. Si
-quedan cerca y alineadas aparece la inductancia mutua $M$, y el total pasa a ser
-$L_1 + L_2 \pm 2M$ --- más o menos según la orientación ---, con lo que el cálculo deja
-de valer. Sepárelas al menos dos diámetros, o colóquelas perpendiculares entre sí.
-\end{seguridad}
+$L_1$ no se compra: se bobina. En un solenoide de una capa con núcleo de aire la
+inductancia depende solo de la geometría, de modo que puede calcularse antes de dar la
+primera vuelta.
 
 \subsubsection*{La fórmula}
 
-Para una bobina de una capa se emplea la fórmula de Wheeler, aquí con las longitudes
-en milímetros:
+Se emplea la de Wheeler, aquí ya convertida a milímetros ---en su forma original las
+longitudes van en \emph{pulgadas}, y ese es el error más común con ella---:
 
 \begin{equation}
-    L\,[\unit{\micro\henry}] = \frac{0.03937\; r^{2} N^{2}}{9\,r + 10\,\ell}
+    L\,[\unit{\micro\henry}] = \frac{\num{0.03937}\; r^{2} N^{2}}{9\,r + 10\,\ell}
+    \qquad (r,\ \ell \text{ en mm})
     \label{eq:wheeler}
 \end{equation}
 
 \noindent donde $N$ es el número de vueltas, $r$ el \emph{radio medio} del bobinado (el
-del formador más el grosor del alambre) y $\ell$ la longitud que ocupa el bobinado.
-La expresión es exacta dentro del \qty{1}{\percent} mientras la bobina sea más larga
-que \num{0.4} diámetros; más abajo se indica qué hacer cuando esa condición no se
-cumple.
+del formador más el grosor del alambre) y $\ell$ su longitud.
+
+Wheeler no vale para cualquier forma de bobina: es una aproximación, y su error se
+mantiene por debajo del \qty{1}{\percent} solo si el bobinado es \emph{alargado} y no un
+anillo plano. La condición es
+%
+\begin{equation*}
+    \frac{\ell}{d} > \num{0.4}
+\end{equation*}
+%
+\noindent es decir, que la longitud del bobinado supere el \qty{40}{\percent} del
+diámetro sobre el que se bobina. Cuanto más plana es la bobina, más se aparta la
+fórmula del valor real. El diseño de abajo sale con $\ell/d = \num{0.45}$, así que la
+cumple y puede usarse tal cual.
 
 \subsubsection*{El cálculo}
 
-Se parte de dos decisiones de construcción: un tubo de PVC de 1\textquotedbl{} como
-formador, de \qty{33.4}{\milli\metre} de diámetro exterior, y alambre esmaltado
-AWG~26, que mide \qty{0.40}{\milli\metre} de cobre y unos \qty{0.46}{\milli\metre} con
-el esmalte. Bobinando las vueltas \emph{juntas}, cada una avanza ese paso $p$, de modo
-que las tres incógnitas se reducen a una sola:
+\noindent Datos de partida:
 
-\begin{equation}
-    \ell = p\,N = 0.46\,N
-    \qquad\qquad
-    r = \frac{\qty{33.4}{\milli\metre} + \qty{0.46}{\milli\metre}}{2} = \qty{16.93}{\milli\metre}
-    \label{eq:geometria}
-\end{equation}
+\begin{itemize}[leftmargin=1.4em, itemsep=1pt, topsep=4pt]
+    \item Diámetro del formador, tubo de PVC de 1\textquotedbl{}
+          \dotfill\ $d = \qty{33.4}{\milli\metre}$
+    \item Paso del alambre AWG~24, esmalte incluido
+          \dotfill\ $p = \qty{0.57}{\milli\metre}$
+    \item Inductancia buscada
+          \dotfill\ $L = \qty{27}{\micro\henry}$
+\end{itemize}
 
-\noindent Sustituyendo ambas en la ecuación~\eqref{eq:wheeler} e imponiendo los
-\qty{30}{\micro\henry} de cada bobina:
+\noindent Con las vueltas bobinadas \emph{juntas}, la geometría queda en función de $N$:
+
+\begin{itemize}[leftmargin=1.4em, itemsep=1pt, topsep=4pt]
+    \item Radio medio del bobinado, $(d + p)/2$
+          \dotfill\ $r = \qty{16.99}{\milli\metre}$
+    \item Longitud del bobinado, $p\,N$
+          \dotfill\ $\ell = \num{0.57}\,N$
+\end{itemize}
+
+\noindent Sustituyendo en la ecuación~\eqref{eq:wheeler} e imponiendo los
+\qty{27}{\micro\henry}:
+
+\begin{gather*}
+    27 = \frac{\num{0.03937} \cdot \num{16.99}^{2} \cdot N^{2}}
+              {9 \cdot \num{16.99} + 10 \cdot \num{0.57}\,N}
+       = \frac{\num{11.359}\,N^{2}}{\num{152.9} + \num{5.70}\,N}
+    \\[14pt]
+    27\,(\num{152.9} + \num{5.70}\,N) = \num{11.359}\,N^{2}
+    \\[14pt]
+    \num{11.359}\,N^{2} - \num{153.9}\,N - \num{4128} = 0
+\end{gather*}
+
+\noindent Se resuelve con la fórmula general. De las dos raíces solo la positiva tiene
+sentido físico:
 
 \begin{equation*}
-    30 = \frac{0.03937 \cdot (16.93)^{2} \cdot N^{2}}{9 (16.93) + 10 (0.46\,N)}
-       = \frac{11.284\,N^{2}}{152.4 + 4.60\,N}
+    N = \frac{\num{153.9} + \sqrt{\num{153.9}^{2} + 4 \cdot \num{11.359} \cdot \num{4128}}}
+             {2 \cdot \num{11.359}}
+      = \frac{\num{153.9} + \num{459.6}}{\num{22.718}}
+      = \num{27.0}
 \end{equation*}
 
-\noindent que reordenada es una simple ecuación de segundo grado en $N$:
+\noindent La bobina lleva \textbf{27 vueltas}, que ocupan
+$\ell = \qty{15.4}{\milli\metre}$ y dan $\ell/d = \num{0.45}$: la fórmula vale sin
+correcciones. El alambre necesario es el perímetro medio por el número de vueltas, más
+\qty{50}{\milli\metre} de terminal a cada lado:
 
 \begin{equation*}
-    11.284\,N^{2} - 138\,N - 4572 = 0
-    \qquad\Longrightarrow\qquad
-    N = \frac{138 + \sqrt{138^{2} + 4(11.284)(4572)}}{2(11.284)} = 27.2
+    \text{longitud} = N \pi d_{\text{medio}} + 2 \cdot \qty{50}{\milli\metre}
+                    = 27 \pi \cdot \qty{33.97}{\milli\metre} + \qty{100}{\milli\metre}
+                    \approx \qty{3.0}{\metre}
 \end{equation*}
 
-\noindent Son, pues, \textbf{27 vueltas por bobina}, que ocupan $\ell = 0.46 \times 27 =
-\qty{12.4}{\milli\metre}$. El alambre que hay que cortar para las dos es el perímetro
-medio por el número de vueltas, más un margen para las cuatro puntas:
-
-\begin{equation*}
-    \text{longitud} = 2 \left[ N \pi d_{\text{medio}} \right] + 4 (\qty{100}{\milli\metre})
-                    = 2 \left[ 27 \pi (\qty{33.86}{\milli\metre}) \right] + \qty{400}{\milli\metre}
-                    \approx \qty{6.2}{\metre}
-\end{equation*}
-
-\noindent Conviene advertir que con estas proporciones $\ell/d = \num{0.37}$, apenas
-por debajo del \num{0.4} que Wheeler exige: la fórmula queda al borde de su rango y el
-valor real puede desviarse cerca de un \qty{8}{\percent}. No es motivo para cambiar de
-diseño, pero sí para no saltarse la verificación del final del apartado.
+\noindent Son justo los \qty{3}{\metre} de la lista de materiales, sin sobrante: hay
+que contar bien antes de cortar. La tabla~\ref{tab:bobina} resume el diseño.
 
 \begin{table}[H]
     \centering
-    \caption{Resumen del diseño de \emph{cada} bobina: solenoide de una capa con núcleo
-             de aire. Hay que construir dos iguales.}
+    \caption{Resumen del diseño de $L_1$: solenoide de una capa con núcleo de aire.}
     \label{tab:bobina}
     \small
     \renewcommand{\arraystretch}{1.35}
@@ -831,199 +1154,30 @@ diseño, pero sí para no saltarse la verificación del final del apartado.
     \textbf{Parámetro} & \textbf{Símbolo} & \textbf{Valor}\\
     \hline
     Diámetro del formador (PVC 1\textquotedbl) & $d$    & \qty{33.4}{\milli\metre} \\ \hline
-    Calibre del alambre            & ---    & AWG 26 (\qty{0.40}{\milli\metre}) \\ \hline
-    Paso entre vueltas, con esmalte& $p$    & \qty{0.46}{\milli\metre} \\ \hline
-    Radio medio del bobinado       & $r$    & \qty{16.93}{\milli\metre} \\ \hline
+    Calibre del alambre            & ---    & AWG 24 (\qty{0.51}{\milli\metre}) \\ \hline
+    Paso entre vueltas, con esmalte& $p$    & \qty{0.57}{\milli\metre} \\ \hline
+    Radio medio del bobinado       & $r$    & \qty{16.99}{\milli\metre} \\ \hline
     Número de vueltas              & $N$    & 27 \\ \hline
-    Longitud del bobinado          & $\ell$ & \qty{12.4}{\milli\metre} \\ \hline
-    Alambre para las dos           & ---    & \qty{6.2}{\metre} \\ \hline
-    Inductancia de cada una        & $L$    & \qty{29.7}{\micro\henry} \\ \hline
-    Inductancia en serie           & $L_1{+}L_2$ & \qty{59.4}{\micro\henry} \\ \hline
+    Longitud del bobinado          & $\ell$ & \qty{15.4}{\milli\metre} \\ \hline
+    Alambre necesario              & ---    & \qty{3.0}{\metre} \\ \hline
+    Inductancia resultante         & $L_1$  & \qty{27.0}{\micro\henry} \\ \hline
     \end{tabular}
 \end{table}
 
-\subsubsection*{Si se consigue otro tubo}
-
-El formador no tiene por qué ser el de 1\textquotedbl. Cualquier cilindro rígido no
-metálico sirve, resolviendo de nuevo la ecuación~\eqref{eq:wheeler}. Cuanto más ancho
-el tubo, menos vueltas hacen falta:
-
-\begin{table}[H]
-    \centering
-    \caption{Vueltas necesarias por bobina para los \qty{30}{\micro\henry} de cada una,
-             según el tubo y siempre con alambre AWG 26 bobinado junto.}
-    \label{tab:formadores}
-    \small
-    \renewcommand{\arraystretch}{1.3}
-    \begin{tabular}{|>{\centering\arraybackslash}m{2.6cm}|>{\centering\arraybackslash}m{2.2cm}
-                    |>{\centering\arraybackslash}m{2.0cm}|>{\centering\arraybackslash}m{2.2cm}
-                    |>{\centering\arraybackslash}m{3.4cm}|}
-    \hline
-    \textbf{Tubo PVC} & \textbf{Diámetro} & \textbf{Vueltas} & \textbf{Largo}
-      & \textbf{¿Vale Wheeler?}\\
-    \hline
-    1/2\textquotedbl  & \qty{21}{\milli\metre} & 45 & \qty{21}{\milli\metre} & sí \\ \hline
-    3/4\textquotedbl  & \qty{27}{\milli\metre} & 34 & \qty{16}{\milli\metre} & sí \\ \hline
-    \textbf{1\textquotedbl} & \qty{33}{\milli\metre} & \textbf{27} & \qty{12}{\milli\metre} & al límite \\ \hline
-    1 1/4\textquotedbl & \qty{42}{\milli\metre} & 22 & \qty{10}{\milli\metre} & no \\ \hline
-    1 1/2\textquotedbl & \qty{48}{\milli\metre} & 20 & \qty{9}{\milli\metre} & no \\ \hline
-    \end{tabular}
-\end{table}
-
-\noindent Se recomienda el de 1\textquotedbl{} porque equilibra las dos cosas: 27
-vueltas se bobinan en un momento y la fórmula de Wheeler todavía sirve, aunque justo en
-su límite. Con el de 3/4\textquotedbl{} el cálculo es más fiable a costa de siete
-vueltas más; con los tubos más anchos las vueltas bajan aún más, pero la bobina se
-vuelve un anillo plano y hay que corregir el cálculo como se explica enseguida.
-
-\subsubsection*{Por qué AWG 26}
-
-El calibre no se elige aquí por la corriente, que es de apenas unos microamperios, sino
-por dos razones distintas. La primera es mecánica: el AWG~26 es lo bastante rígido para
-que la bobina conserve su forma --- y con ella su inductancia --- al manipularla, y a la
-vez lo bastante fino para que las 27 vueltas quepan en poco más de un centímetro de
-tubo.
-
-La segunda es el \textbf{efecto pelicular}. A frecuencias altas la corriente no ocupa
-toda la sección del conductor, sino una capa superficial de espesor
-
-\begin{equation}
-    \delta\,[\unit{\milli\metre}] = \frac{66}{\sqrt{f\,[\unit{\hertz}]}}
-    \qquad\text{que en cobre y a \qty{5}{\mega\hertz} vale}\qquad
-    \delta \approx \qty{30}{\micro\metre}
-    \label{eq:pelicular}
-\end{equation}
-
-\noindent Es decir: de los \qty{202}{\micro\metre} de radio que tiene el AWG~26, solo
-los \num{30} más externos conducen. Engrosar el alambre no añade cobre útil en
-proporción a su sección, sino a su \emph{perímetro}, de modo que pasar a un calibre
-mucho mayor apenas mejora las pérdidas mientras estorba el bobinado. El AWG~24 y el
-AWG~28 también sirven, recalculando $p$ y por tanto $N$.
-
-\subsubsection*{Cuando la bobina es corta y ancha: Nagaoka}
-
-Wheeler deja de ser fiable en cuanto $\ell < 0.4\,d$, que es lo que ocurre con los tubos
-de 1 1/4\textquotedbl{} en adelante. Para esos casos se emplea la expresión del
-solenoide corregida por el factor de Nagaoka $k$:
-
-\begin{equation}
-    L = k\,\frac{\mu_0 N^{2} A}{\ell}
-    \qquad\text{con } A = \pi r^{2}
-    \label{eq:nagaoka}
-\end{equation}
-
-\begin{table}[H]
-    \centering
-    \caption{Factor de Nagaoka para bobinas cortas.}
-    \label{tab:nagaoka}
-    \small
-    \begin{tabular}{|c|c|c|c|c|c|c|}
-    \hline
-    $\ell/d$ & \num{0.1} & \num{0.2} & \num{0.3} & \num{0.4} & \num{0.5} & \num{1.0}\\
-    \hline
-    $k$ & \num{0.196} & \num{0.302} & \num{0.429} & \num{0.511} & \num{0.578} & \num{0.688}\\
-    \hline
-    \end{tabular}
-\end{table}
-
-\noindent Omitir $k$ en una bobina plana no es un detalle menor: con $\ell/d = 0.2$ el
-error supera el factor tres.
-
-\subsubsection*{Verificación}
-
-Como el valor depende de lo apretado que quede el bobinado, hay que comprobarlo. La vía
-más directa es el instrumento \emph{Impedance Analyzer} de la tarjeta, que entrega la
-inductancia en microhenrios sin necesidad de cálculo alguno.
-
-Si no se dispone de él, se contrasta por resonancia: conecte \emph{las dos bobinas ya
-en serie} en paralelo con un condensador de valor conocido y estable --- uno cerámico
-NP0/C0G de \qty{1}{\nano\farad} sirve bien ---, haga un barrido en alterna y localice el
-pico. De la frecuencia medida se despeja la inductancia:
-
-\begin{equation}
-    L_1 = \frac{1}{\left(2\pi f_0\right)^{2} C}
-    \qquad\text{con \qty{1}{\nano\farad} y \qty{60}{\micro\henry} se espera}\qquad
-    f_0 \approx \qty{652}{\kilo\hertz}
-    \label{eq:verificacion}
-\end{equation}
-
-\noindent Una diferencia de un \qtyrange{5}{10}{\percent} respecto de los
-\qty{60}{\micro\henry} es normal y no invalida nada: basta con anotar el valor real
-medido y usar \emph{ese} en los cálculos de la tabla~\ref{tab:resonador}, no el nominal.
-
-\FloatBarrier
-\subsection{Procedimiento}
-
-\begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
-% Primer paso nuevo: medir antes de disenar. La Cj de un rectificador no esta
-% garantizada por catalogo, asi que partir de la hoja de datos es partir de una
-% suposicion. El Impedance Analyzer de la tarjeta la da directamente.
-\item \textbf{Mida la capacitancia de su diodo antes de nada.} Con el instrumento
-\emph{Impedance Analyzer}, y polarizando $D_1$ en inversa a \qty{2}{\volt}, anote su
-$C_j$. La hoja de datos de un rectificador no garantiza este parámetro --- nadie
-fabrica un 1N4007 pensando en su capacitancia ---, de modo que la dispersión entre
-unidades es grande y conviene trabajar con el valor real y no con el nominal.
-
-\item Construya y verifique $L_1$ siguiendo el apartado~\ref{sec:bobina}. Si su $C_j$
-medida se aparta mucho de los \qty{20}{\pico\farad} previstos, recalcule la
-inductancia que necesita con $L_1 = 1/\left[(2\pi f_0)^2 C_j\right]$ para que la
-resonancia le caiga hacia los \qty{5}{\mega\hertz}, y vuelva a resolver el número de
-vueltas.
-
-\item Arme el circuito en el simulador y ejecute un análisis en alterna
-(\emph{AC sweep}) sobre el nodo marcado como \texttt{C1(2)}, entre
-\qty{500}{\kilo\hertz} y \qty{20}{\mega\hertz}, con el eje vertical en decibelios.
-% El pico es estrecho (Q ~ 30): con pocos puntos el barrido pasa de largo sin verlo.
-Use \textbf{al menos mil puntos}: con $Q \approx 30$ el pico mide apenas unos
-\qty{160}{\kilo\hertz} de ancho y un barrido grueso se lo salta sin registrarlo.
-
-\item Exporte el resultado a un archivo de texto. El archivo \texttt{resonador\_4800khz.DAT} que
-acompaña a esta guía es una exportación de ese mismo barrido y sirve como referencia.
-
-\item Grafique la curva con Python, como se pide también en la
-sección~\ref{sec:analisis}. El resultado debe parecerse al de la
-figura~\ref{fig:bode}.
-
-% El circuito se redimensiono para que la resonancia cayera dentro de lo que mide la
-% tarjeta: su generador llega a 8 MHz, de modo que el barrido se pide hasta 7.
-\item \textbf{Repita la medida sobre el circuito real.} Monte el circuito en el
-protoboard y use el instrumento \emph{Network Analyzer} con un barrido lineal de
-\qtyrange{1}{7}{\mega\hertz}, el canal~1 como referencia y el canal~2 en el nodo del
-diodo. Localice el pico y anótelo en la tabla~\ref{tab:resonador}.
-
-\item Repita el barrido anterior para cada valor de $V_2$ y complete la
-tabla~\ref{tab:resonador}. Deberá ver el pico \textbf{desplazarse hacia la derecha} a
-medida que aumenta la tensión inversa.
-\end{enumerate}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=\textwidth]{bode_resonador.pdf}
-    \caption{Diagrama de Bode (magnitud) del resonador, trazado a partir de
-             \texttt{resonador\_4800khz.DAT}. Por debajo de $f_0$ la respuesta sube a
-             \qty{20}{\decibel} por década porque domina la reactancia de $L_1$; por
-             encima cae a igual ritmo porque domina la de $C_j$.}
-    \label{fig:bode}
-\end{figure}
-
-\begin{notatec}{un barrido por cada tensión, y con suficientes puntos}
-La tensión $V_2$ no es un parámetro que el barrido en alterna pueda recorrer por sí
-solo: cada valor exige \emph{su propio} barrido, tanto en el simulador como en la
-tarjeta. Son, pues, cinco barridos para completar la tabla~\ref{tab:resonador}.
-
-Y todos ellos con resolución suficiente. El pico de este circuito mide unos
-\qty{160}{\kilo\hertz} de ancho sobre una resonancia de varios megahercios: con un
-barrido de diez puntos por década los puntos quedan más separados que el propio pico y
-la curva sale plana, como si no hubiera resonancia. Es el error más común en esta
-medida, y no se manifiesta como un fallo sino como una gráfica sin nada que ver.
-\end{notatec}
 
 \FloatBarrier
 \subsection{Mediciones}
 
-Anote en la tabla~\ref{tab:resonador} las frecuencias obtenidas, tanto en el simulador
-como sobre el montaje real. De cada frecuencia medida se despeja la capacitancia que
-presentaba el diodo:
+El circuito se levanta \textbf{dos veces}: primero en \textbf{Proteus}, con un análisis
+en frecuencia (\emph{AC sweep}) sobre el nodo del diodo, y después en el protoboard,
+con el \emph{Network Analyzer} de la tarjeta. De cada una se obtiene un diagrama de
+Bode como el de la figura~\ref{fig:bode}.
+
+Hágalo para \textbf{tres tensiones} inversas: $V_2 = \qty{0}{\volt}$, \qty{1}{\volt} y
+\qty{3}{\volt}, de modo que resulten seis barridos en total. En cada uno localice el
+pico, anote la frecuencia de resonancia y pegue la captura de pantalla señalando sobre
+ella dicha frecuencia. De cada frecuencia se despeja la capacitancia que presentaba el
+diodo:
 
 \begin{equation}
     f_0 = \frac{1}{2\pi\sqrt{L_1\,C_j}}
@@ -1032,51 +1186,121 @@ presentaba el diodo:
     \label{eq:resonancia}
 \end{equation}
 
-\begin{table}[H]
+\begin{figure}[H]
     \centering
-    \caption{Frecuencia de resonancia del tanque en función de la tensión inversa
-             aplicada al diodo.}
-    \label{tab:resonador}
-    \small
-    \renewcommand{\arraystretch}{1.35}
-    \begin{tabular}{|>{\centering\arraybackslash}m{2.6cm}|>{\centering\arraybackslash}m{2.8cm}
-                    |>{\centering\arraybackslash}m{2.8cm}|>{\centering\arraybackslash}m{3.4cm}|}
-    \hline
-    \textbf{Tensión inversa} ($V_2$) & \textbf{$f_0$ simulada}
-      & \textbf{$f_0$ medida} & \textbf{$C_j$ despejada de la medida}\\
-    \hline
-    \qty{0}{\volt}  & & & \\ \hline
-    \qty{1}{\volt}  & & & \\ \hline
-    \qty{2}{\volt}  & & & \\ \hline
-    \qty{5}{\volt}  & & & \\ \hline
-    \qty{10}{\volt} & & & \\ \hline
-    \end{tabular}
-\end{table}
+    \includegraphics[width=\textwidth]{bode_resonador.pdf}
+    \caption{Respuesta en frecuencia del resonador, trazada a partir de
+             \texttt{resonador\_7100khz.DAT}. Ambos ejes son lineales: fuera de la
+             resonancia la señal en el nodo es casi nula, y el pico marca $f_0$.}
+    \label{fig:bode}
+\end{figure}
+
+\subsubsection*{El barrido en Proteus}
+
+En Proteus la curva no sale de un instrumento, sino de un \emph{gráfico de barrido en
+alterna} que se coloca sobre el propio esquema:
+
+\begin{enumerate}[label=\arabic*., leftmargin=2em, itemsep=2pt]
+    \item En la barra de modos elija \emph{Graph} y, en la lista, \texttt{AC SWEEP};
+          arrastre sobre el esquema el recuadro del gráfico
+          (figuras~\ref{fig:proteus}\subref{fig:proteus-a}
+          y~\subref{fig:proteus-b}).
+    \item Arrastre la sonda de tensión del nodo del diodo, \texttt{R1(1)}, dentro del
+          recuadro: así se añade como pista del gráfico
+          (figura~\ref{fig:proteus}\subref{fig:proteus-c}).
+    \item Abra \emph{Editar gráfico} (\texttt{Ctrl+E}) y elija como \emph{Referencia}
+          el generador, \texttt{ROOT\_R2(1)}
+          (figura~\ref{fig:proteus}\subref{fig:proteus-d}).
+    \item Fije frecuencia inicial \qty{100}{\kilo\hertz}, final \qty{8}{\mega\hertz},
+          intervalo \texttt{LINEAR} y \textbf{1000 pasos}, y \textbf{desmarque}
+          «¿Escala Y en dBs?» para que la magnitud salga en lineal
+          (figura~\ref{fig:proteus}\subref{fig:proteus-e}).
+    \item Pulse la \textbf{barra espaciadora} ---o clic derecho sobre el gráfico,
+          \emph{Simular gráfico}--- y la curva se traza. El pico debe aparecer cerca de
+          los \qty{7}{\mega\hertz}
+          (figura~\ref{fig:proteus}\subref{fig:proteus-f}).
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \begin{subfigure}{0.30\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{proteus_a.png}
+        \caption{Modo \emph{Graph}, \texttt{AC SWEEP}.}
+        \label{fig:proteus-a}
+    \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{proteus_b.png}
+        \caption{Recuadro sobre el esquema.}
+        \label{fig:proteus-b}
+    \end{subfigure}\hfill
+    \begin{subfigure}{0.33\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{proteus_c.png}
+        \caption{Sonda \texttt{R1(1)} como pista.}
+        \label{fig:proteus-c}
+    \end{subfigure}
+
+    \vspace{12pt}
+    % Los dos dialogos van a media pagina: con un tercio no se leen los campos.
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{proteus_d.png}
+        \caption{Referencia: el generador.}
+        \label{fig:proteus-d}
+    \end{subfigure}\hfill
+    \begin{subfigure}{0.49\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{proteus_e.png}
+        \caption{Rango, escala y pasos.}
+        \label{fig:proteus-e}
+    \end{subfigure}
+
+    \vspace{12pt}
+    \begin{subfigure}{0.62\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{proteus_f.png}
+        \caption{Gráfico simulado: el pico cae hacia los \qty{7}{\mega\hertz}.}
+        \label{fig:proteus-f}
+    \end{subfigure}
+    \caption{Pasos para obtener el diagrama de Bode en Proteus.}
+    \label{fig:proteus}
+\end{figure}
+
+% Tres tensiones y no cinco: el barrido se hace ahora sobre el equipo y cada
+% uno exige su propia captura. Se toman 0, 1 y 3 V porque la capacitancia varia
+% deprisa al principio y despacio despues; con L1 = 27 uH la resonancia cruza los
+% 8 MHz del generador a partir de 3,5 V, de modo que 3 V es el ultimo punto util.
+\marcobarrido{\qty{0}{\volt}}
+
+\marcobarrido{\qty{1}{\volt}}
+
+\marcobarrido{\qty{3}{\volt}}
+
+\vspace{4pt}
+\noindent\textbf{Para configurar el instrumento:}
+
+\begin{itemize}[leftmargin=1.4em, itemsep=1pt, topsep=4pt]
+    \item Guía del \emph{Network Analyzer} de WaveForms:\\
+          \url{https://digilent.com/reference/test-and-measurement/guides/waveforms-network-analyzer}
+    \item Vídeo de referencia: \url{https://www.youtube.com/watch?v=31tq_A_2TcY}
+\end{itemize}
 
 \subsection{Preguntas}
 
 \begin{enumerate}[label=\arabic*., leftmargin=2em]
+    \item Según los barridos, ¿la frecuencia de resonancia sube o baja al
+          aumentar $V_2$? Explíquelo a partir del ancho de la zona de deplexión.
     \item A partir de la frecuencia medida y de la ecuación~\eqref{eq:resonancia},
-          calcule la capacitancia que presentaba $D_1$ con $V_2 = \qty{2}{\volt}$.
-          Compárela con la que obtuvo directamente con el \emph{Impedance Analyzer} en
-          el paso a) del procedimiento. ¿Coinciden? Si no, ¿cuál de las dos incluye las
+          calcule la capacitancia que presentaba $D_1$ con $V_2 = \qty{3}{\volt}$.
+          Compárela con la que mida directamente sobre el diodo con el
+          \emph{Impedance Analyzer}. ¿Coinciden? Si no, ¿cuál de las dos incluye las
           capacidades parásitas del montaje?
-    \item La resonancia medida en el protoboard no cae en la misma frecuencia que la
-          simulada. Enumere al menos tres capacidades presentes en el montaje real y
-          ausentes en el simulador, y estime cuánta capacitancia habría que añadir a la
-          simulación para que ambas coincidieran.
-    \item Según los valores que anotó en la tabla~\ref{tab:resonador}, ¿la frecuencia
-          de resonancia sube o baja al aumentar $V_2$? Explíquelo a partir del ancho de
-          la zona de deplexión.
-    \item ¿Qué ocurriría si $V_1$ entregase \qty{5}{\volt} eficaces en lugar de
-          \qty{0.5}{\volt}? ¿Seguiría siendo válido el análisis?
     \item ¿Por qué este resonador emplea el 1N4007, que es un diodo rectificador lento,
           y no un diodo de señal como el 1N4148, mucho más rápido? Compare la
           capacitancia de juntura de ambos y razone cuál de las dos características
           --- velocidad o capacitancia --- decide aquí.
-    \item Con $R_1 = \qty{1}{\kilo\ohm}$ en lugar de \qty{470}{\kilo\ohm}, ¿qué factor
-          de calidad tendría el circuito según la ecuación~\eqref{eq:q}? ¿Se podría
-          seguir localizando el pico?
 \end{enumerate}
 
 \FloatBarrier
@@ -1086,7 +1310,7 @@ presentaba el diodo:
 %=======================================================================
 \begin{itemize}
     \item Realice una gráfica $V_D$ \emph{vs.} $I_D$ con las medidas anotadas en las
-          tablas~\ref{tab:directa} y~\ref{tab:inversa} (simulación y medición). Esta gráfica
+          tablas~\ref{tab:directa-sim} a~\ref{tab:inversa-exp}, una curva por diodo. Esta gráfica
           deberá ser generada con Python. Identificar las regiones de la curva característica del
           diodo semiconductor.
 \end{itemize}

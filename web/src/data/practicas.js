@@ -83,15 +83,15 @@ export const PRACTICAS = [
       'Polarizar el diodo en forma directa y representar su curva característica de operación.',
       'Polarizar el diodo en forma inversa y representar su curva característica de operación.',
       'Analizar el comportamiento externo del diodo semiconductor en sus diferentes polarizaciones.',
-      'Contrastar los resultados experimentales con la simulación en Multisim.',
+      'Contrastar los resultados experimentales con la simulación en Proteus.',
       'Aprovechar la capacitancia de juntura del diodo en inversa para sintonizar un resonador LC.',
     ],
-    temas: ['Diodo 1N4007', 'Curva característica', 'Polarización directa', 'Polarización inversa', 'Multisim', 'Varicap', 'Resonador LC', 'Diagrama de Bode'],
+    temas: ['Diodo 1N4007', 'Curva característica', 'Polarización directa', 'Polarización inversa', 'Proteus', 'Varicap', 'Resonador LC', 'Diagrama de Bode'],
     documento: {
       // Visor principal embebido en la pagina
       src: 'practicas/lab2/Laboratorio_2.pdf',
-      paginas: 14,
-      peso: '0.3 MB',
+      paginas: 15,
+      peso: '0.4 MB',
     },
     descargas: [
       {
@@ -100,7 +100,7 @@ export const PRACTICAS = [
         archivo: 'practicas/lab2/Laboratorio_2.pdf',
         nombre: 'Laboratorio_2_Circuitos_Electronicos.pdf',
         tipo: 'PDF',
-        peso: '0.3 MB',
+        peso: '0.4 MB',
         destacado: true,
       },
       {
@@ -109,16 +109,16 @@ export const PRACTICAS = [
         archivo: 'practicas/lab2/Laboratorio_2.tex',
         nombre: 'Laboratorio_2.tex',
         tipo: 'TEX',
-        peso: '54 KB',
+        peso: '63 KB',
         destacado: false,
       },
       {
         etiqueta: 'Datos del resonador',
         detalle: 'Barrido del simulador, 1000 puntos de 0,1 a 8 MHz — para trazar el Bode del resonador LC',
-        archivo: 'practicas/lab2/resonador_4800khz.DAT',
-        nombre: 'resonador_4800khz.DAT',
+        archivo: 'practicas/lab2/resonador_7100khz.DAT',
+        nombre: 'resonador_7100khz.DAT',
         tipo: 'DAT',
-        peso: '120 KB',
+        peso: '122 KB',
         destacado: false,
       },
       {

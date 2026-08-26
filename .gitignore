@@ -46,3 +46,10 @@ Laboratorio_2/LaTeX/imagenes/image20.png
 
 # Python
 __pycache__/
+
+# Intermedio de latexmk con XeLaTeX (el PDF sale de aqui, pero no se versiona)
+*.xdv
+
+# Capturas originales del barrido en Proteus: se versionan ya renombradas como
+# imagenes/proteus_a.png ... proteus_f.png, asi que la carpeta es un duplicado.
+Laboratorio_2/LaTeX/imagenes/Imagenes para obtener el diagrama de bode/
