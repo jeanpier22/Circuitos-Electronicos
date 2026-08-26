@@ -53,3 +53,11 @@ __pycache__/
 # Capturas originales del barrido en Proteus: se versionan ya renombradas como
 # imagenes/proteus_a.png ... proteus_f.png, asi que la carpeta es un duplicado.
 Laboratorio_2/LaTeX/imagenes/Imagenes para obtener el diagrama de bode/
+
+# Bibliografia de consulta (Floyd y el folleto de Saber Electronica).
+#
+# Son 57 MB de PDF con derechos de autor. No se versionan por dos razones: el
+# repositorio se publica en GitHub Pages, y una vez dentro del historial de git
+# ya no se pueden sacar. Las guias solo usan recortes concretos de sus figuras,
+# que si estan versionados en Laboratorio_N/LaTeX/imagenes/ y citados en el pie.
+Libros/
