@@ -258,8 +258,8 @@
   pdfsubject={Circuitos Electronicos - Guia de practicas},
   pdfauthor={Ebert San Roman Castillo; Jeanpier Ancori Sanchez},
   pdfkeywords={electronica, fuente de alimentacion DC, transformador 220/24,
-               rectificador en puente, GBU6B, filtro por condensador, rizado,
-               regulador LM317, Proteus, protoboard, Analog Discovery Studio}
+               puente rectificador, GBU6B, filtro por condensador, rizado,
+               regulador LM317, Proteus, protoboard, osciloscopio}
 }
 
 % babel-spanish rotula las tablas como "Cuadro"; los originales dicen "Tabla".
@@ -306,7 +306,7 @@
 %=======================================================================
 \section{Objetivos}
 %=======================================================================
-El objetivo de esta práctica es diseñar, construir y caracterizar una fuente de
+El objetivo de esta práctica es diseñar y construir una fuente de
 alimentación DC de salida ajustable. Para ello se desarrollan las siguientes actividades:
 
 \begin{itemize}
@@ -317,10 +317,6 @@ alimentación DC de salida ajustable. Para ello se desarrollan las siguientes ac
     \item Montar la fuente por etapas, verificando cada una antes de pasar a la siguiente.
     \item Ajustar la salida con el regulador LM317 y comprobar que el rango medido
           coincide con el que predice su ecuación.
-    \item Caracterizar la fuente con carga: regulación de línea, regulación de carga y
-          rizado.
-    \item Evaluar la potencia que disipa el regulador y decidir si el disipador elegido
-          es suficiente.
 \end{itemize}
 
 \FloatBarrier
@@ -329,11 +325,8 @@ alimentación DC de salida ajustable. Para ello se desarrollan las siguientes ac
 %=======================================================================
 Una fuente de alimentación DC convierte la tensión alterna de la red en una tensión
 continua estable. El trabajo se reparte en etapas y cada una entrega a la siguiente una
-señal más parecida a la continua ideal (figura~\ref{fig:bloques}). Esta práctica
-construye las cuatro primeras: la etapa de protección queda fuera del proyecto.\footnote{%
-Las figuras de esta sección proceden de Floyd, \emph{Electronic Devices},
-10.\textsuperscript{a}~ed., capítulo 2, y de Vallejo y Lopardo, \emph{Curso de electrónica
-para principiantes}, lección 6.}
+señal más parecida a la continua ideal (figura~\ref{fig:bloques}). En esta práctica se
+construyen las cuatro primeras: la etapa de protección queda fuera del alcance de esta guía.
 
 \begin{figure}[H]
   \centering
@@ -344,33 +337,21 @@ para principiantes}, lección 6.}
 \end{figure}
 
 %-----------------------------------------------------------------------
-\subsection{Transformador}
-%-----------------------------------------------------------------------
-Reduce los \qty{220}{\volt} de la red a los \qty{24}{\volt} que necesita el resto del
-circuito y, de paso, aísla el montaje de la línea. La relación entre ambas tensiones la
-fija la relación de vueltas de los dos bobinados. Ambas son tensiones eficaces, pero lo
-que ven los diodos es el valor de pico:
-\begin{equation}
-  \frac{V_{\text{sec}}}{V_{\text{pri}}}=\frac{N_{\text{sec}}}{N_{\text{pri}}}
-  \qquad\qquad
-  V_{p(\text{sec})}=\sqrt{2}\,V_{\text{rms}}=1{,}414\times\qty{24}{\volt}=\qty{33.9}{\volt}
-\end{equation}
-
-%-----------------------------------------------------------------------
-\subsubsection{Valor eficaz y valor de pico}
+\subsection{Valor eficaz y valor de pico}
 %-----------------------------------------------------------------------
 Una tensión alterna no vale lo mismo en todo instante, así que hace falta acordar con qué
 número se la nombra. Se usan tres, y conviene no confundirlos
 (figura~\ref{fig:rms}):
 
 \begin{itemize}
-  \item El \textbf{valor de pico} $V_p$ es lo máximo que alcanza la onda. Es el que
-        soportan de verdad los componentes.
-  \item El \textbf{valor pico a pico} $V_{pp}=2V_p$ es lo que se lee de frente en la
-        pantalla del osciloscopio.
-  \item El \textbf{valor eficaz} o \textbf{rms} $V_{\text{rms}}$ es el valor de continua
-        que calentaría una resistencia igual que esa alterna. Es el que mide el multímetro
-        y con el que se rotulan la red y los transformadores.
+  \item El \textbf{valor de pico} $V_p$ es lo máximo que alcanza la onda, medido desde el
+        cero. Es la tensión que de verdad soportan los componentes, y por eso es la que
+        manda a la hora de elegirlos.
+  \item El \textbf{valor pico a pico} $V_{pp}=2V_p$ es la altura total del trazo, de la
+        cresta al valle.
+  \item El \textbf{valor eficaz} o \textbf{rms} $V_{\text{rms}}$ es el que marca el
+        multímetro cuando se mide en la escala de tensión alterna (V$\sim$), y también con
+        el que se rotulan la red y los transformadores.
 \end{itemize}
 
 Para una onda senoidal, y solo para ella, los tres están ligados por
@@ -383,13 +364,21 @@ Para una onda senoidal, y solo para ella, los tres están ligados por
   \label{eq:rms}
 \end{equation}
 
+Como ejemplo, apliquemos las tres relaciones a la red peruana, cuyos \qty{220}{\volt} de
+rótulo son un valor eficaz:
+\[
+  V_p=1{,}414\times\qty{220}{\volt}=\qty{311}{\volt}
+  \qquad
+  V_{pp}=2\times\qty{311}{\volt}=\qty{622}{\volt}
+\]
+
 \begin{figure}[H]
   \centering
   \begin{tikzpicture}
   \begin{axis}[
-      width=11.5cm, height=5.0cm,
+      width=10.5cm, height=5.0cm,
       axis lines=middle, axis line style={-},
-      xmin=0, xmax=6.6, ymin=-1.45, ymax=1.45,
+      xmin=0, xmax=6.6, ymin=-1.45, ymax=1.65,
       xtick=\empty, ytick={-1,-0.707,0.707,1},
       yticklabels={$-V_p$,,,$V_p$},
       xlabel={$t$}, xlabel style={at={(axis description cs:1,0.5)}, anchor=west},
@@ -400,42 +389,107 @@ Para una onda senoidal, y solo para ella, los tres están ligados por
   \addplot[gray, dashed, samples=2, domain=0:6.4] {1};
   \addplot[gray, dashed, samples=2, domain=0:6.4] {-1};
   \addplot[red!70!black, densely dotted, line width=1pt, samples=2, domain=0:6.4] {0.707};
+  % Rotulos con los numeros reales de la red peruana: es lo que el alumno tiene en
+  % el tomacorriente, asi que el simbolo de la izquierda y la cifra de la derecha
+  % quedan enfrentados en la misma linea.
+  \node[font=\footnotesize\bfseries, anchor=west] at (axis cs:0.05,1.5)
+       {Red peruana: \qty{220}{\volt} eficaces};
+  \node[font=\footnotesize, anchor=west] at (axis cs:6.45,1)
+       {$V_p=\qty{311}{\volt}$};
   \node[red!70!black, font=\footnotesize, anchor=west] at (axis cs:6.45,0.707)
-       {$V_{\text{rms}}=0{,}707\,V_p$};
+       {$V_{\text{rms}}=0{,}707\,V_p=\qty{220}{\volt}$};
+  \node[font=\footnotesize, anchor=west] at (axis cs:6.45,-1)
+       {$-V_p=\qty{-311}{\volt}$};
   % Flecha pico a pico. Ojo: no se puede escribir "<->" porque babel-spanish deja
   % activos los caracteres < y > para las comillas latinas y rompe la compilacion.
   \draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, black, line width=0.8pt]
        (axis cs:1.571,1) -- (axis cs:1.571,-1);
-  \node[fill=white, inner sep=1pt, font=\footnotesize] at (axis cs:1.571,0.28) {$V_{pp}$};
+  \node[fill=white, inner sep=1pt, font=\footnotesize] at (axis cs:1.571,0.28)
+       {$V_{pp}=\qty{622}{\volt}$};
   \end{axis}
   \end{tikzpicture}
-  \caption[Valor de pico, pico a pico y eficaz]{Los tres valores de una senoide. El
-  multímetro en alterna mostraría \qty{24}{\volt} en nuestro secundario; el osciloscopio,
-  \qty{33.9}{\volt} de pico y \qty{67.9}{\volt} de pico a pico.}
+  \caption[Valor de pico, pico a pico y eficaz]{Los tres valores de una senoide, rotulados
+  con los números de la red peruana. El bobinado secundario del transformador se lee igual: los
+  \qty{24}{\volt} que marca el multímetro son \qty{33.9}{\volt} de pico y
+  \qty{67.9}{\volt} de pico a pico. Esos \qty{311}{\volt} explican por qué el
+  osciloscopio nunca se conecta al bobinado primario.}
   \label{fig:rms}
 \end{figure}
 
+%-----------------------------------------------------------------------
+\subsection{Transformador}
+%-----------------------------------------------------------------------
+Esta etapa tiene como finalidad reducir los \qty{220}{\volt} de la red a los
+\qty{24}{\volt} que necesita el resto del circuito y, además, aislar magnéticamente el
+montaje de la línea. Consta de dos bobinados arrollados sobre un mismo núcleo de hierro:
+el \textbf{bobinado primario}, que es el que se conecta a la red, y el
+\textbf{bobinado secundario}, del que sale la tensión ya reducida hacia el resto del
+circuito. Entre los dos no hay ningún
+contacto eléctrico (la energía pasa de uno a otro por el campo magnético del núcleo), y en
+eso consiste el aislamiento. Es un componente pasivo: no amplifica ni rectifica nada, solo
+cambia la escala de la tensión. Su comportamiento se resume en dos ecuaciones:
+
+\begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
+\item La \textbf{relación de transformación}. El transformador reduce la tensión en la
+misma proporción en que el bobinado secundario tiene menos vueltas que el bobinado
+primario.
+\begin{equation}
+  \frac{V_{\text{sec}}}{V_{\text{pri}}}=\frac{N_{\text{sec}}}{N_{\text{pri}}}
+  \label{eq:transformacion}
+\end{equation}
+donde $V_{\text{pri}}$ y $V_{\text{sec}}$ son las tensiones eficaces del bobinado primario y
+del bobinado secundario, y $N_{\text{pri}}$ y $N_{\text{sec}}$ el número de vueltas de cada
+uno. En nuestro transformador la proporción es $24/220\approx 1/9$: el bobinado secundario
+tiene unas nueve veces menos vueltas que el bobinado primario.
+
+\item El \textbf{paso de valor eficaz a valor de pico}. El transformador viene rotulado
+como \qty{24}{\volt}, pero ese número no es la tensión máxima que entrega: es su
+\emph{valor eficaz}, que es el que marca el multímetro. La tensión del bobinado secundario
+no vale lo mismo en todo instante, sino que oscila, y en cada ciclo llega a un máximo
+bastante más alto que el del rótulo. Ese máximo es el \textbf{valor de pico}, y es el que
+ven de verdad los diodos y el condensador. Se obtiene multiplicando el valor eficaz
+por $\sqrt{2}$:
+\begin{equation}
+  V_{p(\text{sec})}=\sqrt{2}\,V_{\text{rms}}=1{,}414\times\qty{24}{\volt}=\qty{33.9}{\volt}
+  \label{eq:pico-sec}
+\end{equation}
+Dicho de otro modo: un transformador rotulado como \qty{24}{\volt} entrega en realidad
+picos de casi \qty{34}{\volt}, un \qty{41}{\percent} más. Estos \qty{33.9}{\volt} son el
+punto de partida de todos los cálculos de las etapas siguientes.
+\end{enumerate}
+
 \begin{notatec}{por qué esto decide los componentes}
-El transformador dice \qty{24}{\volt} porque es su valor eficaz, pero el condensador se
-carga hasta el \textbf{pico}, \qty{33.9}{\volt}. Si eligiera C1 pensando en los
-\qty{24}{\volt} del rótulo, se quedaría corto. Lo mismo pasa con la tensión inversa que
-aguantan los diodos: también se calcula sobre el pico, nunca sobre el eficaz.
+El transformador dice \qty{24}{\volt} porque ese es su valor eficaz, $V_{\text{rms}}$,
+pero el condensador se carga hasta el \textbf{pico}, $V_{p(\text{sec})}=\qty{33.9}{\volt}$
+por la ecuación~\eqref{eq:pico-sec}. Si eligiera C1 pensando en los \qty{24}{\volt} del
+rótulo, se quedaría corto. Lo mismo pasa con la tensión inversa que aguantan los diodos:
+también se calcula sobre $V_{p(\text{sec})}$, nunca sobre $V_{\text{rms}}$.
 \end{notatec}
 
 %-----------------------------------------------------------------------
 \subsection{Rectificador}
 %-----------------------------------------------------------------------
-Cuatro diodos en puente invierten el semiciclo negativo en lugar de descartarlo, de modo
-que la carga recibe los dos semiciclos (figura~\ref{fig:puente}) y la ondulación sale al
-doble de la frecuencia de red, \qty{120}{\hertz}. En cada semiciclo la corriente atraviesa
-dos diodos en serie con la carga, así que el pico a la salida queda \qty{1.4}{\volt} por
-debajo del pico del secundario. La PIV es la tensión inversa que soporta cada diodo, y es
-el dato con el que se elige el componente:
+Esta etapa tiene como finalidad rectificar el semiciclo negativo de la señal alterna que
+entrega el bobinado secundario, de modo que se aprovechen los dos semiciclos de la onda y
+no solo uno. En esta fuente se resuelve con un \textbf{puente rectificador}: un conjunto
+de cuatro diodos conectados en puente, encapsulados en un solo componente.
+
+Lo consigue porque los diodos conducen por parejas, según hacia dónde apunte la tensión
+del bobinado secundario en cada instante. En el semiciclo positivo conducen $D_1$ y $D_2$;
+en el negativo, $D_3$ y $D_4$. Las dos parejas están dispuestas de modo que la corriente
+atraviesa la carga siempre en el mismo sentido (figura~\ref{fig:puente}), así que el
+semiciclo negativo no se descarta: se invierte y se aprovecha. De ahí que la ondulación
+salga al doble de la frecuencia de red, \qty{120}{\hertz}.
+
+Ese aprovechamiento tiene un precio. En cada semiciclo la corriente atraviesa dos diodos
+en serie con la carga, y cada uno cae unos \qty{0.7}{\volt}, de manera que el pico a la
+salida del puente queda \qty{1.4}{\volt} por debajo del pico del bobinado secundario:
 \begin{equation}
   V_{p(\text{out})}=V_{p(\text{sec})}-\qty{1.4}{\volt}
-  \qquad\qquad
-  \text{PIV}=V_{p(\text{out})}+\qty{0.7}{\volt}
+  \label{eq:vpout}
 \end{equation}
+Con los \qty{33.9}{\volt} de pico que entrega nuestro bobinado secundario, a la salida del
+puente quedan \qty{32.5}{\volt}.
 
 \begin{figure}[H]
   \centering
@@ -449,24 +503,182 @@ el dato con el que se elige el componente:
     \includegraphics[width=\linewidth]{puente_semiciclo_neg.png}
     \caption{Semiciclo negativo: conducen $D_3$ y $D_4$.}
   \end{subfigure}
-  \caption[Funcionamiento del rectificador en puente]{Funcionamiento del rectificador en
-  puente: en los dos semiciclos la corriente recorre $R_L$ en el mismo sentido.}
+  \caption[Funcionamiento del puente rectificador]{Funcionamiento del puente
+  rectificador: en los dos semiciclos la corriente recorre $R_L$ en el mismo sentido.}
   \label{fig:puente}
 \end{figure}
-
 %-----------------------------------------------------------------------
 \subsection{Filtro}
 %-----------------------------------------------------------------------
-La salida del puente es continua pero pulsante. Un condensador en paralelo con la carga se
-carga en cada pico y se descarga entre pico y pico, con lo que la tensión ya no baja hasta
-cero: lo que queda es el \emph{rizado} (figura~\ref{fig:rizado}). Cuanto mayor sea $C$ o
-$R_L$, menor es el rizado y mejor el factor de rizado $r=V_{r(pp)}/V_{\text{DC}}$:
+Esta etapa tiene como finalidad alisar la tensión que sale del puente, que es continua
+pero pulsante: oscila 120 veces por segundo. Para conseguirlo se conecta un
+condensador en paralelo con la salida, y este trabaja en dos tiempos. Mientras la señal
+rectificada sube, el condensador \textbf{se carga} hasta alcanzar el valor de pico.
+Cuando la señal empieza a bajar, el condensador \textbf{se descarga} poco a poco sobre lo
+que tiene conectado a continuación (en esta fuente, el regulador y lo que se enchufe a su
+salida) y sostiene la tensión hasta que llega el pico siguiente, de manera
+que ya no cae hasta cero (figura~\ref{fig:rizado-partes}). Lo que queda es una tensión
+continua con una ondulación montada encima, y a esa ondulación se le llama \emph{rizado} ($V_r$).
+Para describir esa señal hacen falta dos números:
+
+\begin{figure}[H]
+  \centering
+  % Figura propia, no sale de ningun libro: los esquemas de Floyd dibujan el rizado
+  % pero no rotulan V_r(pp) ni V_DC, que es justo lo que el alumno necesita ver para
+  % entender las ecuaciones (5) a (7). El rizado va exagerado (aqui ~32 %, en la
+  % fuente real mucho menos): a escala real las tres lineas quedarian superpuestas.
+  % Geometria: picos en x = 1, 3, 5 y 7; el valle se fija en 0,62 y la sinusoide
+  % vuelve a alcanzar ese valor en x = 2,4257, que es donde termina cada descarga.
+  \begin{tikzpicture}[x=1.35cm, y=3.0cm, line cap=round]
+    % --- niveles de referencia
+    \draw[gray!60, dashed] (0,1)    -- (7.5,1);
+    \draw[gray!60, dashed] (0,0.62) -- (7.5,0.62);
+    \draw[red!70!black, line width=0.9pt] (0,0.81) -- (7.5,0.81);
+    % --- senal rectificada, tal como sale del puente (sin condensador)
+    \draw[gray!55, dashed, line width=0.8pt, samples=300, domain=0:7.3]
+         plot (\x, {abs(sin(90*\x))});
+    % --- tension en el condensador: se recarga siguiendo la sinusoide y se
+    %     descarga en linea recta sobre lo que tenga conectado
+    \draw[blue!65!black, line width=1.3pt, samples=60, domain=0:1]
+         plot (\x, {abs(sin(90*\x))});
+    \draw[blue!65!black, line width=1.3pt] (1,1) -- (2.4257,0.62);
+    \draw[blue!65!black, line width=1.3pt, samples=40, domain=2.4257:3]
+         plot (\x, {abs(sin(90*\x))});
+    \draw[blue!65!black, line width=1.3pt] (3,1) -- (4.4257,0.62);
+    \draw[blue!65!black, line width=1.3pt, samples=40, domain=4.4257:5]
+         plot (\x, {abs(sin(90*\x))});
+    \draw[blue!65!black, line width=1.3pt] (5,1) -- (6.4257,0.62);
+    \draw[blue!65!black, line width=1.3pt, samples=40, domain=6.4257:7]
+         plot (\x, {abs(sin(90*\x))});
+    % --- que es el rizado: la propia ondulacion, senalada sobre la onda
+    \node[font=\footnotesize, anchor=west, inner sep=2pt] (rz) at (1.30,0.28)
+         {el \textbf{rizado} es esta ondulación};
+    \draw[-{Stealth[length=1.8mm]}, gray!35!black, line width=0.7pt]
+         (rz.north east) to[bend left=14] (4.35,0.66);
+    % --- ejes
+    \draw[-{Stealth[length=2mm]}] (0,0) -- (8.0,0)
+         node[anchor=west, font=\footnotesize] {$t$};
+    \draw[-{Stealth[length=2mm]}] (0,0) -- (0,1.32);
+    \node[font=\footnotesize, anchor=north east] at (0,0) {0};
+    % --- rotulos de las tres magnitudes
+    \node[font=\footnotesize, anchor=east] at (-0.12,1) {$V_{p(\text{rect})}$};
+    \node[red!70!black, font=\footnotesize, anchor=east] at (-0.12,0.81)
+         {$V_{\text{DC}}$};
+    \draw[{Stealth[length=2mm]}-{Stealth[length=2mm]}, line width=0.8pt]
+         (7.35,0.62) -- (7.35,1);
+    \node[font=\footnotesize, anchor=west, inner sep=2pt] at (7.52,0.81)
+         {$V_{r(pp)}$};
+    % --- leyenda
+    \draw[blue!65!black, line width=1.3pt] (0.15,1.2) -- (0.60,1.2);
+    \node[font=\footnotesize, anchor=west] at (0.68,1.2) {tensión en C1, con filtro};
+    \draw[gray!55, dashed, line width=0.8pt] (3.50,1.2) -- (3.95,1.2);
+    \node[font=\footnotesize, anchor=west] at (4.03,1.2)
+         {salida del puente, sin filtro};
+  \end{tikzpicture}
+  \caption[Las tres magnitudes del filtro]{Las tres magnitudes de las
+  ecuaciones~\eqref{eq:rizado} a~\eqref{eq:factor-rizado} sobre la forma de onda. El rizado
+  va dibujado exagerado para que se distingan las tres líneas.}
+  \label{fig:rizado-partes}
+\end{figure}
+
+\begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
+\item La \textbf{tensión de rizado} $V_{r(pp)}$: la altura de la ondulación, medida de su
+punto más bajo al más alto. Es decir, el valor pico a pico de lo que le sobra a la
+continua; de ahí el subíndice $pp$. Es lo que se lee en el osciloscopio con acoplamiento
+AC:
 \begin{equation}
-  V_{r(pp)}\approx\left(\frac{1}{f\,R_L\,C}\right)V_{p(\text{rect})}
-  \qquad
-  V_{\text{DC}}\approx\left(1-\frac{1}{2f\,R_L\,C}\right)V_{p(\text{rect})}
+  V_{r(pp)}\approx\left(\frac{1}{f\,R_L\,C_1}\right)V_{p(\text{rect})}
   \label{eq:rizado}
 \end{equation}
+
+\item La \textbf{tensión continua} $V_{\text{DC}}$: el valor medio de esa misma señal, la
+altura alrededor de la cual ondula. Es lo que marca el multímetro en continua, y es la
+tensión que realmente le llega al regulador:
+\begin{equation}
+  V_{\text{DC}}\approx\left(1-\frac{1}{2f\,R_L\,C_1}\right)V_{p(\text{rect})}
+  \label{eq:vdc}
+\end{equation}
+\end{enumerate}
+
+En las dos, $V_{p(\text{rect})}$ es el pico de la señal rectificada que entra al filtro, el
+de la ecuación~\eqref{eq:vpout}; $f=\qty{120}{\hertz}$ es la frecuencia del rizado, que en
+un puente es el doble de la de red; $C_1$ es la capacidad del condensador de filtro y $R_L$
+la resistencia de carga (figura~\ref{fig:rl}).
+
+\begin{figure}[H]
+  \centering
+  % Esquema propio. Responde a una pregunta que la guia dejaba en el aire: de donde
+  % sale la R_L de las ecuaciones (5) y (6) si en el circuito no hay ninguna
+  % resistencia de carga montada.
+  \begin{subfigure}{0.48\linewidth}
+    \centering
+    \begin{tikzpicture}[x=0.6cm, y=0.6cm, line width=0.8pt, line cap=round]
+      \draw (0.4,2.6) -- (9.6,2.6);
+      \draw (0.4,0)   -- (9.6,0);
+      \draw[fill=white] (0.4,2.6) circle (0.16);
+      \draw[fill=white] (0.4,0)   circle (0.16);
+      \node[font=\scriptsize, anchor=west] at (0.15,3.2) {del puente};
+      % condensador de filtro
+      \draw (3.6,2.6) -- (3.6,1.55);
+      \draw (2.9,1.55) -- (4.3,1.55);
+      \draw (2.9,1.25) -- (4.3,1.25);
+      \draw (3.6,1.25) -- (3.6,0);
+      \node[font=\scriptsize, anchor=west] at (4.45,1.4) {C1};
+      % resistencia de carga
+      \draw (7.6,2.6) -- (7.6,1.85);
+      \draw[fill=white] (7.2,1.85) rectangle (8.0,0.75);
+      \draw (7.6,0.75) -- (7.6,0);
+      \node[font=\scriptsize, anchor=west] at (8.15,1.3) {$R_L$};
+      \fill (3.6,2.6) circle (0.1); \fill (3.6,0) circle (0.1);
+      \fill (7.6,2.6) circle (0.1); \fill (7.6,0) circle (0.1);
+    \end{tikzpicture}
+    \caption{Como lo dibujan los libros.}
+  \end{subfigure}\hfill
+  \begin{subfigure}{0.48\linewidth}
+    \centering
+    \begin{tikzpicture}[x=0.6cm, y=0.6cm, line width=0.8pt, line cap=round]
+      \draw (0.4,2.6) -- (10.2,2.6);
+      \draw (0.4,0)   -- (10.2,0);
+      \draw[fill=white] (0.4,2.6) circle (0.16);
+      \draw[fill=white] (0.4,0)   circle (0.16);
+      \node[font=\scriptsize, anchor=west] at (0.15,3.2) {del puente};
+      % condensador de filtro
+      \draw (3.0,2.6) -- (3.0,1.55);
+      \draw (2.3,1.55) -- (3.7,1.55);
+      \draw (2.3,1.25) -- (3.7,1.25);
+      \draw (3.0,1.25) -- (3.0,0);
+      \node[font=\scriptsize, anchor=east] at (2.15,1.4) {C1};
+      % lo que hay de verdad
+      \draw[gray!60, dashed, line width=0.7pt] (4.6,0.3) rectangle (8.9,2.3);
+      \draw (6.75,2.6) -- (6.75,2.05);
+      \draw[fill=black!5] (5.1,2.05) rectangle (8.4,0.55);
+      \node[font=\scriptsize] at (6.75,1.55) {regulador};
+      \node[font=\scriptsize] at (6.75,1.05) {y carga};
+      \draw (6.75,0.55) -- (6.75,0);
+      \node[font=\scriptsize, fill=white, inner sep=1pt] at (4.6,2.3) {$R_L$};
+      \fill (6.75,2.6) circle (0.1); \fill (6.75,0) circle (0.1);
+      \fill (3.0,2.6) circle (0.1); \fill (3.0,0) circle (0.1);
+    \end{tikzpicture}
+    \caption{Lo que hay en esta fuente.}
+  \end{subfigure}
+  \caption[De dónde sale la $R_L$ de las ecuaciones]{De dónde sale la $R_L$ de las
+  ecuaciones~\eqref{eq:rizado} y~\eqref{eq:vdc}. Los libros dibujan a la salida del filtro
+  una resistencia de carga; en esta fuente no hay ninguna, porque lo que C1 alimenta es el
+  regulador y lo que se conecte a su salida. $R_L$ es el modelo de ese consumo: la
+  resistencia que absorbería la misma corriente, $R_L=V_{\text{DC}}/I$.}
+  \label{fig:rl}
+\end{figure}
+
+Las dos cifras se combinan en una sola medida de calidad, el \textbf{factor de rizado} $r$,
+que compara lo que ondula con lo que vale la continua:
+\begin{equation}
+  r=\frac{V_{r(pp)}}{V_{\text{DC}}}
+  \label{eq:factor-rizado}
+\end{equation}
+Como es un cociente entre dos tensiones, $r$ no tiene unidades y se suele expresar en
+porcentaje: cuanto más pequeño, más se parece la salida a una continua ideal. En las dos
+ecuaciones anteriores $C_1$ y $R_L$ aparecen dividiendo, así que aumentar cualquiera de los
+dos reduce $V_{r(pp)}$, sube $V_{\text{DC}}$ y por tanto mejora $r$ (figura~\ref{fig:rizado}).
 
 \begin{figure}[H]
   \centering
@@ -480,14 +692,16 @@ $R_L$, menor es el rizado y mejor el factor de rizado $r=V_{r(pp)}/V_{\text{DC}}
 % alumno de tercer semestre no ha visto rizado antes, y con un caso numerico
 % delante repite el patron en la seccion VI sin tener que despejar nada.
 \begin{ejemplo}{el rizado de nuestra fuente con una carga de \qty{100}{\ohm}}
-Partimos del secundario, \qty{24}{\volt} eficaces, con $C=\qty{2200}{\micro\farad}$ y
-$f=\qty{120}{\hertz}$. El pico del secundario y el de la señal rectificada son
+Partimos del bobinado secundario, \qty{24}{\volt} eficaces, con
+$C_1=\qty{2200}{\micro\farad}$ y $f=\qty{120}{\hertz}$. El pico del bobinado secundario y el
+de la señal rectificada son
 \[
   V_{p(\text{sec})}=1{,}414\times\qty{24}{\volt}=\qty{33.9}{\volt}
   \qquad
   V_{p(\text{rect})}=\qty{33.9}{\volt}-\qty{1.4}{\volt}=\qty{32.5}{\volt}
 \]
-Sustituyendo en las dos fórmulas de arriba, con $R_L=\qty{100}{\ohm}$:
+Sustituyendo en las ecuaciones~\eqref{eq:rizado} y~\eqref{eq:vdc}, con
+$R_L=\qty{100}{\ohm}$:
 \[
   V_{r(pp)}\approx\frac{\qty{32.5}{\volt}}{120\times100\times2200\times10^{-6}}
   =\frac{\qty{32.5}{\volt}}{26{,}4}=\qty{1.23}{\volt}
@@ -497,30 +711,79 @@ Sustituyendo en las dos fórmulas de arriba, con $R_L=\qty{100}{\ohm}$:
   \qty{32.5}{\volt}=0{,}981\times\qty{32.5}{\volt}=\qty{31.9}{\volt}
 \]
 El factor de rizado resulta $r=\qty{1.23}{\volt}/\qty{31.9}{\volt}=0{,}039$, es decir un
-\qty{3.9}{\percent}. \textbf{Este es el patrón de cálculo que se repite en la
-sección~\ref{sec:caracterizacion}}, cambiando solo $R_L$.
+\qty{3.9}{\percent}.
 \end{ejemplo}
 
 %-----------------------------------------------------------------------
 \subsection{Regulador}
 %-----------------------------------------------------------------------
-El filtro reduce el rizado, pero la salida sigue moviéndose cuando cambia la red o la
-carga. El regulador la mantiene fija (figura~\ref{fig:regulada}) y su calidad se mide con
-dos cifras:
-\begin{equation}
-  \text{Reg. de línea}=\left(\frac{\Delta V_{\text{OUT}}}{\Delta V_{\text{IN}}}\right)100\%
-  \qquad
-  \text{Reg. de carga}=\left(\frac{V_{\text{NL}}-V_{\text{FL}}}{V_{\text{FL}}}\right)100\%
-\end{equation}
-donde $V_{\text{NL}}$ es la salida sin carga y $V_{\text{FL}}$ la salida a plena carga.
+Esta etapa tiene como finalidad fijar el voltaje de salida en el valor elegido y
+sostenerlo ahí, absorbiendo las variaciones que le llegan por delante. Hace falta porque
+el filtro entrega una tensión continua, pero no \emph{estable}: su valor oscila con la
+red y, sobre todo, se hunde en cuanto la carga pide más corriente.
 
-\begin{figure}[htbp]
+El regulador usado en esta fuente es un LM317, que no entrega una tensión fija sino
+\textbf{ajustable}: su tensión de salida no viene impuesta por el integrado, sino que la
+fijan dos resistencias conectadas por fuera, R1 y el potenciómetro RV1. Girando RV1 se
+elige la tensión que entrega la fuente.
+Todo su funcionamiento se resume en una sola propiedad, y conviene retenerla
+porque de ella sale el resto: \textbf{el integrado hace lo que haga falta para mantener
+siempre \qty{1.25}{\volt} entre su terminal de salida (V\textsubscript{OUT}) y su terminal
+de ajuste (ADJ)}. A esa tensión se le llama tensión de referencia.
+
+\begin{figure}[H]
   \centering
-  \includegraphics[width=0.88\linewidth]{fuente_regulada.png}
-  \caption[Fuente DC regulada completa]{Las cuatro etapas en un mismo esquema, aquí con
-  red de \qty{120}{\volt} y regulador de \qty{5}{\volt}.}
-  \label{fig:regulada}
+  % Recorte de la etapa de regulacion tomado tal cual del esquema completo de la
+  % figura 8, sin redibujar nada: asi el alumno ve exactamente el mismo dibujo que
+  % va a montar, en lugar de dos representaciones distintas del mismo circuito.
+  \includegraphics[width=0.55\linewidth]{regulador_recorte.png}
+  \caption[La etapa de regulación]{La etapa de regulación, recortada del circuito
+  completo de la figura~\ref{fig:circuito}. En el esquema, VI y VO son los terminales
+  V\textsubscript{IN} y V\textsubscript{OUT} del LM317.}
+  \label{fig:regulador}
 \end{figure}
+
+Esa propiedad es la que convierte a $R_1$ y $R_{V1}$ en el mando de la fuente
+(figura~\ref{fig:regulador}). Como sobre
+$R_1$ hay \qty{1.25}{\volt} fijos, por ella circula una corriente que no depende del ajuste:
+\[
+  I=\frac{\qty{1.25}{\volt}}{R_1}=\frac{\qty{1.25}{\volt}}{\qty{240}{\ohm}}
+   =\qty{5.2}{\milli\ampere}
+\]
+Esa misma corriente continúa por $R_{V1}$, porque la que se va por el terminal ADJ es
+despreciable (unos \qty{50}{\micro\ampere}). Sobre $R_{V1}$ aparece entonces una caída
+$I\,R_{V1}$, y la salida es la suma de las dos caídas:
+\begin{equation}
+  V_{\text{OUT}}=\qty{1.25}{\volt}\left(1+\frac{R_{V1}}{R_1}\right)
+  \label{eq:lm317}
+\end{equation}
+En esa expresión se lee el rango de ajuste de la fuente. Con $R_{V1}=0$ la salida vale
+\qty{1.25}{\volt}, que es el mínimo; con $R_{V1}$ al máximo, \qty{4.7}{\kilo\ohm}, sube
+hasta $\qty{1.25}{\volt}\,(1+4700/240)=\qty{25.7}{\volt}$, los \qty{26}{\volt} que da la
+simulación.
+
+Por último, la calidad de un regulador se mide con dos cifras:
+
+\begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
+\item La \textbf{regulación de línea} dice cuánto se mueve la tensión de salida cuando se
+mueve la de entrada. Mide si el regulador aguanta las subidas y bajadas de la red:
+\begin{equation}
+  \text{Regulación de línea}=\left(\frac{\Delta V_{\text{OUT}}}{\Delta V_{\text{IN}}}\right)100\%
+\end{equation}
+donde $\Delta V_{\text{IN}}$ es lo que varía la tensión de entrada y $\Delta V_{\text{OUT}}$
+lo que varía la de salida por causa de ello.
+
+\item La \textbf{regulación de carga} dice cuánto se mueve la tensión de salida cuando
+cambia la corriente que se le pide. Mide si la fuente se hunde al conectarle una carga:
+\begin{equation}
+  \text{Regulación de carga}=\left(\frac{V_{\text{NL}}-V_{\text{FL}}}{V_{\text{FL}}}\right)100\%
+\end{equation}
+donde $V_{\text{NL}}$ es la tensión de salida sin carga y $V_{\text{FL}}$ la que queda a
+plena carga.
+\end{enumerate}
+
+En las dos, cuanto más pequeño sea el resultado, mejor es el regulador: quiere decir que la
+salida apenas se entera de lo que cambia a su alrededor.
 
 \FloatBarrier
 %=======================================================================
@@ -530,40 +793,23 @@ La figura~\ref{fig:circuito} es el circuito que se va a montar, con las tensione
 entrega la simulación. El transformador TR1 baja los \qty{220}{\volt} de la red a
 \qty{24}{\volt}; el puente BR1 los rectifica y C1 los filtra, con lo que a la entrada del
 regulador hay \qty{32.6}{\volt} de continua. El regulador es un LM317, que no da una
-tensión fija sino ajustable: R1 y el potenciómetro RV1 fijan la salida según
-\begin{equation}
-  V_{\text{OUT}}=\qty{1.25}{\volt}\left(1+\frac{R_{V1}}{R_1}\right)
-  \label{eq:lm317}
-\end{equation}
+tensión fija sino ajustable: R1 y el potenciómetro RV1 fijan la salida según la
+ecuación~\eqref{eq:lm317} del marco teórico.
 Con $R_1=\qty{240}{\ohm}$ y RV1 al máximo la salida llega a los \qty{26}{\volt} de la
 simulación, y con RV1 a cero baja hasta \qty{1.25}{\volt}: ese es el rango de ajuste de la
 fuente.
 
 \begin{figure}[H]
   \centering
-  % Los recuadros de etapa se dibujan encima de la captura con TikZ, en coordenadas
-  % relativas a la propia imagen (de 0 a 1): si la figura se reescala, las cajas la
-  % siguen. Asi no hay que retocar el PNG cada vez que cambie el ancho.
-  \begin{tikzpicture}
-    \node[anchor=south west, inner sep=0] (esq) at (0,0)
-      {\includegraphics[width=\linewidth]{circuito_fuente.png}};
-    \begin{scope}[x={(esq.south east)}, y={(esq.north west)}]
-      \foreach \xa/\xb/\col/\etq in {%
-          0.000/0.305/etapaA/{1. Transformador},
-          0.305/0.462/etapaB/{2. Rectificador},
-          0.462/0.660/etapaC/{3. Filtro},
-          0.660/1.000/etapaD/{4. Regulador}}
-      {
-        \draw[\col, dashed, line width=1pt, rounded corners=3pt]
-             ({\xa+0.004}, 0.015) rectangle ({\xb-0.004}, 0.975);
-        \node[\col, font=\bfseries\footnotesize, anchor=south]
-             at ({(\xa+\xb)/2}, 0.99) {\etq};
-      }
-    \end{scope}
-  \end{tikzpicture}
-  \caption[Circuito de la fuente DC ajustable]{Circuito de la fuente, simulado en Proteus,
-  con sus cuatro etapas recuadradas. El interruptor de red no aparece en el esquema: va en
-  serie con el primario de TR1, antes del transformador.}
+  % Version con los dos LED indicadores. No lleva los recuadros de etapa que tenia la
+  % version anterior: el propio esquema ya trae rotulo y rango, y las cajas se
+  % solapaban con ese texto.
+  \includegraphics[width=\linewidth]{fuente.png}
+  \caption[Circuito de la fuente DC ajustable]{Circuito de la fuente, simulado en Proteus.
+  Se recorre de izquierda a derecha en cuatro etapas: transformador (TR1), rectificador
+  (BR1), filtro (C1 y C2) y regulador (U1, R1 y RV1). D2 indica que hay tensión a la
+  entrada del regulador y D1 que la hay a la salida. El interruptor de red no aparece en el
+  esquema: va en serie con el bobinado primario de TR1, antes del transformador.}
   \label{fig:circuito}
 \end{figure}
 
@@ -573,27 +819,22 @@ fuente.
 %=======================================================================
 \noindent\textbf{Equipos y dispositivos:}
 \begin{itemize}
-    \item Tarjeta Analog Discovery Studio, con el instrumento \emph{Osciloscopio}.
-    % Sus entradas llegan a +-25 V y en esta fuente hay 32,6 V: sin puntas 10x la
-    % traza sale recortada. Ver la nota tecnica de mas abajo.
-    \item 02 puntas de osciloscopio con atenuación 10:1.
+    \item Osciloscopio Tektronix.
+    \item 02 puntas de osciloscopio.
     \item Multímetro.
 \end{itemize}
 
-\begin{notatec}{la tarjeta no mide la red, y tampoco los \qty{32.6}{\volt} en directo}
-Las entradas del osciloscopio de la Analog Discovery Studio admiten
-\textbf{\qty{\pm25}{\volt}} y están protegidas hasta \qty{\pm50}{\volt}; además comparten
-masa con el PC por el USB, es decir, no están aisladas.
+\begin{notatec}{la red no se mide con una punta normal}
+El osciloscopio sí puede medir \qty{220}{\volt}, pero no con las puntas habituales: su
+pinza de masa está unida a la tierra de la red por el propio enchufe del equipo, así que
+sujetarla a un conductor de la red lo cortocircuita contra tierra. Para medir ahí harían
+falta una \textbf{punta diferencial} o un \textbf{transformador de aislamiento}, que no se
+usan en esta práctica.
 \begin{itemize}
-    \item \textbf{Nunca} conecte la tarjeta al primario. Los \qty{220}{\volt} eficaces son
-          \qty{311}{\volt} de pico: destruiría la tarjeta y probablemente el computador,
-          con riesgo para quien lo manipule.
-    \item El secundario (\qty{34}{\volt} de pico) y la salida del filtro
-          (\qty{32.6}{\volt}) \emph{también} superan los \qty{25}{\volt}. Mídalos con
-          punta 10:1, que los deja en \qty{3.4}{\volt} y \qty{3.3}{\volt}, o
-          con el multímetro.
-    \item El osciloscopio comparte canales con el \emph{Network Analyzer} y el
-          \emph{Impedance Analyzer}: no se pueden usar a la vez.
+    \item Con el material de esta práctica, \textbf{no} conecte el osciloscopio al bobinado
+          primario ni a ningún punto de la red.
+    \item Del bobinado secundario en adelante todo es baja tensión y se mide con
+          normalidad, llevando siempre la pinza de masa al negativo del montaje.
 \end{itemize}
 \end{notatec}
 
@@ -640,78 +881,42 @@ así una avería no deja el laboratorio a medias.
     % El LM317 se lleva la diferencia entre sus 32,6 V de entrada y la salida: en el
     % extremo bajo del ajuste eso son decenas de vatios. Sin disipador no aguanta.
     \item 01 disipador para el LM317T, con su tornillo y su mica aislante.
-    % --- Cargas de la seccion VI. Con la salida en 12 V dan 26, 55, 120 y 255 mA:
-    % ninguna llega a los 0,3 A, muy por debajo del amperio que aguanta un
-    % protoboard. El vatiaje es el del caso peor de cada una, ya redondeado.
-    \item 01 resistencia de \qty{470}{\ohm} y 01 de \qty{220}{\ohm}
-          (1\,\unit{\watt}), para las pruebas con carga.
-    \item 01 resistencia de \qty{100}{\ohm} y 01 de \qty{47}{\ohm}
-          (5\,\unit{\watt}), para las pruebas con carga.
+    % --- Indicadores. D2 avisa de que hay tension a la entrada del regulador y D1
+    % de que la hay a la salida. R2 ve los 32,4 V del filtro: descontando los 2 V del
+    % LED circulan 13,8 mA y disipa 0,42 W, de ahi el vatio y no 1/4 W. En R3, con la
+    % salida en 25 V, son 10,5 mA y 0,24 W. Los LED van dobles: montados al reves no
+    % encienden y es el error tipico.
+    \item \textbf{04} diodos LED rojos (D1 y D2, dos de repuesto).
+    \item \textbf{04} resistencias de \qty{2.2}{\kilo\ohm} (1\,\unit{\watt}) (R2 y R3,
+          dos de repuesto).
     % --- Montaje. Se arma en protoboard, pero el primario NO: ver la caja de
     % seguridad. De ahi la bornera y el aislante, que son solo para ese tramo.
     \item 01 protoboard.
     \item Cables conectores para protoboard.
     \item 01 bornera de conexión y cinta aislante o tubo termorretráctil, para cablear
-          el primario fuera del protoboard.
+          el bobinado primario fuera del protoboard.
     \item Mandil (obligatorio).
 \end{itemize}
 
-\begin{seguridad}{el primario no va en el protoboard}
-La fuente se arma en protoboard \textbf{a partir del secundario}. El tramo enchufe --
-interruptor -- primario de TR1 está a \qty{220}{\volt} y sus contactos quedarían
+\begin{seguridad}{el bobinado primario no va en el protoboard}
+La fuente se arma en protoboard \textbf{a partir del bobinado secundario}. El tramo enchufe --
+interruptor -- bobinado primario de TR1 está a \qty{220}{\volt} y sus contactos quedarían
 accesibles: cablee ese tramo aparte, con bornera y las uniones aisladas, y déjelo
-desconectado mientras trabaja. Desde el secundario en adelante todo es baja tensión y se
+desconectado mientras trabaja. Desde el bobinado secundario en adelante todo es baja tensión y se
 maneja con normalidad, siempre con la fuente desenchufada.
 \end{seguridad}
 
 \FloatBarrier
 %=======================================================================
-\section{Construcción \puntos{6}}
+\section{Construcción}
 %=======================================================================
-El montaje se hace \textbf{en clase} y sobre \textbf{protoboard}, salvo el primario. La
-fuente se arma y se comprueba \textbf{por etapas}: no pase a la siguiente hasta que la
-anterior entregue la tensión que le corresponde. Anote cada medida en la
-tabla~\ref{tab:puesta-marcha}.
-
-%-----------------------------------------------------------------------
-\subsection{Antes de montar}
-%-----------------------------------------------------------------------
-\begin{enumerate}[label=\textbf{Paso \arabic*.}, leftmargin=*, labelsep=0.6em]
-\item Compruebe cada componente con el multímetro: los cuatro diodos del puente en la
-escala de prueba de diodos, la continuidad del interruptor, el valor de R1 y el recorrido
-de RV1 de extremo a extremo.
-\item Identifique los terminales. El puente lleva marcados los dos de alterna
-($\sim$) y los de continua ($+$ y $-$). El LM317 se lee como en la
-figura~\ref{fig:lm317}: su orden \emph{no} es el de un 78xx, y montarlo por analogía lo
-destruye.
-\end{enumerate}
-
-\begin{figure}[H]
-  \centering
-  % Encapsulado TO-220 visto de frente, con la cara metalica hacia atras. Se
-  % dibuja aqui y no se toma de ningun libro: Floyd solo trae el pinout del 78xx,
-  % que es justo el que NO hay que usar.
-  \begin{tikzpicture}[line width=0.9pt, scale=1.0]
-    % cuerpo
-    \draw[fill=black!12, rounded corners=1.5pt] (0,0) rectangle (2.6,2.0);
-    % pestana metalica con su agujero
-    \draw[fill=black!25, rounded corners=1.5pt] (0,2.0) rectangle (2.6,2.9);
-    \draw[fill=white] (1.3,2.45) circle (0.22);
-    \node[font=\scriptsize\itshape, anchor=west] at (2.85,2.45) {cara metálica (atrás)};
-    \node[font=\small\bfseries] at (1.3,1.0) {LM317T};
-    % patas
-    \foreach \x/\n/\r in {0.55/1/ADJ, 1.30/2/{V\textsubscript{OUT}}, 2.05/3/{V\textsubscript{IN}}}{
-      \draw (\x,0) -- (\x,-0.75);
-      \node[font=\scriptsize, anchor=north] at (\x,-0.80) {\n};
-      \node[font=\scriptsize\bfseries, anchor=north, rotate=90, anchor=east]
-           at (\x,-1.15) {\r};
-    }
-  \end{tikzpicture}
-  \caption[Patillaje del LM317T]{Patillaje del LM317T en cápsula TO-220, visto de frente
-  con la cara metálica hacia atrás. La pestaña metálica está unida internamente a
-  V\textsubscript{OUT}: por eso el disipador necesita mica aislante.}
-  \label{fig:lm317}
-\end{figure}
+El montaje se hace \textbf{en clase} y sobre \textbf{protoboard}, salvo el bobinado
+primario. La fuente se arma \textbf{etapa por etapa} siguiendo el circuito propuesto de la
+figura~\ref{fig:circuito}: primero el transformador, después el rectificador, luego el filtro
+y por último el regulador. No pase a la siguiente etapa hasta que la anterior entregue la
+tensión que le corresponde. Al terminar cada una, mida y capture la señal con el
+osciloscopio y anote el resultado en la tabla~\ref{tab:puesta-marcha}. La figura~\ref{fig:armado} sirve de
+referencia para el cableado de las tres primeras etapas.
 
 \begin{figure}[H]
   \centering
@@ -719,56 +924,16 @@ destruye.
   \caption[Cableado de las tres primeras etapas]{Cableado de las tres primeras etapas, que
   son iguales a las de nuestra fuente. El folleto lo resuelve sobre un puente de
   terminales; nosotros haremos lo mismo en protoboard, con una salvedad: el tramo enchufe
-  -- interruptor -- primario va cableado aparte. Tomado del folleto de Saber Electrónica.}
+  -- interruptor -- bobinado primario va cableado aparte. Tomado del folleto de Saber
+  Electrónica.}
   \label{fig:armado}
 \end{figure}
 
-%-----------------------------------------------------------------------
-\subsection{Etapa de red y transformador}
-%-----------------------------------------------------------------------
-\begin{enumerate}[label=\textbf{Paso \arabic*.}, leftmargin=*, labelsep=0.6em, start=3]
-\item Cablee enchufe $\rightarrow$ interruptor $\rightarrow$ primario de TR1 \textbf{fuera
-del protoboard}, con bornera y las uniones aisladas. Deje el transformador apoyado en la
-mesa, nunca sobre la placa.
-\item Lleve los dos hilos del secundario al protoboard. Conecte, accione el interruptor y
-mida el secundario con el \textbf{multímetro en alterna}. Desconecte.
-\end{enumerate}
-
-%-----------------------------------------------------------------------
-\subsection{Rectificador}
-%-----------------------------------------------------------------------
-\begin{enumerate}[label=\textbf{Paso \arabic*.}, leftmargin=*, labelsep=0.6em, start=5]
-\item Con la fuente desconectada, pinche el puente en el protoboard y una a sus terminales
-$\sim$ los dos hilos del secundario. Todavía sin condensador.
-\item Conecte y mida en \textbf{continua} entre $+$ y $-$: obtendrá el valor medio de la
-señal rectificada. Con la tarjeta y la punta 10:1 verá los dos semiciclos a
-\qty{120}{\hertz}.
-\end{enumerate}
-
-%-----------------------------------------------------------------------
-\subsection{Filtro}
-%-----------------------------------------------------------------------
-\begin{enumerate}[label=\textbf{Paso \arabic*.}, leftmargin=*, labelsep=0.6em, start=7]
-\item Monte C1 entre $+$ y $-$ \textbf{respetando la polaridad}, y C2 en paralelo con él.
-\item Mida de nuevo en continua: la tensión sube hasta el valor de pico. Con la punta
-10:1 y el osciloscopio en acoplamiento AC, mida el rizado $V_{r(pp)}$.
-\end{enumerate}
-
-%-----------------------------------------------------------------------
-\subsection{Regulador}
-%-----------------------------------------------------------------------
-\begin{enumerate}[label=\textbf{Paso \arabic*.}, leftmargin=*, labelsep=0.6em, start=9]
-\item Atornille el LM317 al disipador con su mica aislante antes de pincharlo en el
-protoboard.
-\item Lleve el $+$ del filtro a V\textsubscript{IN}. Monte R1 entre V\textsubscript{OUT} y
-ADJ, RV1 entre ADJ y el negativo, y C3 a la salida.
-\item Conecte y gire RV1 de un extremo al otro midiendo la salida. Anote el mínimo y el
-máximo, y contrástelos con la ecuación~\eqref{eq:lm317}.
-\end{enumerate}
-
 \begin{table}[H]
   \centering
-  \caption{Puesta en marcha por etapas.}
+  \caption[Puesta en marcha por etapas]{Puesta en marcha por etapas. La columna
+  \textbf{Medido} no se rellena con un número suelto: cada casilla debe respaldarse con
+  la \textbf{captura del osciloscopio} de esa medida, numerada y adjunta en el informe.}
   \label{tab:puesta-marcha}
   \small
   % Filas altas: el alumno tiene que poder anotar a mano en cada casilla.
@@ -780,12 +945,12 @@ máximo, y contrástelos con la ecuación~\eqref{eq:lm317}.
     \hline
     \textbf{Punto de medida} & \textbf{Calculado} & \textbf{Simulado} & \textbf{Medido}\\
     \hline
-    Secundario de TR1 (AC)                    & & & \\ \hline
-    Salida del puente, sin C1 (DC)            & & & \\ \hline
-    Salida del filtro (DC)                    & & & \\ \hline
-    Rizado $V_{r(pp)}$ a la salida del filtro & & & \\ \hline
-    Salida mínima de la fuente                & & & \\ \hline
-    Salida máxima de la fuente                & & & \\ \hline
+    Bobinado secundario de TR1 ($V_{\text{rms}}$ y $V_p$) & & & \\ \hline
+    Salida del puente, sin C1 ($V_{\text{DC}}$) & & & \\ \hline
+    Salida del filtro, con C1 ($V_{\text{DC}}$) & & & \\ \hline
+    Rizado a la salida del filtro ($V_{r(pp)}$) & & & \\ \hline
+    Salida mínima de la fuente ($V_{\text{DC}}$) & & & \\ \hline
+    Salida máxima de la fuente ($V_{\text{DC}}$) & & & \\ \hline
   \end{tabularx}
 \end{table}
 
@@ -795,164 +960,38 @@ Antes de modificar el circuito, descárguelo con una resistencia y compruebe con
 multímetro que la tensión ha bajado a cero.
 \end{seguridad}
 
-\begin{notatec}{si una etapa no entrega lo que debe}
-Desconecte antes de cambiar nada. El síntoma dice casi siempre dónde está el fallo:
-\begin{itemize}
-    \item \textbf{Sin tensión en el secundario.} Interruptor, cableado del primario o el
-          propio transformador. Verifique continuidad con la fuente desenchufada.
-    \item \textbf{El rizado sale a \qty{60}{\hertz} en vez de \qty{120}{\hertz}, y la
-          continua es la mitad.} Un diodo del puente está abierto: solo rectifica media
-          onda. Sustituya el puente.
-    \item \textbf{C1 se calienta, se hincha o huele.} Está montado al revés. Desconecte de
-          inmediato y no lo reutilice.
-    \item \textbf{La salida no baja del máximo y no responde al potenciómetro.} RV1 está
-          abierto o conectado por el terminal equivocado: el cursor debe ir a ADJ.
-    \item \textbf{La salida es igual a la entrada.} El LM317 está mal orientado o
-          destruido; compruébelo contra la figura~\ref{fig:lm317}.
-    \item \textbf{La salida cae en cuanto conecta la carga.} Corriente excesiva para el
-          protoboard o para el transformador. Reduzca la carga.
-\end{itemize}
-\end{notatec}
-
 \FloatBarrier
 %=======================================================================
-\section{Caracterización de la fuente \puntos{8}}
-\label{sec:caracterizacion}
+\section{Observaciones}
 %=======================================================================
-Construir la fuente es la mitad del trabajo; la otra mitad es saber qué tan buena es. Una
-fuente no se juzga por lo que marca en vacío, sino por lo que hace cuando se le pide
-corriente. Ajuste la salida a \qty{12}{\volt} y no la vuelva a tocar durante los
-apartados~1 a~3.
+Las mediciones no se entregan como números escritos en una tabla, sino como
+\textbf{imágenes}: la captura del osciloscopio es la evidencia de cada medida. Presente una
+captura por cada punto de medida de la tabla~\ref{tab:puesta-marcha}:
 
-\begin{seguridad}{no pase de \qty{0.5}{\ampere}}
-Los contactos de un protoboard admiten alrededor de \qty{1}{\ampere}. Las cargas de esta
-sección se han elegido para no pasar de \qty{0.3}{\ampere}; no las sustituya por otras de
-menor valor.
-\end{seguridad}
-
-%-----------------------------------------------------------------------
-\subsection{Regulación de carga}
-%-----------------------------------------------------------------------
-Conecte cada resistencia de carga entre la salida y el negativo, y mida en cada caso la
-tensión de salida $V_{\text{OUT}}$, la tensión continua a la entrada del regulador
-$V_{\text{IN}}$ y el rizado $V_{r(pp)}$ sobre C1. Complete la tabla~\ref{tab:carga}.
-
-\begin{table}[H]
-  \centering
-  \caption{Comportamiento con carga, con la salida ajustada a \qty{12}{\volt}.}
-  \label{tab:carga}
-  \small
-  \renewcommand{\arraystretch}{2.1}
-  \begin{tabularx}{\linewidth}{@{}|>{\centering\arraybackslash}m{2.1cm}
-                                 |>{\centering\arraybackslash}X
-                                 |>{\centering\arraybackslash}X
-                                 |>{\centering\arraybackslash}X
-                                 |>{\centering\arraybackslash}X|@{}}
-    \hline
-    \textbf{$R_L$} & \textbf{$I_{\text{OUT}}$ (mA)} & \textbf{$V_{\text{OUT}}$ (V)}
-      & \textbf{$V_{\text{IN}}$ (V)} & \textbf{$V_{r(pp)}$ (V)}\\
-    \hline
-    Sin carga           & 0 & & & \\ \hline
-    \qty{470}{\ohm}     & & & & \\ \hline
-    \qty{220}{\ohm}     & & & & \\ \hline
-    \qty{100}{\ohm}     & & & & \\ \hline
-    \qty{47}{\ohm}      & & & & \\ \hline
-  \end{tabularx}
-\end{table}
-
-Con la primera fila y la última calcule la regulación de carga:
-\begin{equation}
-  \text{Reg. de carga}=\left(\frac{V_{\text{NL}}-V_{\text{FL}}}{V_{\text{FL}}}\right)100\%
-\end{equation}
-
-\lineasresp{2}
-
-%-----------------------------------------------------------------------
-\subsection{Regulación de línea}
-%-----------------------------------------------------------------------
-La regulación de línea dice cuánto se mueve la salida cuando se mueve la entrada. En el
-laboratorio no hay forma de subir o bajar los \qty{220}{\volt} de la red, pero
-\textbf{no hace falta}: en la tabla~\ref{tab:carga} la entrada del regulador ya cambió
-sola, porque al pedir más corriente el condensador se descarga más y $V_{\text{IN}}$ cae.
-Aproveche ese cambio en tres pasos, entre la fila sin carga y la de \qty{47}{\ohm}:
-
-\begin{enumerate}[label=\textbf{\alph*)}, leftmargin=*, labelsep=0.6em]
-  \item Reste las dos entradas: $\Delta V_{\text{IN}}=V_{\text{IN,sin carga}}-V_{\text{IN},47\,\Omega}$.
-  \item Reste las dos salidas: $\Delta V_{\text{OUT}}=V_{\text{OUT,sin carga}}-V_{\text{OUT},47\,\Omega}$.
-  \item Divida y multiplique por cien.
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, labelsep=0.6em]
+  \item Tensión en el bobinado secundario de TR1.
+  \item Salida del puente rectificador, todavía sin C1.
+  \item Salida del filtro, ya con C1 montado.
+  \item Rizado $V_{r(pp)}$ a la salida del filtro, con el osciloscopio en acoplamiento AC.
+  \item Salida de la fuente ajustada a su valor mínimo.
+  \item Salida de la fuente ajustada a su valor máximo.
 \end{enumerate}
 
-\begin{equation}
-  \text{Reg. de línea}=\left(\frac{\Delta V_{\text{OUT}}}{\Delta V_{\text{IN}}}\right)100\%
-\end{equation}
+En cada captura utilice los \textbf{cursores o marcadores} del osciloscopio para señalar
+sobre la propia traza el valor que se está midiendo: $V_p$ y $V_{pp}$ en las señales
+alternas, $V_{r(pp)}$ en el rizado y el nivel de continua donde corresponda. La lectura
+del cursor debe quedar visible en la imagen.
 
-Anote el resultado. ¿Le parece un valor bueno o malo? Justifíquelo.
+Cada imagen debe ir numerada y llevar un pie que indique a qué punto del circuito
+corresponde y con qué escalas de tiempo y de tensión se tomó. Compare después cada valor
+leído con el que entrega la simulación en Proteus y comente las diferencias que encuentre.
 
-\lineasresp{3}
-
-%-----------------------------------------------------------------------
-\subsection{Rizado en función de la carga}
-%-----------------------------------------------------------------------
-Con la columna $V_{r(pp)}$ de la tabla~\ref{tab:carga}, compare cada medida con lo que
-predice la ecuación~\eqref{eq:rizado}, tomando $R_L$ como la resistencia equivalente que
-ve el filtro. Comente si el rizado crece como esperaba y a qué atribuye la diferencia.
-
-\lineasresp{3}
-
-%-----------------------------------------------------------------------
-\subsection{Disipación del regulador}
-%-----------------------------------------------------------------------
-Todo lo que el LM317 no entrega a la carga lo disipa en calor:
-\begin{equation}
-  P_D=(V_{\text{IN}}-V_{\text{OUT}})\,I_{\text{OUT}}
-  =\frac{(V_{\text{IN}}-V_{\text{OUT}})\,V_{\text{OUT}}}{R_L}
-  \label{eq:disipacion}
-\end{equation}
-
-Deje puesta la carga de \qty{100}{\ohm} y tome $V_{\text{IN}}=\qty{32.6}{\volt}$. Ajuste
-la salida a cada valor de la tabla~\ref{tab:disipacion}, mida la corriente y calcule
-$P_D$ con la ecuación~\eqref{eq:disipacion}. La primera fila va resuelta como ejemplo.
-
-\begin{table}[H]
-  \centering
-  \caption{Potencia disipada por el LM317 con $R_L=\qty{100}{\ohm}$.}
-  \label{tab:disipacion}
-  \small
-  \renewcommand{\arraystretch}{2.1}
-  \begin{tabularx}{\linewidth}{@{}|>{\centering\arraybackslash}m{2.6cm}
-                                 |>{\centering\arraybackslash}X
-                                 |>{\centering\arraybackslash}X
-                                 |>{\centering\arraybackslash}X|@{}}
-    \hline
-    \textbf{$V_{\text{OUT}}$ (V)} & \textbf{$V_{\text{IN}}-V_{\text{OUT}}$ (V)}
-      & \textbf{$I_{\text{OUT}}$ (mA)} & \textbf{$P_D$ (W)}\\
-    \hline
-    5   & 27,6 & 50 & 1,38 \\ \hline
-    10  & & & \\ \hline
-    16  & & & \\ \hline
-    22  & & & \\ \hline
-    26  & & & \\ \hline
-  \end{tabularx}
-\end{table}
-
-Mire la última columna: \textbf{¿en qué fila sale mayor $P_D$?} No es ni en la salida más
-baja ni en la más alta. Explique con sus palabras por qué ocurre eso, fijándose en que al
-subir $V_{\text{OUT}}$ la corriente crece pero la caída sobre el regulador se achica.
-
-\lineasresp{3}
-
-\subsubsection{¿Basta el disipador?}
-Un LM317 en cápsula TO-220 \textbf{sin disipador} no puede evacuar más de
-\qty{1}{\watt} aproximadamente antes de entrar en protección térmica. Compare ese
-\qty{1}{\watt} con el $P_D$ máximo de su tabla y responda si el disipador es opcional o
-imprescindible. Después, con la fuente en ese punto durante cinco minutos, compruebe con
-cuidado si el disipador se puede tocar o no.
-
-\lineasresp{3}
+\lineasresp{5}
 
 \FloatBarrier
+
 %=======================================================================
-\section{Cuestionario \puntos{3}}
+\section{Cuestionario}
 %=======================================================================
 \begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, labelsep=0.6em]
 \item El rizado que midió está a \qty{120}{\hertz}. Si uno de los cuatro diodos del puente
@@ -964,25 +1003,27 @@ el porqué a partir de la figura~\ref{fig:puente}.
 \qty{0.1}{\micro\farad}?
 \lineasresp{3}
 
-\item El LM317 necesita una corriente mínima circulando por su salida para regular bien.
-Sabiendo que entre V\textsubscript{OUT} y ADJ hay siempre \qty{1.25}{\volt}, calcule la
-corriente que impone $R_1=\qty{240}{\ohm}$ y explique por qué no serviría una de
-\qty{10}{\kilo\ohm}.
-\lineasresp{3}
-
-\item Si duplicara C1, ¿qué le pasaría al rizado y qué le pasaría a la corriente de pico
-que atraviesa los diodos? ¿Por qué no conviene subir C1 sin más?
+\item El transformador está rotulado como \qty{24}{\volt} y el multímetro en alterna
+confirma esa lectura, pero en el osciloscopio la traza del bobinado secundario llega a casi
+\qty{34}{\volt}. ¿Cómo se explica que los dos instrumentos den valores distintos midiendo lo
+mismo? ¿Cuál de los dos hay que usar para decidir la tensión que debe aguantar C1, y por
+qué?
 \lineasresp{3}
 \end{enumerate}
 
 \FloatBarrier
 %=======================================================================
-\section{Conclusiones \puntos{3}}
+\section{Conclusiones}
 %=======================================================================
-Redacte sus conclusiones. Al menos dos deben ser \textbf{cuantitativas}, citando valores
-medidos, y al menos una debe pronunciarse sobre si esta fuente sirve tal cual o qué le
-cambiaría.
+\begin{itemize}
+    \item Deberán consignar como mínimo 05 conclusiones \textbf{cualitativas} y 05
+          \textbf{cuantitativas}.
+\end{itemize}
 
-\lineasresp{7}
+\noindent\textbf{Cualitativas}
+\lineasresp{10}
+
+\noindent\textbf{Cuantitativas}
+\lineasresp{10}
 
 \end{document}
