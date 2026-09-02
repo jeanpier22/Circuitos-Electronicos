@@ -1,12 +1,15 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, CalendarDays, CheckCircle2, CircleDot, Circle } from 'lucide-react'
+import { ArrowRight, CheckCircle2, CircleDot, Circle, FileText } from 'lucide-react'
 import { CRONOGRAMA } from '../data/practicas'
 
 /**
- * Cronograma de la primera unidad, en rejilla de ocho semanas.
+ * Cronograma del curso, semana por semana.
  *
- * El contenido sale entero de CRONOGRAMA (src/data/practicas.js): para
- * rellenar una semana pendiente no hay que tocar este componente.
+ * Ojo con la lectura de las fechas: hay dos grupos de laboratorio, el del
+ * miercoles y el del viernes, y ambos hacen la misma practica dentro de la
+ * misma semana. Las dos fechas de cada tarjeta son eso, un grupo cada una.
+ *
+ * El contenido sale entero de CRONOGRAMA (src/data/practicas.js).
  */
 
 const ESTADOS = {
@@ -33,26 +36,44 @@ const ESTADOS = {
   },
 }
 
+const EXAMEN = {
+  etiqueta: 'Evaluación',
+  icono: FileText,
+  banda: 'bg-gradient-to-r from-amber-400 to-amber-600',
+  numero: 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
+  chip: 'bg-amber-50 text-amber-700 ring-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:ring-amber-900',
+}
+
+function Grupo({ dia, fecha }) {
+  return (
+    <span className="flex items-baseline justify-between gap-2 text-xs">
+      <span className="text-slate-400 dark:text-slate-500">{dia}</span>
+      <span className="font-medium text-slate-600 dark:text-slate-300">{fecha}</span>
+    </span>
+  )
+}
+
 function SemanaCard({ dato, indice }) {
-  const estado = ESTADOS[dato.estado] ?? ESTADOS.programada
-  const Icono = estado.icono
-  const pendiente = dato.estado === 'programada'
+  const esExamen = dato.tipo === 'examen'
+  const estilo = esExamen ? EXAMEN : (ESTADOS[dato.estado] ?? ESTADOS.programada)
+  const Icono = estilo.icono
+  const atenuada = !esExamen && dato.estado === 'programada'
 
   return (
     <li
       className={[
         'card relative flex animate-fade-up flex-col overflow-hidden p-5 transition duration-300',
-        pendiente ? 'opacity-70' : 'hover:-translate-y-1 hover:shadow-lift',
+        atenuada ? 'opacity-70' : 'hover:-translate-y-1 hover:shadow-lift',
       ].join(' ')}
-      style={{ animationDelay: `${indice * 60}ms` }}
+      style={{ animationDelay: `${Math.min(indice, 12) * 45}ms` }}
     >
-      <span aria-hidden className={['absolute inset-x-0 top-0 h-1', estado.banda].join(' ')} />
+      <span aria-hidden className={['absolute inset-x-0 top-0 h-1', estilo.banda].join(' ')} />
 
       <div className="flex items-start justify-between gap-3">
         <span
           className={[
             'grid h-11 w-11 shrink-0 place-items-center rounded-xl text-sm font-extrabold',
-            estado.numero,
+            estilo.numero,
           ].join(' ')}
         >
           {dato.semana}
@@ -60,11 +81,11 @@ function SemanaCard({ dato, indice }) {
         <span
           className={[
             'inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-semibold ring-1',
-            estado.chip,
+            estilo.chip,
           ].join(' ')}
         >
           <Icono className="h-3 w-3 shrink-0" />
-          {estado.etiqueta}
+          {esExamen ? EXAMEN.etiqueta : estilo.etiqueta}
         </span>
       </div>
 
@@ -83,15 +104,8 @@ function SemanaCard({ dato, indice }) {
       </h3>
 
       <div className="mt-4 space-y-1 border-t border-slate-100 pt-3 dark:border-slate-800">
-        {dato.sesiones.map((s) => (
-          <span
-            key={s}
-            className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400"
-          >
-            <CalendarDays className="h-3.5 w-3.5 shrink-0" />
-            {s}
-          </span>
-        ))}
+        <Grupo dia="Grupo miércoles" fecha={dato.grupoMiercoles} />
+        <Grupo dia="Grupo viernes" fecha={dato.grupoViernes} />
       </div>
 
       {dato.practica && (
@@ -107,9 +121,29 @@ function SemanaCard({ dato, indice }) {
   )
 }
 
+function Bloque({ titulo, nota, semanas, desde }) {
+  if (semanas.length === 0) return null
+  return (
+    <>
+      <div className="mt-10 flex flex-wrap items-baseline gap-x-3 gap-y-1 first:mt-8">
+        <h3 className="text-lg font-bold text-slate-900 dark:text-white">{titulo}</h3>
+        {nota && <span className="text-sm text-slate-500 dark:text-slate-400">{nota}</span>}
+      </div>
+      <ol className="mt-4 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        {semanas.map((dato, i) => (
+          <SemanaCard key={dato.semana} dato={dato} indice={desde + i} />
+        ))}
+      </ol>
+    </>
+  )
+}
+
 export default function Cronograma() {
   if (CRONOGRAMA.length === 0) return null
 
+  const unidad1 = CRONOGRAMA.filter((s) => s.unidad === 1)
+  const unidad2 = CRONOGRAMA.filter((s) => s.unidad === 2)
+  const sueltas = CRONOGRAMA.filter((s) => !s.unidad)
   const hechas = CRONOGRAMA.filter((s) => s.estado === 'completada').length
 
   return (
@@ -121,8 +155,12 @@ export default function Cronograma() {
               Cronograma de avance
             </h2>
             <p className="mt-2 max-w-2xl text-slate-600 dark:text-slate-400">
-              Primera unidad: {CRONOGRAMA.length} semanas antes del examen parcial, con sesiones
-              los miércoles y viernes. El curso arrancó el miércoles 19 de agosto.
+              El curso son {CRONOGRAMA.length} semanas. Hay{' '}
+              <strong className="font-semibold text-slate-700 dark:text-slate-200">
+                dos grupos de laboratorio
+              </strong>
+              , el del miércoles y el del viernes, y ambos hacen la misma práctica dentro de la
+              misma semana.
             </p>
           </div>
           <span className="rounded-full bg-slate-100 px-3.5 py-1.5 text-sm font-semibold text-slate-600 dark:bg-slate-800 dark:text-slate-300">
@@ -130,11 +168,23 @@ export default function Cronograma() {
           </span>
         </div>
 
-        <ol className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {CRONOGRAMA.map((dato, i) => (
-            <SemanaCard key={dato.semana} dato={dato} indice={i} />
-          ))}
-        </ol>
+        <Bloque
+          titulo="Primera unidad"
+          nota={`${unidad1.length} semanas, hasta el examen parcial`}
+          semanas={unidad1}
+          desde={0}
+        />
+        <Bloque
+          titulo="Segunda unidad"
+          nota={`${unidad2.length} semanas, hasta el examen final`}
+          semanas={unidad2}
+          desde={unidad1.length}
+        />
+        <Bloque
+          titulo="Evaluaciones y semanas por asignar"
+          semanas={sueltas}
+          desde={unidad1.length + unidad2.length}
+        />
       </div>
     </section>
   )

@@ -18,70 +18,180 @@ export const CURSO = {
 }
 
 /**
- * Cronograma de la primera unidad: 8 semanas antes del examen parcial.
+ * Cronograma del curso: 16 semanas.
  *
- * Las clases son los miercoles y viernes; la semana 1 arranca el miercoles 19
- * de agosto de 2026. Las semanas todavia sin practica asignada van con titulo
- * en null y la portada las dibuja como "Por confirmar": basta con rellenarlas
- * aqui cuando se sepan, sin tocar ningun componente.
+ * Hay dos grupos de laboratorio, el del miercoles y el del viernes, y ambos
+ * hacen la misma practica dentro de la misma semana. Por eso cada entrada
+ * lleva dos fechas: una por grupo, no dos sesiones del mismo grupo.
+ *
+ * Semanas 1 a 8: primera unidad. Semana 9: examen parcial. Semanas 10 a 14:
+ * segunda unidad. Semana 16: examen final.
+ *
+ * Las semanas sin practica asignada van con titulo en null y la portada las
+ * dibuja como "Por confirmar": basta rellenarlas aqui, sin tocar componentes.
  *
  * estado: 'completada' | 'encurso' | 'programada'
+ * tipo:   'practica' | 'examen'
  */
 export const CRONOGRAMA = [
   {
     semana: 1,
-    sesiones: ['Miércoles 19 de agosto', 'Viernes 21 de agosto'],
+    unidad: 1,
+    tipo: 'practica',
+    grupoMiercoles: '19 de agosto',
+    grupoViernes: '21 de agosto',
     practica: 'lab1',
     titulo: 'Mi primer circuito',
     estado: 'completada',
   },
   {
     semana: 2,
-    sesiones: ['Miércoles 26 de agosto', 'Viernes 28 de agosto'],
+    unidad: 1,
+    tipo: 'practica',
+    grupoMiercoles: '26 de agosto',
+    grupoViernes: '28 de agosto',
     practica: 'lab2',
     titulo: 'El diodo semiconductor',
     estado: 'completada',
   },
   {
     semana: 3,
-    sesiones: ['Miércoles 2 de septiembre', 'Viernes 4 de septiembre'],
+    unidad: 1,
+    tipo: 'practica',
+    grupoMiercoles: '2 de septiembre',
+    grupoViernes: '4 de septiembre',
     practica: 'lab3',
     titulo: 'Diseño de una fuente de alimentación DC',
     estado: 'encurso',
   },
   {
     semana: 4,
-    sesiones: ['Miércoles 9 de septiembre', 'Viernes 11 de septiembre'],
+    unidad: 1,
+    tipo: 'practica',
+    grupoMiercoles: '9 de septiembre',
+    grupoViernes: '11 de septiembre',
     practica: null,
     titulo: null,
     estado: 'programada',
   },
   {
     semana: 5,
-    sesiones: ['Miércoles 16 de septiembre', 'Viernes 18 de septiembre'],
+    unidad: 1,
+    tipo: 'practica',
+    grupoMiercoles: '16 de septiembre',
+    grupoViernes: '18 de septiembre',
     practica: null,
     titulo: null,
     estado: 'programada',
   },
   {
     semana: 6,
-    sesiones: ['Miércoles 23 de septiembre', 'Viernes 25 de septiembre'],
+    unidad: 1,
+    tipo: 'practica',
+    grupoMiercoles: '23 de septiembre',
+    grupoViernes: '25 de septiembre',
     practica: null,
     titulo: null,
     estado: 'programada',
   },
   {
     semana: 7,
-    sesiones: ['Miércoles 30 de septiembre', 'Viernes 2 de octubre'],
+    unidad: 1,
+    tipo: 'practica',
+    grupoMiercoles: '30 de septiembre',
+    grupoViernes: '2 de octubre',
     practica: null,
     titulo: null,
     estado: 'programada',
   },
   {
     semana: 8,
-    sesiones: ['Miércoles 7 de octubre', 'Viernes 9 de octubre'],
+    unidad: 1,
+    tipo: 'practica',
+    grupoMiercoles: '7 de octubre',
+    grupoViernes: '9 de octubre',
     practica: null,
     titulo: null,
+    estado: 'programada',
+  },
+  {
+    semana: 9,
+    unidad: null,
+    tipo: 'examen',
+    grupoMiercoles: '14 de octubre',
+    grupoViernes: '16 de octubre',
+    practica: null,
+    titulo: 'Examen parcial',
+    estado: 'programada',
+  },
+  {
+    semana: 10,
+    unidad: 2,
+    tipo: 'practica',
+    grupoMiercoles: '21 de octubre',
+    grupoViernes: '23 de octubre',
+    practica: null,
+    titulo: null,
+    estado: 'programada',
+  },
+  {
+    semana: 11,
+    unidad: 2,
+    tipo: 'practica',
+    grupoMiercoles: '28 de octubre',
+    grupoViernes: '30 de octubre',
+    practica: null,
+    titulo: null,
+    estado: 'programada',
+  },
+  {
+    semana: 12,
+    unidad: 2,
+    tipo: 'practica',
+    grupoMiercoles: '4 de noviembre',
+    grupoViernes: '6 de noviembre',
+    practica: null,
+    titulo: null,
+    estado: 'programada',
+  },
+  {
+    semana: 13,
+    unidad: 2,
+    tipo: 'practica',
+    grupoMiercoles: '11 de noviembre',
+    grupoViernes: '13 de noviembre',
+    practica: null,
+    titulo: null,
+    estado: 'programada',
+  },
+  {
+    semana: 14,
+    unidad: 2,
+    tipo: 'practica',
+    grupoMiercoles: '18 de noviembre',
+    grupoViernes: '20 de noviembre',
+    practica: null,
+    titulo: null,
+    estado: 'programada',
+  },
+  {
+    semana: 15,
+    unidad: null,
+    tipo: 'practica',
+    grupoMiercoles: '25 de noviembre',
+    grupoViernes: '27 de noviembre',
+    practica: null,
+    titulo: null,
+    estado: 'programada',
+  },
+  {
+    semana: 16,
+    unidad: null,
+    tipo: 'examen',
+    grupoMiercoles: '2 de diciembre',
+    grupoViernes: '4 de diciembre',
+    practica: null,
+    titulo: 'Examen final',
     estado: 'programada',
   },
 ]
