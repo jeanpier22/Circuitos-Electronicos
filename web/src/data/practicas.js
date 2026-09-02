@@ -17,6 +17,45 @@ export const CURSO = {
   correoRetroalimentacion: 'jbancori@ucsp.edu.pe',
 }
 
+/**
+ * Cronograma de avance del curso.
+ *
+ * Las clases son los miercoles y viernes. La semana 1 arranca el miercoles 19
+ * de agosto de 2026. Para agregar una semana basta con anadir una entrada aqui:
+ * la pagina principal la dibuja sola.
+ *
+ * estado: 'completada' | 'encurso' | 'programada'
+ */
+export const CRONOGRAMA = [
+  {
+    semana: 1,
+    sesiones: ['Miércoles 19 de agosto', 'Viernes 21 de agosto'],
+    practica: 'lab1',
+    titulo: 'Mi primer circuito',
+    detalle:
+      'Reconocimiento del instrumental, montaje en protoboard y verificación de la ley de Ohm.',
+    estado: 'completada',
+  },
+  {
+    semana: 2,
+    sesiones: ['Miércoles 26 de agosto', 'Viernes 28 de agosto'],
+    practica: 'lab2',
+    titulo: 'El diodo semiconductor',
+    detalle:
+      'Curva característica del diodo en directa e inversa y medida de su capacitancia.',
+    estado: 'completada',
+  },
+  {
+    semana: 3,
+    sesiones: ['Miércoles 2 de septiembre', 'Viernes 4 de septiembre'],
+    practica: 'lab3',
+    titulo: 'Diseño de una fuente de alimentación DC',
+    detalle:
+      'Montaje por etapas de la fuente regulable con LM317 y captura de cada etapa.',
+    estado: 'encurso',
+  },
+]
+
 export const PRACTICAS = [
   {
     id: 'lab1',

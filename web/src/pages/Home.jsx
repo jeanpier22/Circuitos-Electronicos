@@ -1,5 +1,6 @@
 import { BookOpenCheck, GraduationCap, Sparkles } from 'lucide-react'
 import PracticaCard from '../components/PracticaCard'
+import Cronograma from '../components/Cronograma'
 import { CURSO, PRACTICAS } from '../data/practicas'
 
 function Estadistica({ icono: Icono, valor, etiqueta }) {
@@ -96,6 +97,9 @@ export default function Home() {
           ))}
         </div>
       </section>
+
+      {/* ------------------------------------------------------- Cronograma */}
+      <Cronograma />
     </>
   )
 }
