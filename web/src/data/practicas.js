@@ -18,11 +18,12 @@ export const CURSO = {
 }
 
 /**
- * Cronograma de avance del curso.
+ * Cronograma de la primera unidad: 8 semanas antes del examen parcial.
  *
- * Las clases son los miercoles y viernes. La semana 1 arranca el miercoles 19
- * de agosto de 2026. Para agregar una semana basta con anadir una entrada aqui:
- * la pagina principal la dibuja sola.
+ * Las clases son los miercoles y viernes; la semana 1 arranca el miercoles 19
+ * de agosto de 2026. Las semanas todavia sin practica asignada van con titulo
+ * en null y la portada las dibuja como "Por confirmar": basta con rellenarlas
+ * aqui cuando se sepan, sin tocar ningun componente.
  *
  * estado: 'completada' | 'encurso' | 'programada'
  */
@@ -32,8 +33,6 @@ export const CRONOGRAMA = [
     sesiones: ['Miércoles 19 de agosto', 'Viernes 21 de agosto'],
     practica: 'lab1',
     titulo: 'Mi primer circuito',
-    detalle:
-      'Reconocimiento del instrumental, montaje en protoboard y verificación de la ley de Ohm.',
     estado: 'completada',
   },
   {
@@ -41,8 +40,6 @@ export const CRONOGRAMA = [
     sesiones: ['Miércoles 26 de agosto', 'Viernes 28 de agosto'],
     practica: 'lab2',
     titulo: 'El diodo semiconductor',
-    detalle:
-      'Curva característica del diodo en directa e inversa y medida de su capacitancia.',
     estado: 'completada',
   },
   {
@@ -50,9 +47,42 @@ export const CRONOGRAMA = [
     sesiones: ['Miércoles 2 de septiembre', 'Viernes 4 de septiembre'],
     practica: 'lab3',
     titulo: 'Diseño de una fuente de alimentación DC',
-    detalle:
-      'Montaje por etapas de la fuente regulable con LM317 y captura de cada etapa.',
     estado: 'encurso',
+  },
+  {
+    semana: 4,
+    sesiones: ['Miércoles 9 de septiembre', 'Viernes 11 de septiembre'],
+    practica: null,
+    titulo: null,
+    estado: 'programada',
+  },
+  {
+    semana: 5,
+    sesiones: ['Miércoles 16 de septiembre', 'Viernes 18 de septiembre'],
+    practica: null,
+    titulo: null,
+    estado: 'programada',
+  },
+  {
+    semana: 6,
+    sesiones: ['Miércoles 23 de septiembre', 'Viernes 25 de septiembre'],
+    practica: null,
+    titulo: null,
+    estado: 'programada',
+  },
+  {
+    semana: 7,
+    sesiones: ['Miércoles 30 de septiembre', 'Viernes 2 de octubre'],
+    practica: null,
+    titulo: null,
+    estado: 'programada',
+  },
+  {
+    semana: 8,
+    sesiones: ['Miércoles 7 de octubre', 'Viernes 9 de octubre'],
+    practica: null,
+    titulo: null,
+    estado: 'programada',
   },
 ]
 
