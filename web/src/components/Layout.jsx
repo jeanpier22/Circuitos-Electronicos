@@ -34,6 +34,9 @@ function Navbar() {
           <NavLink to="/" className={enlace} end>
             Prácticas
           </NavLink>
+          <NavLink to="/notas" className={enlace}>
+            Notas
+          </NavLink>
           <NavLink to="/acerca" className={enlace}>
             Acerca de
           </NavLink>

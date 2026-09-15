@@ -2,6 +2,7 @@ import { HashRouter, Route, Routes } from 'react-router-dom'
 import Layout from './components/Layout'
 import Home from './pages/Home'
 import Practica from './pages/Practica'
+import Notas from './pages/Notas'
 import Acerca from './pages/Acerca'
 import NoEncontrado from './pages/NoEncontrado'
 
@@ -17,6 +18,7 @@ export default function App() {
         <Route element={<Layout />}>
           <Route index element={<Home />} />
           <Route path="practica/:id" element={<Practica />} />
+          <Route path="notas" element={<Notas />} />
           <Route path="acerca" element={<Acerca />} />
           <Route path="*" element={<NoEncontrado />} />
         </Route>
