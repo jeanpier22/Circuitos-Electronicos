@@ -443,6 +443,41 @@ export const PRACTICAS = [
       },
     ],
   },
+  {
+    id: 'lab6',
+    numero: 6,
+    titulo: 'El transistor en corte y saturación',
+    subtitulo: 'Interruptor de un LED y compuertas NOT, NOR y NAND',
+    estado: 'disponible',
+    duracion: '2 horas',
+    resumen:
+      'El transistor bipolar trabajando solo en corte y en saturación. Primero enciende y apaga un LED: se verifica la condición de saturación, se ve la conmutación en el osciloscopio y se busca con un potenciómetro la resistencia de base con la que deja de saturarse. Después se arman compuertas lógicas NOT, NOR y NAND con diodos y un transistor. Se mide con la Analog Discovery Studio.',
+    objetivos: [
+      'Diseñar la polarización de base de un transistor bipolar para que trabaje como interruptor, en corte o en saturación.',
+      'Comprobar experimentalmente la condición de saturación y encontrar la resistencia de base con la que el transistor deja de saturarse.',
+      'Armar y verificar compuertas lógicas NOT, NOR y NAND con diodos y un transistor.',
+    ],
+    temas: ['Transistor BJT', '2N2222A', 'Corte y saturación', 'Transistor como interruptor', 'β forzado', 'Compuertas lógicas', 'Lógica DTL', 'Analog Discovery Studio'],
+    documento: {
+      // Visor principal embebido en la pagina
+      src: 'practicas/lab6/Laboratorio_6.pdf',
+      paginas: 12,
+      peso: '0.1 MB',
+    },
+    // Sin la fuente .tex: su cabecera trae los valores de referencia del
+    // docente, que son las respuestas del diseño previo.
+    descargas: [
+      {
+        etiqueta: 'Práctica en PDF',
+        detalle: 'Documento compilado desde LaTeX',
+        archivo: 'practicas/lab6/Laboratorio_6.pdf',
+        nombre: 'Laboratorio_6_Circuitos_Electronicos.pdf',
+        tipo: 'PDF',
+        peso: '0.1 MB',
+        destacado: true,
+      },
+    ],
+  },
 ]
 
 export const getPractica = (id) => PRACTICAS.find((p) => p.id === id)
