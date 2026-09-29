@@ -408,6 +408,41 @@ export const PRACTICAS = [
       },
     ],
   },
+  {
+    id: 'lab5',
+    numero: 5,
+    titulo: 'Polarización del transistor bipolar',
+    subtitulo: 'El punto Q cerca del corte, cerca de la saturación y en el punto medio',
+    estado: 'disponible',
+    duracion: '2 horas',
+    resumen:
+      'Diseño de la polarización por divisor de tensión de un transistor BJT para ubicar su punto de operación en tres posiciones de la misma recta de carga: cerca del corte, cerca de la saturación y en el punto medio. En cada experimento se inyecta una señal AC para ver cómo el punto Q limita la excursión de la salida. Se mide con la Analog Discovery Studio.',
+    objetivos: [
+      'Diseñar la polarización por divisor de tensión de un transistor bipolar para ubicar su punto Q en una posición determinada de la recta de carga.',
+      'Trazar la recta de carga DC y ubicar sobre ella los puntos Q teóricos, simulados y medidos.',
+      'Comprobar experimentalmente cómo la posición del punto Q limita la excursión de una señal AC.',
+    ],
+    temas: ['Transistor BJT', 'BC548B', 'Divisor de tensión', 'Recta de carga', 'Punto Q', 'Corte y saturación', 'Emisor común', 'Analog Discovery Studio'],
+    documento: {
+      // Visor principal embebido en la pagina
+      src: 'practicas/lab5/Laboratorio_5.pdf',
+      paginas: 11,
+      peso: '0.1 MB',
+    },
+    // Sin la fuente .tex: su cabecera trae los valores de referencia del
+    // docente (R2 y puntos Q), que son las respuestas del diseño previo.
+    descargas: [
+      {
+        etiqueta: 'Práctica en PDF',
+        detalle: 'Documento compilado desde LaTeX',
+        archivo: 'practicas/lab5/Laboratorio_5.pdf',
+        nombre: 'Laboratorio_5_Circuitos_Electronicos.pdf',
+        tipo: 'PDF',
+        peso: '0.1 MB',
+        destacado: true,
+      },
+    ],
+  },
 ]
 
 export const getPractica = (id) => PRACTICAS.find((p) => p.id === id)

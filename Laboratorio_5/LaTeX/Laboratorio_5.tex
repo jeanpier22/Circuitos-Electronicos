@@ -1,0 +1,785 @@
+%=======================================================================
+%  LABORATORIO N.o 5 - POLARIZACION DEL TRANSISTOR BIPOLAR
+%  Curso : Circuitos Electronicos  (2026-2)
+%  UCSP  - Facultad de Ingenieria - Ing. Electronica y de Telecomunicaciones
+%  Docente     : Ebert San Roman Castillo
+%  Laboratorio : Ing. Jeanpier Ancori Sanchez
+%
+%  Version 1 - Practica nueva, pedida por el docente: polarizacion con
+%  divisor de tension y tres puntos Q sobre la misma recta de carga, en este
+%  orden: cerca del corte, cerca de la saturacion y en el punto medio. A cada
+%  circuito se le inyecta una senal AC para ver como el punto Q limita la
+%  excursion de la salida.
+%    - Formato del Laboratorio 4 (preambulo, cabecera, encabezado/pie,
+%      numeracion en romanos, \cuadrorespuesta, cuestionario de 3 preguntas,
+%      conclusiones 5 + 5).
+%    - Materiales en el estilo de las guias del docente (Lab. 06 y 07 de
+%      2026-1): BC548B o 2N2222A, electroliticos. Resistencias a 1/4 W: la
+%      que mas disipa es RC, 44 mW con IC = ICsat = 4,46 mA.
+%    - El alumno calcula R2: la guia da solo el V_CE objetivo, las formulas
+%      y las tablas vacias. No se imprimen los resultados.
+%    - Todo sale de la Analog Discovery Studio: rail fijo de +12 V (0,2 A),
+%      W1 y osciloscopio (+-25 V, alcanza para ver el colector en DC).
+%
+%  Circuito fijo: VCC = 12 V, R1 = 10 kOhm, RC = 2,2 kOhm,
+%  RE = RE1 + RE2 = 100 + 390 Ohm, CE = 100 uF en paralelo con RE2,
+%  Cin = 10 uF. Con R1 = 47 kOhm el punto cerca de la saturacion variaba
+%  de 0,8 a 2,2 V entre beta = 100 y 300 (divisor blando); con 10 kOhm se
+%  cumple beta*RE >= 10*R2 y la variacion baja de 0,3 V.
+%
+%  VALORES DE REFERENCIA PARA EL DOCENTE (beta = 200, VBE = 0,7 V; no se
+%  imprimen). ICsat = 4,46 mA, VCE(corte) = 12 V.
+%                         Circ. 1 corte   Circ. 2 sat.   Circ. 3 medio
+%    VCE objetivo          10,5 V          1,5 V          6 V
+%    IC objetivo           0,558 mA        3,90 mA        2,23 mA
+%    VB de diseno          0,975 V         2,62 V         1,80 V
+%    R2 calculada          886 Ohm         2,86 kOhm      1,78 kOhm
+%    R2 comercial (E12)    820 Ohm         2,7 kOhm       1,8 kOhm
+%    VTH / RTH             0,909 V/758     2,55 V/2,13 k  1,83 V/1,53 k
+%    IB                    2,1 uA          18,4 uA        11,3 uA
+%    IC                    0,42 mA         3,68 mA        2,26 mA
+%    VB / VE / VC          0,91/0,21/11,07 2,51/1,81/3,91 1,81/1,11/7,03
+%    VCE                   10,86 V         2,09 V         5,91 V
+%    Av = -RC/(re+RE1)     -13,6           -20,6          -19,7
+%    vin max (corte)       68 mV pico      394 mV pico    252 mV pico
+%    vin max (saturacion)  748 mV pico     88 mV pico     277 mV pico
+%  Con 150 mV pico: circuito 1 recorta el semiciclo SUPERIOR de vC (corte),
+%  circuito 2 el INFERIOR (saturacion) y circuito 3 sale limpio; empieza a
+%  recortar hacia 250 mV pico. R2 = 3,0 kOhm (E24) acerca el circuito 2 a
+%  VCE = 0,95 V, pero con tolerancia del 5 % puede quedar saturado.
+%
+%  SIMULACION (ngspice 36, modelos BC548B de NXP y 2N2222A; netlists y
+%  graficas en ../Simulaciones):
+%                         Circ. 1 corte   Circ. 2 sat.   Circ. 3 medio
+%    VB / VE / VC          0,91/0,29/10,71 2,52/1,85/3,73 1,82/1,16/6,82
+%    VCE / IC (BC548B)     10,43 V/0,58 mA 1,88 V/3,76 mA 5,66 V/2,36 mA
+%    VCE / IC (2N2222A)    10,48 V/0,57 mA 2,03 V/3,70 mA 5,75 V/2,32 mA
+%    beta en el punto Q    328             283            303
+%    Av (20 mV pico)       -15,0           -20,2          -19,5
+%    Con 150 mV pico       vC tope plano   vC piso plano  limpia
+%                          en 12 V (THD    en 1,95 V (THD (THD 1,6 %)
+%                          21 %)           9 %)
+%    Empieza a recortar    60-80 mV (se    ~90 mV         ~250-300 mV
+%                          comprime arriba,
+%                          gradual)
+%  El circuito 1 se aparta mas del calculo a mano: con 0,5 mA el VBE real
+%  es ~0,62 V y no 0,7 V, asi que IC sale ~40 % mayor. Sirve para discutir
+%  la aproximacion VBE = 0,7 V.
+%=======================================================================
+
+\documentclass[11pt,a4paper]{article}
+
+%------------------------------------------------------------- idioma
+% Compilar con XeLaTeX (no con pdflatex): Trebuchet MS es una fuente TrueType
+% del sistema y solo fontspec, bajo XeLaTeX o LuaLaTeX, sabe cargarla.
+\usepackage{fontspec}
+\setmainfont{Trebuchet MS}[
+  Path            = C:/Windows/Fonts/,
+  Extension       = .ttf,
+  UprightFont     = trebuc,
+  BoldFont        = trebucbd,
+  ItalicFont      = trebucit,
+  BoldItalicFont  = trebucbi,
+  Ligatures       = TeX
+]
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{microtype}
+
+%----------------------------------------------------------- geometria
+\usepackage[left=2.4cm,right=2.4cm,top=3.1cm,bottom=2.6cm,headheight=30pt,
+            footskip=1.2cm]{geometry}
+
+%------------------------------------------------------------ graficos
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\usepackage{subcaption}
+\graphicspath{{imagenes/}}
+\usepackage[american,siunitx]{circuitikz}
+% babel-spanish activa < > " y rompe las opciones de TikZ sin esta libreria.
+\usetikzlibrary{calc,patterns,babel}
+
+%-------------------------------------------------------------- tablas
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{multirow}
+
+%----------------------------------------------------- matematicas / SI
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\sisetup{
+  output-decimal-marker = {,},
+  per-mode              = symbol,
+  mode                  = match,
+  detect-weight         = true,
+  detect-family         = true
+}
+
+%--------------------------------------------------------------- listas
+\usepackage{enumitem}
+\setlist[itemize]{itemsep=3pt,topsep=4pt,parsep=0pt}
+\setlist[enumerate]{itemsep=8pt,topsep=4pt,parsep=0pt}
+
+%------------------------------------------------------------ comandos
+\usepackage{pgffor}
+
+% Lineas punteadas para respuestas del alumno: \lineasresp{n}
+\newcommand{\lineasresp}[1]{%
+  \par\vspace{6pt}%
+  \foreach \i in {1,...,#1}{\noindent\rule{\linewidth}{0.4pt}\par\vspace{8pt}}%
+}
+
+% Recuadro "Figura / Comentario": una celda alta para pegar la captura del
+% osciloscopio y otra debajo para el comentario.
+\newcommand{\cuadrorespuesta}{%
+  \par\vspace{6pt}\noindent
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}X|}
+    \hline
+    \rule{0pt}{4.4cm}\raisebox{2.1cm}{\textcolor{black!45}{Figura}}\\
+    \hline
+    \rule{0pt}{2.0cm}\raisebox{0.9cm}{\textcolor{black!45}{Comentario}}\\
+    \hline
+  \end{tabularx}\par\vspace{8pt}%
+}
+
+% Indicacion de la captura que sustenta la fila Ganancia, seguida del
+% recuadro Figura / Comentario. \needspace evita que el texto y el recuadro
+% queden en paginas distintas.
+\newcommand{\capturaganancia}{%
+  \par\needspace{8.2cm}\vspace{4pt}\noindent
+  \textbf{Captura de la ganancia.} Con una entrada que no produzca recorte, muestre en la
+  misma pantalla del osciloscopio la señal de entrada $v_{in}$ (CH1) y la de salida $v_C$
+  (CH2). Coloque \textbf{marcadores} (cursores) en el pico máximo y en el pico mínimo de
+  cada señal para leer sus amplitudes pico a pico, y calcule
+  $A_v = v_{C,pp}/v_{in,pp}$. La captura debe mostrar los marcadores y sus valores; anote el
+  resultado en la columna \emph{Medido} de la fila \emph{Ganancia}.%
+  \cuadrorespuesta
+}
+
+% Celda vacia de altura comoda para escribir a mano.
+\newcommand{\hueco}{\rule{0pt}{0.5cm}}
+
+% Tabla de mediciones DC de un circuito: Teorico / Simulado / Medido.
+\newcommand{\tablamedicion}[2]{%
+  \begin{table}[H]
+    \centering
+    \renewcommand{\arraystretch}{1.15}
+    \begin{tabularx}{0.85\linewidth}{|>{\centering\arraybackslash}m{3.2cm}|*{3}{>{\centering\arraybackslash}X|}}
+      \hline
+      \textbf{Parámetro} & \textbf{Teórico} & \textbf{Simulado} & \textbf{Medido}\\
+      \hline
+      $R_2$ (comercial) & \multicolumn{3}{c|}{\hueco} \\ \hline
+      $V_B$      & \hueco & & \\ \hline
+      $V_E$      & \hueco & & \\ \hline
+      $V_C$      & \hueco & & \\ \hline
+      $V_{CE}$   & \hueco & & \\ \hline
+      $I_B$      & \hueco & & \\ \hline
+      $I_C$      & \hueco & & \\ \hline
+      $I_E$      & \hueco & & \\ \hline
+      $\beta = I_C/I_B$ & \hueco & & \\ \hline
+      Ganancia $A_v = v_C/v_{in}$ & \hueco & & \\ \hline
+    \end{tabularx}
+    \caption{#1}
+    \label{#2}
+  \end{table}%
+}
+
+%----------------------------------------------------- compaginacion
+\usepackage{needspace}
+\usepackage{etoolbox}
+\pretocmd{\section}{\needspace{5\baselineskip}}{}{}
+\pretocmd{\subsection}{\needspace{4\baselineskip}}{}{}
+\widowpenalty=10000
+\clubpenalty=10000
+
+%---------------------------------------------------- encabezado / pie
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize UCSP --- Facultad de Ingeniería\\
+              Ing. Electrónica y de Telecomunicaciones}
+\fancyhead[R]{\footnotesize 2026-2 Circuitos Electrónicos\\
+              Ebert San Román Castillo}
+\fancyfoot[L]{\footnotesize Laboratorio N.\textsuperscript{o} 5 --- Polarización del transistor bipolar}
+\fancyfoot[R]{\footnotesize Página \thepage\ de \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\usepackage{lastpage}
+
+%------------------------------------------------------- numeracion
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+\setcounter{secnumdepth}{3}
+
+%-------------------------------------------------------- hiperenlaces
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+\usepackage{xurl}
+\hypersetup{
+  pdftitle={Laboratorio 5 - Polarizacion del transistor bipolar},
+  pdfsubject={Circuitos Electronicos - Guia de practicas},
+  pdfauthor={Ebert San Roman Castillo; Jeanpier Ancori Sanchez},
+  pdfkeywords={electronica, transistor, BJT, polarizacion, recta de carga,
+               punto Q, corte, saturacion, divisor de tension,
+               Analog Discovery Studio, Proteus, Multisim, osciloscopio}
+}
+
+% babel-spanish rotula las tablas como "Cuadro"; los originales dicen "Tabla".
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+\begin{document}
+
+%=======================================================================
+%  CABECERA DE LA GUIA
+%=======================================================================
+\begin{center}
+    {\normalsize\bfseries SEGUNDA UNIDAD: TRANSISTOR DE UNIÓN BIPOLAR (BJT)}
+\end{center}
+
+\vspace{0.55cm}
+
+\begingroup
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\renewcommand{\arraystretch}{2.0}
+\setlength{\tabcolsep}{12pt}
+\noindent
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}X|>{\centering\arraybackslash}m{3.0cm}|}
+\hline
+\rule{0pt}{2.1cm}{\fontsize{58}{58}\selectfont\bfseries 5}
+    & \begin{minipage}[c]{\linewidth}\centering
+          {\large\bfseries Guía de Prácticas}\\[7pt]
+          {\Large\bfseries Polarización del\\ Transistor Bipolar}
+      \end{minipage}
+    & {\Large\bfseries Nota}\\
+\hline
+\multicolumn{3}{|l|}{\rule{0pt}{1.3cm}\large\textbf{Grupo:}~\rule{4.6cm}{0.4pt}%
+    \hfill\large\textbf{Fecha:}~\rule{4.6cm}{0.4pt}\hspace{2mm}}\\
+\hline
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\large\textbf{Alumno(s):}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\phantom{\large\textbf{Alumno(s):}}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
+\hline
+\end{tabularx}
+\endgroup
+
+\vspace{0.8cm}
+
+%=======================================================================
+\section{Objetivos}
+%=======================================================================
+\begin{itemize}
+    \item Diseñar la polarización por divisor de tensión de un transistor bipolar para
+          ubicar su punto de operación (punto Q) en una posición determinada de la recta de
+          carga.
+    \item Trazar la recta de carga DC y ubicar sobre ella los puntos Q teóricos, simulados
+          y medidos.
+    \item Comprobar experimentalmente cómo la posición del punto Q ---cerca del corte, cerca
+          de la saturación o en el punto medio--- limita la excursión de una señal AC.
+\end{itemize}
+
+%=======================================================================
+\section{Contenido teórico}
+%=======================================================================
+\begin{itemize}
+    \item Transistor de unión bipolar (BJT): regiones de trabajo (corte, activa y
+          saturación).
+    \item Polarización por divisor de tensión, recta de carga y punto de operación.
+    \item Amplificador en emisor común: ganancia de voltaje y máxima excursión de salida.
+\end{itemize}
+
+%=======================================================================
+\section{Equipos y materiales}
+%=======================================================================
+\noindent\textbf{Laboratorio:} Electrónica de Comunicaciones.
+
+\vspace{0.25cm}
+\noindent\textbf{Equipos y dispositivos:}
+\begin{itemize}
+    \item Tarjeta Analog Discovery Studio: riel fijo de \qty{+12}{\volt}, generador de
+          funciones \texttt{W1} y osciloscopio de dos canales.
+\end{itemize}
+
+\noindent\textbf{Software:}
+\begin{itemize}
+    \item Simulador Multisim o Proteus.
+\end{itemize}
+
+\vspace{0.25cm}
+\needspace{6\baselineskip}
+\noindent\textbf{Materiales y fungibles} (deben ser adquiridos por los alumnos):
+\begin{itemize}
+    % --- Transistores
+    \item 02 transistores de unión bipolar NPN BC548B o 2N2222A (uno de repuesto).
+    % --- Resistencias
+    \item $R_1$: 02 resistencias de \qty{10}{\kilo\ohm} a \qty{0.25}{\watt}.
+    \item $R_C$: 02 resistencias de \qty{2.2}{\kilo\ohm} a \qty{0.25}{\watt}.
+    \item $R_{E1}$: 02 resistencias de \qty{100}{\ohm} a \qty{0.25}{\watt}.
+    \item $R_{E2}$: 02 resistencias de \qty{390}{\ohm} a \qty{0.25}{\watt}.
+    % R2 sale 885-890 Ohm, 2,83-2,93 kOhm y 1,77-1,81 kOhm para beta de 100 a
+    % 300 (E12: 820 Ohm, 2,7 kOhm, 1,8 kOhm), asi que se piden esos tres.
+    \item $R_2$: 02 resistencias de \qty{820}{\ohm}, 02 de \qty{2.7}{\kilo\ohm} y 02 de
+          \qty{1.8}{\kilo\ohm}, a \qty{0.25}{\watt}. Se recomienda traer además algunos
+          valores vecinos (\qty{680}{\ohm}, \qty{1}{\kilo\ohm}, \qty{1.5}{\kilo\ohm},
+          \qty{2.2}{\kilo\ohm}, \qty{3.3}{\kilo\ohm}) por si su diseño previo da un valor
+          distinto.
+    % --- Capacitores
+    \item $C_{in}$: 02 capacitores electrolíticos de \qty{10}{\micro\farad}, de
+          \qty{16}{\volt} como mínimo.
+    \item $C_E$: 02 capacitores electrolíticos de \qty{100}{\micro\farad}, de
+          \qty{16}{\volt} como mínimo.
+    % --- Montaje
+    \item Protoboard.
+    \item Jumpers macho-macho para protoboard.
+    \item Alicates para cortar y pelar alambre.
+    \item Multímetro (con escala de \unit{\micro\ampere} y, si es posible, medición de
+          $h_{FE}$).
+    \item Lentes de protección y mandil.
+\end{itemize}
+
+\FloatBarrier
+%=======================================================================
+\section{Conocimientos previos}
+%=======================================================================
+
+%-----------------------------------------------------------------------
+\subsection{Recta de carga y punto de operación}
+%-----------------------------------------------------------------------
+Al recorrer la malla colector-emisor del circuito de la figura~\ref{fig:circuito} se obtiene
+la ecuación de la \textbf{recta de carga DC}, donde $R_E = R_{E1}+R_{E2}$:
+\begin{equation}
+  V_{CE} = V_{CC} - I_C\,(R_C + R_E)
+  \label{eq:recta}
+\end{equation}
+Sus dos extremos son el punto de \textbf{saturación} ($V_{CE}\approx 0$) y el de
+\textbf{corte} ($I_C = 0$):
+\begin{equation}
+  I_{C(\text{sat})} = \frac{V_{CC}}{R_C + R_E}
+  \qquad\qquad
+  V_{CE(\text{corte})} = V_{CC}
+  \label{eq:extremos}
+\end{equation}
+El transistor siempre opera en algún punto de esta recta: el \textbf{punto Q}
+$(V_{CEQ},\,I_{CQ})$. La polarización decide dónde queda
+(figura~\ref{fig:recta-concepto}).
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[x=0.85cm,y=1.35cm,font=\small]
+    % zonas
+    \fill[red!12]  (0,0) rectangle (0.25,4.3);
+    \fill[blue!12] (0,0) rectangle (11.4,0.08);
+    % ejes
+    \draw[->] (0,0) -- (11.6,0) node[above] {$V_{CE}$};
+    \draw[->] (0,0) -- (0,4.4) node[left] {$I_C$};
+    % recta
+    \draw[very thick] (0,3.6) -- (10.4,0);
+    \node[left]  at (0,3.6) {$\dfrac{V_{CC}}{R_C+R_E}$};
+    \node[below] at (10.4,0) {$V_{CC}$};
+    \node[below] at (0,0) {0};
+    % puntos Q
+    \foreach \x/\c/\t/\a in {9.3/blue/{Cerca del corte}/above right,
+                            5.2/green!55!black/{Punto medio}/above right,
+                            1.4/red/{Cerca de la saturación}/above right}{
+      \pgfmathsetmacro{\y}{3.6*(1-\x/10.4)}
+      \draw[dotted,\c] (\x,0) -- (\x,\y) -- (0,\y);
+      \fill[\c] (\x,\y) circle (3.2pt);
+      \node[\a,\c] at (\x,\y) {\t};
+    }
+    \node[red!70!black,rotate=90,font=\scriptsize] at (0.55,1.3) {saturación};
+    \node[blue!70!black,font=\scriptsize] at (8.4,0.25) {corte};
+  \end{tikzpicture}
+  \caption{Recta de carga DC y tres posiciones posibles del punto Q.}
+  \label{fig:recta-concepto}
+\end{figure}
+
+%-----------------------------------------------------------------------
+\subsection{Polarización por divisor de tensión}
+%-----------------------------------------------------------------------
+Visto desde la base, el divisor $R_1$--$R_2$ equivale a una fuente de Thévenin:
+\begin{equation}
+  V_{TH} = V_{CC}\,\frac{R_2}{R_1 + R_2}
+  \qquad\qquad
+  R_{TH} = \frac{R_1\,R_2}{R_1 + R_2}
+  \label{eq:thevenin}
+\end{equation}
+y la malla base-emisor da la corriente de base:
+\begin{equation}
+  I_B = \frac{V_{TH} - V_{BE}}{R_{TH} + (\beta+1)\,R_E},
+  \qquad
+  I_C = \beta\,I_B,
+  \qquad
+  I_E = I_C + I_B
+  \label{eq:ib}
+\end{equation}
+Con ellas se obtienen los voltajes de los terminales, medidos respecto a tierra:
+\begin{equation}
+  V_E = I_E\,R_E,
+  \qquad
+  V_B = V_E + V_{BE},
+  \qquad
+  V_C = V_{CC} - I_C\,R_C,
+  \qquad
+  V_{CE} = V_C - V_E
+  \label{eq:voltajes}
+\end{equation}
+El punto Q casi no depende de $\beta$ cuando el divisor es \textbf{firme}:
+\begin{equation}
+  \beta\,R_E \;\geq\; 10\,R_2
+  \label{eq:firme}
+\end{equation}
+
+\needspace{10\baselineskip}
+\noindent\textbf{Procedimiento de diseño.} Dados $V_{CC}$, $R_1$, $R_C$, $R_E$ y el
+$V_{CE}$ que se quiere:
+\begin{enumerate}[label=\arabic*), leftmargin=*, itemsep=3pt]
+  \item $I_C = \dfrac{V_{CC} - V_{CE}}{R_C + R_E}$ \quad (de la recta de
+        carga~\eqref{eq:recta}).
+  \item $I_B = \dfrac{I_C}{\beta}$, \quad $I_E = I_C + I_B$.
+  \item $V_E = I_E\,R_E$, \quad $V_B = V_E + \qty{0.7}{\volt}$.
+  \item Corriente por $R_1$: \quad $I_1 = \dfrac{V_{CC} - V_B}{R_1}$. \quad Por $R_2$ circula
+        $I_2 = I_1 - I_B$.
+  \item $R_2 = \dfrac{V_B}{I_1 - I_B}$. \quad Se elige el valor comercial más cercano y se
+        \textbf{recalcula} el punto Q con \eqref{eq:thevenin}--\eqref{eq:voltajes}.
+\end{enumerate}
+
+%-----------------------------------------------------------------------
+\subsection{El punto Q y la señal AC}
+%-----------------------------------------------------------------------
+Con $C_E$ en paralelo con $R_{E2}$, en AC solo queda $R_{E1}$ en el emisor. La ganancia de
+voltaje del emisor común es aproximadamente:
+\begin{equation}
+  A_v = \frac{v_c}{v_{in}} \approx -\frac{R_C}{r_e + R_{E1}},
+  \qquad
+  r_e = \frac{\qty{26}{\milli\volt}}{I_E}
+  \label{eq:ganancia}
+\end{equation}
+El signo negativo indica que la salida está invertida. La señal se mueve alrededor del
+punto Q, y el punto Q fija cuánto puede moverse antes de deformarse:
+\begin{itemize}
+  \item Hacia el \textbf{corte}, $i_c$ no puede bajar de cero: el colector sube como máximo
+        $\Delta v_C \approx I_{CQ}\,R_C$ y se \textbf{recorta el semiciclo superior} de
+        $v_C$.
+  \item Hacia la \textbf{saturación}, $V_{CE}$ no puede bajar de
+        $V_{CE(\text{sat})}\approx\qty{0.2}{\volt}$: el colector baja como máximo
+        $\Delta v_C \approx (V_{CEQ} - 0.2)\,\dfrac{R_C}{R_C + R_{E1}}$ y se
+        \textbf{recorta el semiciclo inferior}.
+\end{itemize}
+La amplitud máxima de entrada sin recorte es la menor de esas dos excursiones dividida entre
+$|A_v|$:
+\begin{equation}
+  v_{in,\max} = \frac{\min\!\left(\Delta v_{C,\text{corte}},\;\Delta v_{C,\text{sat}}\right)}{|A_v|}
+  \label{eq:vinmax}
+\end{equation}
+
+\FloatBarrier
+\needspace{14\baselineskip}
+%=======================================================================
+\section{Desarrollo del laboratorio}
+%=======================================================================
+Se trabaja siempre con el circuito de la figura~\ref{fig:circuito}. Entre un experimento y otro
+\textbf{solo cambia $R_2$}: la recta de carga es la misma y el punto Q se desplaza sobre
+ella.
+
+\begin{figure}[H]
+  \centering
+  \begin{circuitikz}[scale=0.95, transform shape]
+    \coordinate (top) at (0,5);
+    \coordinate (gnd) at (0,-3.6);
+    % transistor
+    \draw (4.2,0.6) node[npn](Q){};
+    \node[right] at (Q.east) {BC548B};
+    % base y divisor
+    \coordinate (b) at (2.6,0.6);
+    \draw (b) -- (Q.B);
+    \draw (b |- top) to[R, l=$R_1$, a=\qty{10}{\kilo\ohm}] (b);
+    \draw (b) to[R, l=$R_2$, a={diseño}, *-] (b |- gnd) node[ground]{};
+    % colector
+    \draw (Q.C) -- ++(0,0.6) coordinate(c) to[R, l=$R_C$, a=\qty{2.2}{\kilo\ohm}] (c |- top);
+    \draw (c) to[short, *-o] ++(1.6,0) node[right]{CH2 ($v_C$)};
+    % riel
+    \draw (b |- top) -- (c |- top) node[circ]{} -- ++(1.4,0) node[right]{$V_{CC} = \qty{+12}{\volt}$};
+    % emisor
+    \draw (Q.E) to[R, l=$R_{E1}$, a=\qty{100}{\ohm}] ++(0,-1.6) coordinate(e2);
+    \draw (e2) to[R, l=$R_{E2}$, a=\qty{390}{\ohm}, *-] (e2 |- gnd) node[ground]{};
+    \draw (e2) -- ++(1.9,0) coordinate(ce)
+          to[eC, l={$C_E = \qty{100}{\micro\farad}$}] (ce |- gnd) -- (e2 |- gnd);
+    % entrada
+    \draw (-1.2,-3.6) node[ground]{} to[sV, l=\texttt{W1}] (-1.2,0.6)
+          to[short, -*] (-0.6,0.6) node[above]{CH1}
+          to[eC, l=$C_{in}$, a=\qty{10}{\micro\farad}, invert] (b);
+  \end{circuitikz}
+  \caption{Emisor común con polarización por divisor de tensión. Alimentación:
+           riel de \qty{+12}{\volt} de la tarjeta. El terminal positivo de los
+           electrolíticos va hacia la base ($C_{in}$) y hacia el emisor ($C_E$).}
+  \label{fig:circuito}
+\end{figure}
+
+% Diagrama de conexion con la tarjeta. Mismo circuito que la figura
+% anterior, con W1 como fuente y los cables de la Analog Discovery Studio
+% en los colores de su arnes (W1 amarillo, osciloscopio 1 naranja y 2 azul,
+% GND negro, alimentacion roja). Los canales son diferenciales: 1- y 2- van
+% a GND o la medida flota.
+\begin{figure}[H]
+  \centering
+  \begin{circuitikz}[scale=0.88, transform shape]
+    \coordinate (top) at (0,5);
+    \coordinate (gnd) at (0,-3.6);
+    \colorlet{cw1}{yellow!70!black}
+    \colorlet{cch1}{orange!90!black}
+    \colorlet{cch2}{blue!75!black}
+    \colorlet{cvcc}{red!80!black}
+    % transistor y divisor (igual que la figura del circuito)
+    \draw (4.2,0.6) node[npn](Q){};
+    \node[right] at (Q.east) {BC548B};
+    \coordinate (b) at (2.6,0.6);
+    \draw (b) -- (Q.B);
+    \draw (b |- top) to[R, l=$R_1$, a=\qty{10}{\kilo\ohm}] (b);
+    \draw (b) to[R, l=$R_2$, a={diseño}, *-*] (b |- gnd);
+    \draw (Q.C) -- ++(0,0.6) coordinate(c) to[R, l=$R_C$, a=\qty{2.2}{\kilo\ohm}] (c |- top);
+    \draw (b |- top) -- (c |- top) node[circ]{};
+    \draw (Q.E) to[R, l=$R_{E1}$, a=\qty{100}{\ohm}] ++(0,-1.6) coordinate(e2);
+    \draw (e2) to[R, l=$R_{E2}$, a=\qty{390}{\ohm}, *-*] (e2 |- gnd);
+    \draw (e2) -- ++(1.9,0) coordinate(ce)
+          to[eC, l={$C_E = \qty{100}{\micro\farad}$}] (ce |- gnd) node[circ]{};
+    \draw (-0.6,0.6) to[eC, l=$C_{in}$, a=\qty{10}{\micro\farad}, invert, *-] (b);
+    % bus de tierra
+    \coordinate (p2m) at ($(ce)+(1.0,0)$);
+    \coordinate (p2p) at ($(ce)+(2.8,0)$);
+    \coordinate (p12) at ($(ce)+(3.5,0)$);
+    \draw[very thick] (0,-3.6) -- (p2m |- gnd);
+    % tarjeta
+    \coordinate (ytab) at (0,-5.2);
+    \draw[thick, fill=black!6, rounded corners=3pt]
+         (-2.0,-5.2) rectangle ($(p12 |- ytab)+(0.9,-1.5)$);
+    \node[font=\bfseries] at ($(-2.0,-6.25)!0.5!(p12 |- 0,-6.25)+(0.45,0)$)
+         {Analog Discovery Studio};
+    \foreach \x/\n/\c in {-1.2/W1/cw1, -0.6/1+/cch1, 0/1$-$/cch1, 0.8/GND/black}{
+      \fill[\c] (\x-0.12,-5.32) rectangle (\x+0.12,-5.08);
+      \node[font=\scriptsize\ttfamily, below] at (\x,-5.32) {\n};
+    }
+    \foreach \p/\n/\c in {p2m/2$-$/cch2, p2p/2+/cch2, p12/+12V/cvcc}{
+      \fill[\c] ($(\p |- ytab)+(-0.12,-0.12)$) rectangle ($(\p |- ytab)+(0.12,0.12)$);
+      \node[font=\scriptsize\ttfamily, below] at ($(\p |- ytab)+(0,-0.12)$) {\n};
+    }
+    % cables
+    \draw[cw1, line width=1.3pt]  (-1.2,-5.08) -- (-1.2,0.6) -- (-0.6,0.6);
+    \draw[cch1, line width=1.3pt] (-0.6,-5.08) -- (-0.6,0.6);
+    \draw[cch1, line width=1.3pt, dashed] (0,-5.08) -- (0,-3.6) node[circ, black]{};
+    \draw[black, line width=1.3pt] (0.8,-5.08) -- (0.8,-3.6) node[circ]{};
+    \draw[cch2, line width=1.3pt, dashed] ($(p2m |- ytab)+(0,0.12)$) -- (p2m |- gnd) node[circ, black]{};
+    \draw[cch2, line width=1.3pt] ($(p2p |- ytab)+(0,0.12)$) -- (p2p |- c) -- (c) node[circ, black]{};
+    \draw[cvcc, line width=1.3pt] ($(p12 |- ytab)+(0,0.12)$) -- (p12 |- top) -- (c |- top);
+    % rotulos de las senales
+    \node[cch1, font=\scriptsize, above left] at (-0.6,0.6) {CH1: $v_{in}$};
+    \node[cch2, font=\scriptsize, above] at ($(c)!0.5!(p2p |- c)$) {CH2: $v_C$};
+  \end{circuitikz}
+  \caption{Conexión con la Analog Discovery Studio. \texttt{W1} alimenta la entrada;
+           \texttt{1+} mide la entrada y \texttt{2+} el colector. Los canales del
+           osciloscopio son diferenciales: \texttt{1$-$} y \texttt{2$-$} deben ir a
+           \texttt{GND}, o la medida queda flotando. El riel de \qty{+12}{\volt} alimenta el
+           circuito y todas las tierras se unen al \texttt{GND} de la tarjeta.}
+  \label{fig:conexion}
+\end{figure}
+
+%-----------------------------------------------------------------------
+\subsection{Diseño previo (traerlo resuelto al laboratorio)}
+\label{sec:diseno}
+%-----------------------------------------------------------------------
+\begin{enumerate}[label=\roman*., leftmargin=*, labelsep=0.6em]
+  \item Mida el $\beta$ ($h_{FE}$) de su transistor con el multímetro. Si su multímetro no
+        tiene esa función, use $\beta = 200$.
+  \item Calcule los extremos de la recta de carga con~\eqref{eq:extremos} y dibújela en la
+        figura~\ref{fig:grilla}.
+  \item Siguiendo el procedimiento de diseño, calcule $R_2$ para cada uno de los tres
+        puntos Q de la tabla~\ref{tab:diseno}. Elija el valor comercial más cercano.
+  \item Verifique la condición de divisor firme~\eqref{eq:firme} para cada $R_2$.
+  \item Con el valor comercial, recalcule el punto Q, la ganancia~\eqref{eq:ganancia} y la
+        amplitud máxima de entrada sin recorte~\eqref{eq:vinmax}. Anote los resultados en la
+        columna \emph{Teórico} de las tablas~\ref{tab:circ1}, \ref{tab:circ2}
+        y~\ref{tab:circ3} y en la tabla~\ref{tab:ac}.
+  \item Simule el circuito de los tres experimentos en Multisim o Proteus y complete la columna
+        \emph{Simulado}.
+\end{enumerate}
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{0.95\linewidth}{|>{\centering\arraybackslash}m{3.6cm}|*{3}{>{\centering\arraybackslash}X|}}
+    \hline
+    & \textbf{Experimento 1}\par Cerca del corte
+    & \textbf{Experimento 2}\par Cerca de la saturación
+    & \textbf{Experimento 3}\par Punto medio \\
+    \hline
+    $V_{CE}$ objetivo & \qty{10.5}{\volt} & \qty{1.5}{\volt} & $V_{CC}/2 = \qty{6}{\volt}$ \\ \hline
+    $I_C$             & \hueco & & \\ \hline
+    $I_B$             & \hueco & & \\ \hline
+    $I_E$             & \hueco & & \\ \hline
+    $V_E$             & \hueco & & \\ \hline
+    $V_B$             & \hueco & & \\ \hline
+    $I_1$             & \hueco & & \\ \hline
+    $R_2$ calculada   & \hueco & & \\ \hline
+    $R_2$ comercial   & \hueco & & \\ \hline
+    $\beta R_E \geq 10R_2$ ? & \hueco & & \\ \hline
+  \end{tabularx}
+  \caption{Diseño de $R_2$ para los tres puntos Q ($\beta = $ \rule{1.5cm}{0.4pt}).}
+  \label{tab:diseno}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[x=1.05cm,y=1.45cm,font=\small]
+    \draw[step=0.5,black!12,thin] (0,0) grid (13,5);
+    \draw[black!30] (0,0) grid (13,5);
+    \draw[->] (0,0) -- (13.4,0) node[right] {$V_{CE}$ (V)};
+    \draw[->] (0,0) -- (0,5.3)  node[left] {$I_C$ (mA)};
+    \foreach \x in {0,1,...,13} \node[below] at (\x,0) {\x};
+    \foreach \y in {1,...,5}    \node[left]  at (0,\y) {\y};
+  \end{tikzpicture}
+  \caption{Recta de carga DC. Dibuje la recta y marque los tres puntos Q: teóricos
+           ($\circ$), simulados ($\triangle$) y medidos ($\times$).}
+  \label{fig:grilla}
+\end{figure}
+
+\FloatBarrier
+%-----------------------------------------------------------------------
+\subsection{Experimento 1: punto Q cerca del corte}
+%-----------------------------------------------------------------------
+\begin{enumerate}[label=\roman*., leftmargin=*, labelsep=0.6em]
+  \item Arme el circuito de la figura~\ref{fig:circuito} con el $R_2$ de diseño del experimento
+        1 y conéctelo a la tarjeta como indica la figura~\ref{fig:conexion}. Alimente con
+        el riel de \qty{+12}{\volt} y mida su valor real: si no es exactamente
+        \qty{12}{\volt}, recalcule con el valor medido.
+  \item \textbf{Polarización (DC).} Con \texttt{W1} apagado, mida $V_B$, $V_E$ y $V_C$ con el
+        multímetro, respecto a tierra. Calcule $I_C = (V_{CC} - V_C)/R_C$ e
+        $I_E = V_E/R_E$. Mida $I_B$ con el multímetro en serie con la base, en la escala de
+        \unit{\micro\ampere}. Complete la tabla~\ref{tab:circ1} y marque el punto Q en la
+        figura~\ref{fig:grilla}.
+  \item \textbf{Señal AC.} Configure \texttt{W1} como señal sinusoidal de
+        \qty{150}{\milli\volt} pico, \qty{1}{\kilo\hertz} y offset \qty{0}{\volt}. Conecte
+        CH1 a la salida de \texttt{W1} y CH2 al colector, con \textbf{acoplamiento DC}, para
+        ver a la vez el nivel del punto Q y la señal. Capture ambas señales.
+  \item ¿Se deforma la salida? ¿Qué semiciclo se recorta y por qué? Reduzca la amplitud de
+        \texttt{W1} hasta que la salida quede sin recorte y anote esa amplitud en la
+        tabla~\ref{tab:ac}.
+\end{enumerate}
+
+\tablamedicion{Experimento 1: punto Q cerca del corte.}{tab:circ1}
+
+\capturaganancia
+
+\clearpage
+%-----------------------------------------------------------------------
+\subsection{Experimento 2: punto Q cerca de la saturación}
+%-----------------------------------------------------------------------
+\begin{enumerate}[label=\roman*., leftmargin=*, labelsep=0.6em]
+  \item Apague el riel y cambie $R_2$ por la del experimento 2. No modifique nada más.
+  \item Repita las mediciones DC del experimento 1 y complete la tabla~\ref{tab:circ2}. Marque
+        el punto Q en la figura~\ref{fig:grilla}. Compare el $\beta$ medido con el del
+        experimento 1: si es mucho menor, el transistor ya entró en saturación.
+  \item Aplique la misma señal de \texttt{W1} (\qty{150}{\milli\volt} pico,
+        \qty{1}{\kilo\hertz}) y capture la entrada y la salida.
+  \item ¿Qué semiciclo se recorta ahora? ¿Es el mismo que en el experimento 1? Busque la
+        amplitud máxima sin recorte y anótela en la tabla~\ref{tab:ac}.
+\end{enumerate}
+
+\tablamedicion{Experimento 2: punto Q cerca de la saturación.}{tab:circ2}
+
+\capturaganancia
+
+\clearpage
+%-----------------------------------------------------------------------
+\subsection{Experimento 3: punto Q en el punto medio}
+%-----------------------------------------------------------------------
+\begin{enumerate}[label=\roman*., leftmargin=*, labelsep=0.6em]
+  \item Cambie $R_2$ por la del experimento 3, repita las mediciones DC y complete la
+        tabla~\ref{tab:circ3}. Marque el punto Q en la figura~\ref{fig:grilla}.
+  \item Aplique la misma señal de \texttt{W1} (\qty{150}{\milli\volt} pico,
+        \qty{1}{\kilo\hertz}) y capture la entrada y la salida. ¿Se recorta?
+  \item Aumente poco a poco la amplitud de \texttt{W1} hasta que la salida empiece a
+        recortarse. Anote esa amplitud en la tabla~\ref{tab:ac}. ¿Qué semiciclo se recorta
+        primero? Capture la señal en ese punto.
+\end{enumerate}
+
+\tablamedicion{Experimento 3: punto Q en el punto medio.}{tab:circ3}
+
+\capturaganancia
+
+\FloatBarrier
+%-----------------------------------------------------------------------
+\subsection{Comparación de los tres puntos Q}
+%-----------------------------------------------------------------------
+Complete la tabla~\ref{tab:ac}. La ganancia medida es el cociente entre la amplitud pico a
+pico de $v_C$ y la de $v_{in}$, con una entrada que no produzca recorte.
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{3.1cm}|*{3}{>{\centering\arraybackslash}X|}}
+    \hline
+    & \textbf{Experimento 1}\par Cerca del corte
+    & \textbf{Experimento 2}\par Cerca de la saturación
+    & \textbf{Experimento 3}\par Punto medio \\
+    \hline
+    $V_{CEQ}$ / $I_{CQ}$ medidos          & \hueco & & \\ \hline
+    $A_v$ teórica                         & \hueco & & \\ \hline
+    $A_v$ medida                          & \hueco & & \\ \hline
+    ¿Se recorta con \qty{150}{\milli\volt} pico? & \hueco & & \\ \hline
+    Semiciclo de $v_C$ recortado          & \hueco & & \\ \hline
+    $v_{in,\max}$ teórica                 & \hueco & & \\ \hline
+    $v_{in,\max}$ medida                  & \hueco & & \\ \hline
+  \end{tabularx}
+  \caption{Punto Q y comportamiento con señal AC.}
+  \label{tab:ac}
+\end{table}
+
+\FloatBarrier
+%=======================================================================
+\section{Informe final}
+%=======================================================================
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, labelsep=0.6em]
+  \item Adjunte todos los cálculos del diseño previo y la simulación de los tres experimentos.
+  \item Presente la recta de carga con los tres puntos Q teóricos, simulados y medidos.
+        Explique las diferencias entre ellos.
+  \item Presente las formas de onda de cada experimento y explique por qué cada uno se recorta
+        de la manera observada.
+\end{enumerate}
+
+\FloatBarrier
+%=======================================================================
+\section{Cuestionario}
+%=======================================================================
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, labelsep=0.6em]
+\item Con la misma señal de entrada, el experimento 1 (cerca del corte) y el experimento 2 (cerca de la
+saturación) recortan semiciclos distintos de $v_C$. Explique por qué, usando la recta de
+carga.
+\lineasresp{3}
+
+\item Compare la ganancia medida en los tres experimentos. Si $R_C$ y $R_{E1}$ no cambian,
+¿por qué no es la misma? Justifíquelo con la ecuación~\eqref{eq:ganancia}.
+\lineasresp{3}
+
+\item Si se reemplaza el BC548B por un 2N2222A, que tiene otro $\beta$, ¿cuánto se movería
+el punto Q del experimento 2? ¿Y si $R_1$ fuera de \qty{47}{\kilo\ohm} en lugar de
+\qty{10}{\kilo\ohm} (recalculando $R_2$)? Relacione su respuesta con la
+condición~\eqref{eq:firme}.
+\lineasresp{3}
+\end{enumerate}
+
+\FloatBarrier
+%=======================================================================
+\section{Conclusiones}
+%=======================================================================
+\begin{itemize}
+    \item Redacte como mínimo 05 conclusiones \textbf{cualitativas} y 05
+          \textbf{cuantitativas}.
+\end{itemize}
+
+\noindent\textbf{Cualitativas}
+\lineasresp{10}
+
+\needspace{6\baselineskip}
+\noindent\textbf{Cuantitativas}
+\lineasresp{10}
+
+\end{document}
