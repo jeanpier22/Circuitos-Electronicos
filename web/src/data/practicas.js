@@ -447,17 +447,17 @@ export const PRACTICAS = [
     id: 'lab6',
     numero: 6,
     titulo: 'El transistor en corte y saturación',
-    subtitulo: 'Interruptor de un LED y compuertas NOT, NOR y NAND',
+    subtitulo: 'Diseño del interruptor, compuertas NOR y NAND y manejo de un relé',
     estado: 'disponible',
     duracion: '2 horas',
     resumen:
-      'El transistor bipolar trabajando solo en corte y en saturación. Primero enciende y apaga un LED: se verifica la condición de saturación, se ve la conmutación en el osciloscopio y se busca con un potenciómetro la resistencia de base con la que deja de saturarse. Después se arman compuertas lógicas NOT, NOR y NAND con diodos y un transistor. Se mide con la Analog Discovery Studio.',
+      'El transistor bipolar trabajando solo en corte y en saturación. A partir de las condiciones de la carga y de la hoja de datos, el alumno calcula las resistencias de un interruptor para un LED y comprueba por qué la misma resistencia de base satura a un transistor y no a otro. Después verifica compuertas NOR y NAND con diodos y maneja un relé protegido con un diodo volante. Se mide con la Analog Discovery Studio.',
     objetivos: [
-      'Diseñar la polarización de base de un transistor bipolar para que trabaje como interruptor, en corte o en saturación.',
-      'Comprobar experimentalmente la condición de saturación y encontrar la resistencia de base con la que el transistor deja de saturarse.',
-      'Armar y verificar compuertas lógicas NOT, NOR y NAND con diodos y un transistor.',
+      'Calcular las resistencias de base y de colector de un transistor que trabaja como interruptor, a partir de las condiciones de la carga y de la hoja de datos, y comprobar por simulación y por medición que queda en corte o en saturación.',
+      'Explicar por qué una resistencia de base calculada con el β justo puede no saturar a otro transistor.',
+      'Verificar compuertas NOR y NAND con diodos y un transistor, y manejar un relé protegiendo al transistor con un diodo volante.',
     ],
-    temas: ['Transistor BJT', '2N2222A', 'Corte y saturación', 'Transistor como interruptor', 'β forzado', 'Compuertas lógicas', 'Lógica DTL', 'Analog Discovery Studio'],
+    temas: ['Transistor BJT', 'BC548B', '2N2222A', 'Corte y saturación', 'Transistor como interruptor', 'β forzado', 'Compuertas lógicas', 'Lógica DTL', 'Relé', 'Diodo volante', 'Analog Discovery Studio'],
     documento: {
       // Visor principal embebido en la pagina
       src: 'practicas/lab6/Laboratorio_6.pdf',
@@ -472,6 +472,76 @@ export const PRACTICAS = [
         detalle: 'Documento compilado desde LaTeX',
         archivo: 'practicas/lab6/Laboratorio_6.pdf',
         nombre: 'Laboratorio_6_Circuitos_Electronicos.pdf',
+        tipo: 'PDF',
+        peso: '0.1 MB',
+        destacado: true,
+      },
+    ],
+  },
+  {
+    id: 'lab7',
+    numero: 7,
+    titulo: 'Amplificadores con transistor bipolar',
+    subtitulo: 'Ganancia de voltaje, de corriente y de potencia',
+    estado: 'disponible',
+    duracion: '2 sesiones (2 semanas)',
+    resumen:
+      'Práctica de dos semanas sobre los tipos de amplificación con el transistor bipolar. El alumno calcula, simula y mide las ganancias de voltaje, de corriente y de potencia y la impedancia de entrada del transistor en sus tres configuraciones: emisor común y base común (semana 1) y colector común (semana 2), y comprueba que el seguidor rescata la ganancia del emisor común frente a una carga pequeña. Termina con una etapa de potencia push-pull en clase B y en clase AB: distorsión de cruce, potencia en la carga y rendimiento. Se mide con la Analog Discovery Studio.',
+    objetivos: [
+      'Calcular, simular y medir las ganancias de voltaje, de corriente y de potencia y la impedancia de entrada del transistor en sus tres configuraciones: emisor común, base común y colector común.',
+      'Distinguir qué amplifica cada configuración y explicar por qué el emisor común pierde casi toda su ganancia con una carga pequeña y cómo un seguidor de emisor lo resuelve.',
+      'Comparar una etapa de potencia push-pull en clase B y en clase AB: distorsión de cruce, potencia entregada a la carga y rendimiento.',
+    ],
+    temas: ['Transistor BJT', 'Amplificador', 'Emisor común', 'Base común', 'Colector común', 'Seguidor de emisor', 'Ganancia de voltaje', 'Ganancia de corriente', 'Ganancia de potencia', 'Impedancia de entrada', 'Push-pull', 'Clase B', 'Clase AB', 'Analog Discovery Studio'],
+    documento: {
+      // Visor principal embebido en la pagina
+      src: 'practicas/lab7/Laboratorio_7.pdf',
+      paginas: 21,
+      peso: '0.2 MB',
+    },
+    // Sin la fuente .tex: su cabecera trae los valores de referencia del
+    // docente, que son las respuestas del diseño previo.
+    descargas: [
+      {
+        etiqueta: 'Práctica en PDF',
+        detalle: 'Documento compilado desde LaTeX',
+        archivo: 'practicas/lab7/Laboratorio_7.pdf',
+        nombre: 'Laboratorio_7_Circuitos_Electronicos.pdf',
+        tipo: 'PDF',
+        peso: '0.2 MB',
+        destacado: true,
+      },
+    ],
+  },
+  {
+    id: 'lab8',
+    numero: 8,
+    titulo: 'Transistores de efecto de campo: JFET y MOSFET',
+    subtitulo: 'Curvas de transferencia, fuente de corriente y atenuador PWM de LEDs',
+    estado: 'disponible',
+    duracion: '2 sesiones (2 semanas)',
+    resumen:
+      'Práctica de dos semanas sobre los transistores de efecto de campo. En la semana 1 el alumno mide la curva de transferencia de un JFET 2N5457, obtiene su I_DSS y su V_P y los compara con la ecuación de Shockley; luego diseña su autopolarización y lo usa como fuente de corriente constante para un LED. En la semana 2 mide el voltaje umbral, la curva de transferencia y la resistencia de conducción de un MOSFET 2N7000, y lo usa como interruptor en un atenuador PWM de LEDs. Se mide con la Analog Discovery Studio.',
+    objetivos: [
+      'Medir la curva de transferencia de un JFET, obtener su corriente I_DSS y su voltaje de estrangulamiento V_P, y compararlos con la ecuación de Shockley.',
+      'Diseñar la autopolarización de un JFET y usarlo como fuente de corriente constante para un LED, comprobando que la corriente no cambia con el voltaje de alimentación.',
+      'Medir el voltaje umbral, la curva de transferencia y la resistencia de conducción de un MOSFET de enriquecimiento, y usarlo como interruptor en un atenuador PWM de LEDs.',
+    ],
+    temas: ['FET', 'JFET', 'MOSFET', '2N5457', '2N7000', 'Ecuación de Shockley', 'I_DSS y V_P', 'Autopolarización', 'Fuente de corriente', 'Voltaje umbral', 'R_DS(on)', 'PWM', 'LED', 'Analog Discovery Studio'],
+    documento: {
+      // Visor principal embebido en la pagina
+      src: 'practicas/lab8/Laboratorio_8.pdf',
+      paginas: 14,
+      peso: '0.1 MB',
+    },
+    // Sin la fuente .tex: su cabecera trae los valores de referencia del
+    // docente, que son las respuestas del diseño previo.
+    descargas: [
+      {
+        etiqueta: 'Práctica en PDF',
+        detalle: 'Documento compilado desde LaTeX',
+        archivo: 'practicas/lab8/Laboratorio_8.pdf',
+        nombre: 'Laboratorio_8_Circuitos_Electronicos.pdf',
         tipo: 'PDF',
         peso: '0.1 MB',
         destacado: true,

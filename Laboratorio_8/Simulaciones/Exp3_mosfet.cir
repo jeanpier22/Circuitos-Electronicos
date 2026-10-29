@@ -1,0 +1,35 @@
+* Practica 8 - Experimento 3: MOSFET 2N7000: umbral, curva de transferencia y RDS(on)
+.include modelos.lib
+* a) umbral: compuerta unida al drenador, 5 V a traves de 3,3 k
+V5 v5 0 5
+RT v5 dt 3.3k
+MT dt dt 0 0 M2N7000
+* b) transferencia: 12 V, RD = 1 k, compuerta con W1
+VDD dd 0 12
+RD dd d 1k
+VG g 0 0
+M1 d g 0 0 M2N7000
+* c) RDS(on): 5 V, RD = 100, VGS = 5 V y 12 V
+RD2 v5 d2 100
+VG2 g2 0 5
+M2 d2 g2 0 0 M2N7000
+.control
+set noaskquit
+op
+print v(dt) (5-v(dt))/3.3k
+print v(d2) (5-v(d2))/100 v(d2)/((5-v(d2))/100)
+alter VG2 dc = 12
+op
+print v(d2) (5-v(d2))/100 v(d2)/((5-v(d2))/100)
+dc VG 0 5 0.01
+let id = (12-v(d))/1k
+wrdata exp3_transferencia id
+meas dc vgs1m WHEN id=1m
+meas dc vgs10m WHEN id=10m
+foreach vgs 1.5 2.0 2.2 2.4 2.6 3.0 4.0 5.0
+  alter VG dc = $vgs
+  op
+  print $vgs (12-v(d))/1k v(d)
+end
+.endc
+.end

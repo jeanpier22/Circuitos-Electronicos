@@ -1,0 +1,1207 @@
+%=======================================================================
+%  LABORATORIO N.o 8 - TRANSISTORES DE EFECTO DE CAMPO: JFET Y MOSFET
+%  Curso : Circuitos Electronicos  (2026-2)
+%  UCSP  - Facultad de Ingenieria - Ing. Electronica y de Telecomunicaciones
+%  Docente     : Ebert San Roman Castillo
+%  Laboratorio : Ing. Jeanpier Ancori Sanchez
+%
+%  Version 1 - Pedido del docente: practica de JFET y MOSFET con una
+%  aplicacion. Practica de DOS SEMANAS con el formato de los Laboratorios 6
+%  y 7 (Datos -> Calcule -> Arme y mida -> Anote, cuadro resumen,
+%  cuestionario de 3 preguntas, conclusiones 5 + 5); no se imprimen los
+%  resultados.
+%  Semana 1 (JFET 2N5457):
+%    1. Curva de transferencia: I_DSS y V_P de la unidad de cada alumno
+%       (la hoja de datos da I_DSS de 1 a 5 mA y V_GS(off) de -0,5 a -6 V).
+%       Puntos en DC y la curva completa en modo XY con W1 en triangular.
+%    2. Aplicacion: el JFET como fuente de corriente constante para un LED
+%       (compuerta a la fuente y autopolarizado para I_DSS/2), frente a un
+%       LED con solo una resistencia, con V_DD de 3, 4, 5 y 12 V.
+%  Semana 2 (MOSFET 2N7000):
+%    3. Umbral V_GS(th), curva de transferencia, R_DS(on) con V_GS = 5 y
+%       12 V, y corriente de compuerta nula.
+%    4. Aplicacion: atenuador PWM de LEDs (6 LED rojos en dos ramas en el
+%       riel de 12 V). Retoma el "Lab. 08 - Circuitos accionadores de Leds"
+%       del docente (2026-1), con W1 en lugar del 555 astable.
+%  Instrumental: Analog Discovery Studio. Rieles fijos de +12 V (0,2 A) y
+%  +5 V; fuente programable V+ para 3 y 4 V en el exp. 2. W1 da la
+%  compuerta en los exp. 1, 3 y 4 (en el exp. 1 siempre negativa).
+%  Consumo maximo: 36 mA en el exp. 4 y 49 mA en la medida de R_DS(on).
+%
+%  VALORES DE REFERENCIA PARA EL DOCENTE (a mano: I_DSS = 2,1 mA,
+%  V_P = -1,4 V, V_GS(th) = 2,1 V, K = 80 mA/V^2, R_DS(on) = 2,5 Ohm con
+%  4,5-5 V y 1,2 Ohm con 10-12 V, LED rojo 1,85 V a 2 mA y 2,0 V a 18 mA;
+%  no se imprimen):
+%    Exp. 1 (Shockley): V_GS = 0 / -0,25 / -0,5 / -0,75 / -1,0 / -1,25 V
+%      -> I_D = 2,10 / 1,42 / 0,87 / 0,45 / 0,17 / 0,02 mA.
+%      V_P = 2 V_GS donde I_D = I_DSS/4 (unos -0,7 V).
+%    Exp. 2: I_D = I_DSS/2 = 1,05 mA ; V_GS = -1,4 (1 - 0,707) = -0,41 V ;
+%      R_S = 0,41/1,05 mA = 390 Ohm (E12 exacto).
+%      V_DD(min) = V_LED + |V_P| = 1,85 + 1,4 = 3,25 V (no depende de R_S).
+%      Solo 4,7 k: I = (V_DD - 1,85)/4,7 k = 0,25 / 0,46 / 0,67 / 2,16 mA
+%      a 3 / 4 / 5 / 12 V.
+%    Exp. 3: umbral I_D = (5 - 2,1)/3,3 k = 0,88 mA.
+%      Transferencia (12 V, R_D = 1 k): I_D = 80m (V_GS - 2,1)^2 hasta
+%      12 mA (V_GS = 2,49 V); 1,5 y 2,0 V -> 0 ; 2,2 -> 0,8 mA ;
+%      2,4 -> 7,2 mA ; 2,6 V en adelante -> 12 mA (region ohmica).
+%      R_DS(on) (5 V, R_D = 100): I_D = 48,8 mA ; V_DS = 0,12 V con
+%      V_GS = 5 V y 0,06 V con V_GS = 12 V. I_G = 0.
+%    Exp. 4: I_on por rama = (12 - 6,0 - 0,1)/330 = 17,9 mA ; total
+%      35,8 mA ; P(330) = 106 mW ; P(MOSFET) = 35,8m^2 * 2,7 = 3,5 mW.
+%      I_prom = D * 35,8 mA = 3,6 / 8,9 / 17,9 / 26,8 / 32,2 mA para
+%      D = 10 / 25 / 50 / 75 / 90 %. Parpadeo visible por debajo de
+%      unos 50-60 Hz.
+%    Cuestionario 1: V_DD(min) = V_LED + |V_P|, sin R_S (V_RS = -V_GS se
+%      cancela). Con V_P = -1,4 V: 3,25 V.
+%    Cuestionario 2: rele del Lab. 6 (68,6 mA) con 2N7000 a V_GS = 5 V:
+%      I_G = 0 ; V_DS = 68,6m * 2,7 = 0,19 V ; P = 12,7 mW, contra
+%      I_B = 3,6 mA y V_CE(sat) = 0,12 V (8,2 mW) del 2N2222A.
+%    Cuestionario 3: D = 30 % -> I_prom = 10,7 mA ; P(riel) = 129 mW.
+%
+%  SIMULACION (ngspice 26 de Fusion/Eagle; 2N5457 de la biblioteca de
+%  Motorola, 2N7000 de nivel 1 ajustado a mano a la hoja de datos y el
+%  LED rojo del Lab. 6; netlists, datos y graficas en ../Simulaciones):
+%    Exp. 1: I_DSS = 2,16 mA ; I_D = 2,16 / 1,45 / 0,88 / 0,45 / 0,16 /
+%      0,017 mA ; I_D = 10 uA en V_GS = -1,28 V.
+%    Exp. 2 (3 / 4 / 5 / 12 V): R_S = 0 -> 2,06 / 2,12 / 2,13 / 2,16 mA ;
+%      R_S = 390 -> 1,03 / 1,05 / 1,05 / 1,06 mA, V_GS = -0,41 V ;
+%      solo 4,7 k -> 0,28 / 0,48 / 0,69 / 2,16 mA. Con 2 V el JFET cae
+%      a 0,67 mA (region ohmica).
+%    Exp. 3: umbral V_GS = 2,20 V con 0,85 mA. Transferencia: 1 mA en
+%      2,20 V, 10 mA en 2,45 V ; 2,2 / 2,4 / 2,6 / 3 / 5 V -> 0,92 /
+%      7,72 / 11,8 / 11,9 / 12,0 mA. R_DS(on) = 2,71 Ohm (V_DS = 0,132 V,
+%      48,7 mA) con 5 V y 1,21 Ohm (0,060 V, 49,4 mA) con 12 V.
+%    Exp. 4: I_on = 34,6 mA (LED 2,07 V), V_DS(on) = 0,093 V ;
+%      I_prom = 3,78 / 8,87 / 17,4 / 25,9 / 30,9 mA.
+%=======================================================================
+
+\documentclass[11pt,a4paper]{article}
+
+%------------------------------------------------------------- idioma
+% Compilar con XeLaTeX (no con pdflatex): Trebuchet MS es una fuente TrueType
+% del sistema y solo fontspec, bajo XeLaTeX o LuaLaTeX, sabe cargarla.
+\usepackage{fontspec}
+\setmainfont{Trebuchet MS}[
+  Path            = C:/Windows/Fonts/,
+  Extension       = .ttf,
+  UprightFont     = trebuc,
+  BoldFont        = trebucbd,
+  ItalicFont      = trebucit,
+  BoldItalicFont  = trebucbi,
+  Ligatures       = TeX
+]
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{microtype}
+
+%----------------------------------------------------------- geometria
+\usepackage[left=2.4cm,right=2.4cm,top=3.1cm,bottom=2.6cm,headheight=30pt,
+            footskip=1.2cm]{geometry}
+
+%------------------------------------------------------------ graficos
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\usepackage{subcaption}
+\graphicspath{{imagenes/}}
+\usepackage[american,siunitx]{circuitikz}
+% babel-spanish activa < > " y rompe las opciones de TikZ sin esta libreria.
+\usetikzlibrary{calc,patterns,babel,arrows.meta,positioning,decorations.pathreplacing}
+
+%-------------------------------------------------------------- tablas
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{multirow}
+
+%----------------------------------------------------- matematicas / SI
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\sisetup{
+  output-decimal-marker = {,},
+  per-mode              = symbol,
+  mode                  = match,
+  detect-weight         = true,
+  detect-family         = true
+}
+
+%--------------------------------------------------------------- listas
+\usepackage{enumitem}
+\setlist[itemize]{itemsep=3pt,topsep=4pt,parsep=0pt}
+\setlist[enumerate]{itemsep=8pt,topsep=4pt,parsep=0pt}
+
+%------------------------------------------------------------ comandos
+\usepackage{pgffor}
+
+% Lineas punteadas para respuestas del alumno: \lineasresp{n}
+\newcommand{\lineasresp}[1]{%
+  \par\vspace{6pt}%
+  \foreach \i in {1,...,#1}{\noindent\rule{\linewidth}{0.4pt}\par\vspace{8pt}}%
+}
+
+% Recuadro "Figura / Comentario": una celda alta para pegar la captura del
+% osciloscopio y otra debajo para el comentario.
+\newcommand{\cuadrorespuesta}{%
+  \par\vspace{6pt}\noindent
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}X|}
+    \hline
+    \rule{0pt}{4.4cm}\raisebox{2.1cm}{\textcolor{black!45}{Figura}}\\
+    \hline
+    \rule{0pt}{2.0cm}\raisebox{0.9cm}{\textcolor{black!45}{Comentario}}\\
+    \hline
+  \end{tabularx}\par\vspace{8pt}%
+}
+
+% Celda vacia de altura comoda para escribir a mano.
+\newcommand{\hueco}{\rule{0pt}{0.5cm}}
+
+%----------------------------------------------------- compaginacion
+\usepackage{needspace}
+% \needspace mide mal el espacio libre despues de figuras y tablas [H] y deja
+% paginas medio vacias; \Needspace es la variante exacta del mismo paquete.
+\let\needspace\Needspace
+\usepackage{etoolbox}
+\pretocmd{\section}{\needspace{5\baselineskip}}{}{}
+\pretocmd{\subsection}{\needspace{4\baselineskip}}{}{}
+\widowpenalty=10000
+\clubpenalty=10000
+
+%---------------------------------------------------- encabezado / pie
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize UCSP --- Facultad de Ingeniería\\
+              Ing. Electrónica y de Telecomunicaciones}
+\fancyhead[R]{\footnotesize 2026-2 Circuitos Electrónicos\\
+              Ebert San Román Castillo}
+\fancyfoot[L]{\footnotesize Laboratorio N.\textsuperscript{o} 8 --- Transistores de efecto de campo: JFET y MOSFET}
+\fancyfoot[R]{\footnotesize Página \thepage\ de \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\usepackage{lastpage}
+
+%------------------------------------------------------- numeracion
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+\setcounter{secnumdepth}{3}
+
+%-------------------------------------------------------- hiperenlaces
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+\usepackage{xurl}
+\hypersetup{
+  pdftitle={Laboratorio 8 - Transistores de efecto de campo: JFET y MOSFET},
+  pdfsubject={Circuitos Electronicos - Guia de practicas},
+  pdfauthor={Ebert San Roman Castillo; Jeanpier Ancori Sanchez},
+  pdfkeywords={electronica, transistor de efecto de campo, FET, JFET, MOSFET,
+               2N5457, 2N7000, curva de transferencia, ecuacion de Shockley,
+               IDSS, voltaje de estrangulamiento, voltaje umbral, RDS(on),
+               autopolarizacion, fuente de corriente, PWM, LED,
+               Analog Discovery Studio, Proteus, Multisim, osciloscopio}
+}
+
+% babel-spanish rotula las tablas como "Cuadro"; los originales dicen "Tabla".
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+\begin{document}
+
+%=======================================================================
+%  CABECERA DE LA GUIA
+%=======================================================================
+\begin{center}
+    {\normalsize\bfseries SEGUNDA UNIDAD: TRANSISTOR DE EFECTO DE CAMPO (FET)}
+\end{center}
+
+\vspace{0.55cm}
+
+\begingroup
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\renewcommand{\arraystretch}{2.0}
+\setlength{\tabcolsep}{12pt}
+\noindent
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}X|>{\centering\arraybackslash}m{3.0cm}|}
+\hline
+\rule{0pt}{2.1cm}{\fontsize{58}{58}\selectfont\bfseries 8}
+    & \begin{minipage}[c]{\linewidth}\centering
+          {\large\bfseries Guía de Prácticas}\\[7pt]
+          {\Large\bfseries Transistores de Efecto\\ de Campo: JFET y MOSFET}
+      \end{minipage}
+    & {\Large\bfseries Nota}\\
+\hline
+\multicolumn{3}{|l|}{\rule{0pt}{1.3cm}\large\textbf{Grupo:}~\rule{4.6cm}{0.4pt}%
+    \hfill\large\textbf{Fecha:}~\rule{4.6cm}{0.4pt}\hspace{2mm}}\\
+\hline
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\large\textbf{Alumno(s):}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\phantom{\large\textbf{Alumno(s):}}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
+\hline
+\end{tabularx}
+\endgroup
+
+\vspace{0.8cm}
+
+% Encabezado de cada paso dentro de un experimento: \paso{1}{Datos}
+\newcommand{\paso}[2]{%
+  \par\needspace{6\baselineskip}\vspace{8pt}\noindent
+  \colorbox{black!8}{\makebox[\dimexpr\linewidth-2\fboxsep\relax][l]{%
+    \textbf{Paso #1 \,·\, #2}}}\par\vspace{4pt}}
+
+%=======================================================================
+\section{Objetivos}
+%=======================================================================
+\begin{itemize}
+    \item Medir la curva de transferencia de un JFET, obtener su corriente $I_{DSS}$ y su
+          voltaje de estrangulamiento $V_P$, y compararlos con la ecuación de Shockley.
+    \item Diseñar la autopolarización de un JFET y usarlo como fuente de corriente constante
+          para un LED, comprobando que la corriente no cambia con el voltaje de alimentación.
+    \item Medir el voltaje umbral, la curva de transferencia y la resistencia de conducción
+          de un MOSFET de enriquecimiento, y usarlo como interruptor en un atenuador PWM de
+          LEDs.
+\end{itemize}
+
+%=======================================================================
+\section{Contenido teórico}
+%=======================================================================
+\begin{itemize}
+    \item El transistor de efecto de campo (FET): control por voltaje, corriente de compuerta
+          nula; JFET y MOSFET.
+    \item El JFET: ecuación de Shockley, regiones de trabajo, autopolarización y fuente de
+          corriente constante.
+    \item El MOSFET de enriquecimiento: voltaje umbral, región de saturación y región óhmica;
+          el MOSFET como interruptor y la modulación por ancho de pulso (PWM).
+\end{itemize}
+
+\noindent\textbf{Duración:} dos sesiones. \textbf{Semana~1:} experimentos~1 y~2 (JFET).
+\textbf{Semana~2:} experimentos~3 y~4 (MOSFET).
+
+%=======================================================================
+\section{Equipos y materiales}
+%=======================================================================
+\noindent\textbf{Laboratorio:} Electrónica de Comunicaciones.
+
+\vspace{0.25cm}
+\noindent\textbf{Equipos y dispositivos:}
+\begin{itemize}
+    \item Tarjeta Analog Discovery Studio: rieles fijos de \qty{+12}{\volt} y
+          \qty{+5}{\volt}, fuente programable $V_+$, generador de funciones \texttt{W1} y
+          osciloscopio de dos canales.
+\end{itemize}
+
+\noindent\textbf{Software:}
+\begin{itemize}
+    \item Simulador Multisim o Proteus.
+\end{itemize}
+
+\vspace{0.25cm}
+\needspace{6\baselineskip}
+\noindent\textbf{Materiales y fungibles} (deben ser adquiridos por los alumnos):
+\begin{itemize}
+    % --- Semiconductores
+    \item 02 JFET canal N 2N5457 (o MPF102) y 02 MOSFET canal N 2N7000 (uno de repuesto de
+          cada uno). Sus terminales están en distinto orden: revise la hoja de datos antes de
+          armar.
+    \item 08 LED rojos de \qty{5}{\milli\metre} (uno de repuesto).
+    % --- Resistencias (la que mas disipa es RD = 100 Ohm del exp. 3: 240 mW;
+    %     las de 330 Ohm del exp. 4 reciben 106 mW)
+    \item Resistencia a \qty{0.5}{\watt}: 01 de \qty{100}{\ohm}.
+    \item Resistencias a \qty{0.25}{\watt}:
+          01 de \qty{470}{\ohm},
+          02 de \qty{100}{\kilo\ohm},
+          01 de \qty{1}{\mega\ohm},
+          01 de \qty{4.7}{\kilo\ohm},
+          01 de \qty{3.3}{\kilo\ohm},
+          02 de \qty{1}{\kilo\ohm} y
+          02 de \qty{330}{\ohm}.
+          Para la $R_S$ del experimento~2 traiga una de cada valor:
+          \qty{220}{\ohm}, \qty{270}{\ohm}, \qty{390}{\ohm}, \qty{560}{\ohm},
+          \qty{680}{\ohm} y \qty{820}{\ohm}.
+    % --- Montaje
+    \item Protoboard.
+    \item Jumpers macho-macho para protoboard.
+    \item Alicates para cortar y pelar alambre.
+    \item Multímetro.
+    \item Lentes de protección y mandil.
+\end{itemize}
+
+\noindent La compuerta del MOSFET es una capa de óxido muy delgada que se perfora con la
+electricidad estática: tómelo por la cápsula y no deje nunca su compuerta al aire.
+
+\FloatBarrier
+%=======================================================================
+\section{Conocimientos previos}
+%=======================================================================
+
+%-----------------------------------------------------------------------
+\subsection{El transistor de efecto de campo}
+%-----------------------------------------------------------------------
+En el transistor bipolar (Laboratorios~5 a~7) una \textbf{corriente} de base controla la
+corriente de colector. En el transistor de efecto de campo (FET) un \textbf{voltaje}, el
+voltaje compuerta-fuente $V_{GS}$, controla la corriente que circula por un canal entre el
+\textbf{drenador} (D) y la \textbf{fuente} (S). La \textbf{compuerta} (G) está aislada del
+canal, así que no toma corriente: $I_G \approx 0$ y la resistencia de entrada es de
+\qty{e9}{\ohm} o más. Hay dos familias (figura~\ref{fig:simbolos}):
+\begin{itemize}
+  \item \textbf{JFET} (FET de unión): la compuerta es una unión PN polarizada en
+        \emph{inversa}. Conduce con $V_{GS} = 0$ y se va cerrando con $V_{GS}$ negativo
+        (canal N). Es un dispositivo de \textbf{agotamiento}.
+  \item \textbf{MOSFET} (FET de compuerta aislada): la compuerta está separada del canal por
+        una capa de óxido. El de \textbf{enriquecimiento}, el más usado, no conduce con
+        $V_{GS} = 0$: el canal aparece cuando $V_{GS}$ supera un umbral positivo (canal N).
+\end{itemize}
+
+\begin{figure}[H]
+  \centering
+  \begin{circuitikz}[scale=0.9, transform shape]
+    \draw (0,0) node[npn](Q){};
+    \node[right] at (Q.C) {C};  \node[left] at (Q.B) {B};  \node[right] at (Q.E) {E};
+    \node[below=6mm, font=\small] at (Q.E) {BJT NPN};
+    \draw (4,0) node[njfet](J){};
+    \node[right] at (J.D) {D};  \node[left] at (J.G) {G};  \node[right] at (J.S) {S};
+    \node[below=6mm, font=\small] at (J.S) {JFET canal N};
+    \draw (8,0) node[nigfete](M){};
+    \node[right] at (M.D) {D};  \node[left] at (M.G) {G};  \node[right] at (M.S) {S};
+    \node[below=6mm, font=\small] at (M.S) {MOSFET canal N (enriq.)};
+  \end{circuitikz}
+  \caption{Símbolos. El canal partido del MOSFET indica que no existe hasta que $V_{GS}$
+           supera el umbral.}
+  \label{fig:simbolos}
+\end{figure}
+
+%-----------------------------------------------------------------------
+\subsection{El JFET: ecuación de Shockley}
+\label{sec:jfet}
+%-----------------------------------------------------------------------
+Con $V_{DS}$ suficientemente grande el JFET trabaja en la \textbf{región de saturación}
+(o de estrangulamiento): la corriente de drenador ya no depende de $V_{DS}$, solo de $V_{GS}$,
+y sigue la \textbf{ecuación de Shockley} (figura~\ref{fig:transf}a):
+\begin{equation}
+  I_D = I_{DSS}\left(1 - \frac{V_{GS}}{V_P}\right)^{2},
+  \qquad V_P \le V_{GS} \le 0.
+  \label{eq:shockley}
+\end{equation}
+$I_{DSS}$ es la corriente con la compuerta unida a la fuente ($V_{GS} = 0$), la máxima del
+JFET. $V_P$ (o $V_{GS(\text{off})}$) es el voltaje de \textbf{estrangulamiento}: con
+$V_{GS} \le V_P$ el canal se cierra y $I_D = 0$ (\textbf{corte}). Las tres regiones son:
+\begin{itemize}
+  \item \textbf{Corte:} $V_{GS} \le V_P$; no hay corriente.
+  \item \textbf{Saturación:} $V_{DS} \ge V_{GS} - V_P$; $I_D$ sigue~\eqref{eq:shockley}.
+        Es la región de los amplificadores y de la fuente de corriente.
+  \item \textbf{Óhmica:} $V_{DS} < V_{GS} - V_P$; el canal se comporta como una resistencia
+        controlada por $V_{GS}$.
+\end{itemize}
+
+\noindent\textbf{Cómo medir $V_P$.} Cerca de $V_P$ la corriente es tan pequeña que cuesta
+ver dónde se anula. Es más preciso usar el punto en que $I_D = I_{DSS}/4$: por~\eqref{eq:shockley}
+ahí $1 - V_{GS}/V_P = 1/2$, es decir,
+\begin{equation}
+  V_P = 2\,V_{GS} \quad\text{cuando}\quad I_D = \frac{I_{DSS}}{4}.
+  \label{eq:vp}
+\end{equation}
+
+\noindent\textbf{Dispersión.} $I_{DSS}$ y $V_P$ cambian mucho de una unidad a otra: la hoja de
+datos del 2N5457 da $I_{DSS}$ de \qtyrange{1}{5}{\milli\ampere} y $V_{GS(\text{off})}$ de
+\qtyrange{-0.5}{-6}{\volt}. Por eso cada alumno mide los de su propio JFET (experimento~1)
+antes de diseñar con él (experimento~2).
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.48\linewidth}
+    \centering
+    \begin{tikzpicture}[scale=0.95, >=Stealth]
+      \draw[->] (-3.6,0) -- (0.6,0) node[below] {$V_{GS}$};
+      \draw[->] (0,-0.2) -- (0,3.4) node[left] {$I_D$};
+      \draw[very thick, domain=-3:0, smooth, samples=40, variable=\x]
+           plot ({\x},{2.8*(1+\x/3)^2});
+      \draw[dashed] (-1.5,0) node[below] {$V_P/2$} -- (-1.5,0.7) -- (0,0.7)
+           node[right] {$I_{DSS}/4$};
+      \fill (-1.5,0.7) circle (1.6pt);
+      \fill (0,2.8) circle (1.6pt) node[right] {$I_{DSS}$};
+      \node[below] at (-3,0) {$V_P$};
+      \fill (-3,0) circle (1.6pt);
+      \node[font=\small, align=center] at (-2.6,2.4) {corte a la\\izquierda de $V_P$};
+    \end{tikzpicture}
+    \caption{JFET canal N.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.48\linewidth}
+    \centering
+    \begin{tikzpicture}[scale=0.95, >=Stealth]
+      \draw[->] (-0.2,0) -- (4.2,0) node[below] {$V_{GS}$};
+      \draw[->] (0,-0.2) -- (0,3.4) node[left] {$I_D$};
+      \draw[very thick] (0,0) -- (1.4,0);
+      \draw[very thick, domain=1.4:2.6, smooth, samples=30, variable=\x]
+           plot ({\x},{2.0*(\x-1.4)^2});
+      \draw[very thick] (2.6,2.88) .. controls (2.75,3.0) .. (3.9,3.05);
+      \fill (1.4,0) circle (1.6pt);
+      \node[below] at (1.4,0) {$V_{GS(\text{th})}$};
+      \node[font=\small, align=center] at (3.2,1.6) {la carga\\limita $I_D$};
+      \node[font=\small] at (0.7,0.45) {corte};
+    \end{tikzpicture}
+    \caption{MOSFET canal N de enriquecimiento.}
+  \end{subfigure}
+  \caption{Curvas de transferencia $I_D$ contra $V_{GS}$. El JFET conduce con $V_{GS} = 0$ y se
+           corta con $V_{GS}$ negativo; el MOSFET de enriquecimiento no conduce hasta que
+           $V_{GS}$ supera el umbral.}
+  \label{fig:transf}
+\end{figure}
+
+%-----------------------------------------------------------------------
+\subsection{Autopolarización del JFET}
+%-----------------------------------------------------------------------
+Para trabajar con un $V_{GS}$ negativo sin una fuente negativa se pone una resistencia $R_S$
+en la fuente y la compuerta a tierra a través de $R_G$ (figura~\ref{fig:exp2}b). Como
+$I_G = 0$, la compuerta queda a \qty{0}{\volt} y la fuente a $I_D R_S$, así que
+\begin{equation}
+  V_{GS} = -I_D\,R_S.
+  \label{eq:autopol}
+\end{equation}
+\noindent\textbf{Cómo se diseña.} Para una corriente deseada $I_D$, se despeja $V_{GS}$
+de~\eqref{eq:shockley} y luego $R_S$ de~\eqref{eq:autopol}:
+\begin{equation}
+  V_{GS} = V_P\left(1 - \sqrt{\frac{I_D}{I_{DSS}}}\right),
+  \qquad
+  R_S = \frac{-V_{GS}}{I_D}.
+  \label{eq:rs}
+\end{equation}
+Con el valor E12 más cercano se recalcula $I_D$ y se comprueba que el JFET esté en saturación:
+$V_{DS} \ge V_{GS} - V_P$.
+
+\needspace{14\baselineskip}
+\noindent\textbf{Ejemplo resuelto} (valores distintos a los de la práctica). JFET con
+$I_{DSS} = \qty{8}{\milli\ampere}$ y $V_P = \qty{-4}{\volt}$, $V_{DD} = \qty{15}{\volt}$,
+$R_D = \qty{2.2}{\kilo\ohm}$; se desea $I_D = I_{DSS}/4 = \qty{2}{\milli\ampere}$.
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{2.1}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{2.6cm}|>{\centering\arraybackslash}X|>{\centering\arraybackslash}m{2.8cm}|}
+    \hline
+    \textbf{Paso} & \textbf{Cálculo} & \textbf{Resultado} \\ \hline
+    $V_{GS}$ & $-4\left(1 - \sqrt{\dfrac{2}{8}}\right) = -4\,(1 - \num{0.5})$
+             & \qty{-2}{\volt} \\ \hline
+    $R_S$ & $\dfrac{\qty{2}{\volt}}{\qty{2}{\milli\ampere}}$ & \qty{1}{\kilo\ohm} (E12) \\ \hline
+    $V_{DS}$ & $15 - \qty{2}{\milli\ampere}\,(\num{2.2} + 1)\,\unit{\kilo\ohm}$
+             & \qty{8.6}{\volt} \\ \hline
+    Comprobación & $V_{GS} - V_P = -2 - (-4) = \qty{2}{\volt}$, \qquad $\num{8.6} \ge 2$
+                 & saturación \\ \hline
+  \end{tabularx}
+  \caption{Ejemplo de autopolarización de un JFET.}
+  \label{tab:ejemplo}
+\end{table}
+
+%-----------------------------------------------------------------------
+\subsection{El JFET como fuente de corriente constante}
+\label{sec:fuente}
+%-----------------------------------------------------------------------
+En la región de saturación $I_D$ depende de $V_{GS}$ pero \textbf{no} de $V_{DS}$. Si se pone
+la carga (un LED) en el drenador, la corriente queda fijada por el JFET y su $R_S$, aunque cambie
+el voltaje de alimentación: el JFET absorbe la diferencia en su $V_{DS}$. Con la compuerta
+unida a la fuente la corriente es $I_{DSS}$; con una $R_S$, una corriente menor dada
+por~\eqref{eq:rs}. Esto funciona mientras el JFET siga en saturación; el voltaje mínimo de
+alimentación es
+\begin{equation}
+  V_{DD(\min)} = V_{\text{LED}} + I_D R_S + (V_{GS} - V_P).
+  \label{eq:vddmin}
+\end{equation}
+En cambio, con un LED y solo una resistencia $R$, la corriente
+$I = (V_{DD} - V_{\text{LED}})/R$ sigue cada variación de $V_{DD}$.
+
+%-----------------------------------------------------------------------
+\subsection{El MOSFET de enriquecimiento}
+%-----------------------------------------------------------------------
+Con $V_{GS} = 0$ no hay canal y el MOSFET está en \textbf{corte}. Cuando $V_{GS}$ supera el
+\textbf{voltaje umbral} $V_{GS(\text{th})}$ (entre \num{0.8} y \qty{3}{\volt} en el 2N7000) el
+canal se forma y, en la región de saturación,
+\begin{equation}
+  I_D = K\,\bigl(V_{GS} - V_{GS(\text{th})}\bigr)^{2},
+  \qquad V_{GS} > V_{GS(\text{th})},
+  \label{eq:mos}
+\end{equation}
+donde $K$ (en \unit{\milli\ampere\per\volt\squared}) depende del transistor. La hoja de datos
+define $V_{GS(\text{th})}$ como el $V_{GS}$ con el que circula \qty{1}{\milli\ampere} cuando la
+compuerta está unida al drenador ($V_{DS} = V_{GS}$).
+
+\noindent\textbf{El MOSFET como interruptor.} Con $V_{GS}$ muy por encima del umbral el
+MOSFET pasa a la \textbf{región óhmica} y se comporta como una resistencia pequeña, la
+\textbf{resistencia de conducción} $R_{DS(\text{on})}$:
+\begin{equation}
+  V_{DS} = I_D\,R_{DS(\text{on})}.
+  \label{eq:rdson}
+\end{equation}
+$R_{DS(\text{on})}$ baja cuanto mayor es $V_{GS}$. La tabla~\ref{tab:bjtmos} compara este
+interruptor con el del Laboratorio~6.
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}m{3.6cm}|>{\centering\arraybackslash}X|>{\centering\arraybackslash}X|}
+    \hline
+    & \textbf{BJT (Laboratorio 6)} & \textbf{MOSFET} \\ \hline
+    Se controla con & corriente de base $I_B$ & voltaje $V_{GS}$ \\ \hline
+    Corriente de entrada en DC & $I_C/\beta_{\text{forzado}}$ & $\approx 0$ \\ \hline
+    Caída en conducción & $V_{CE(\text{sat})} \approx \qty{0.2}{\volt}$ & $I_D\,R_{DS(\text{on})}$ \\ \hline
+    Para conducir necesita & $V_{BE} \approx \qty{0.7}{\volt}$ e $I_B$ suficiente & $V_{GS}$ muy por encima de $V_{GS(\text{th})}$ \\ \hline
+    Cuidado & $\beta$ distinto en cada unidad & compuerta sensible a la estática \\ \hline
+  \end{tabularx}
+  \caption{El transistor bipolar y el MOSFET como interruptores.}
+  \label{tab:bjtmos}
+\end{table}
+
+%-----------------------------------------------------------------------
+\subsection{Modulación por ancho de pulso (PWM)}
+%-----------------------------------------------------------------------
+Para variar el brillo de un LED sin desperdiciar potencia en una resistencia variable, se lo
+enciende y apaga muy rápido con un interruptor. La señal de control es una onda cuadrada de
+período $T$ que está en alto un tiempo $t_{on}$ (figura~\ref{fig:pwm}). Su \textbf{ciclo de
+trabajo} es $D = t_{on}/T$ y la corriente promedio en la carga es
+\begin{equation}
+  I_{\text{prom}} = D\,I_{on},
+  \label{eq:pwm}
+\end{equation}
+\noindent\begin{minipage}[c]{0.50\linewidth}
+donde $I_{on}$ es la corriente con el interruptor cerrado. Por encima de unos
+\qty{100}{\hertz} el ojo no distingue el parpadeo y percibe un brillo que crece con $D$. El
+MOSFET disipa poco: casi nada cuando está abierto y solo $I_{on}^2 R_{DS(\text{on})}$ cuando
+está cerrado.
+\end{minipage}\hfill
+\begin{minipage}[c]{0.46\linewidth}
+  \centering
+  \begin{tikzpicture}[scale=0.62, >=Stealth]
+    \draw[->] (0,0) -- (7.4,0) node[below] {$t$};
+    \draw[->] (0,0) -- (0,2.0) node[left] {$v_{GS}$};
+    \draw[very thick] (0,0) -- (0,1.3) -- (1.2,1.3) -- (1.2,0) -- (3.2,0) -- (3.2,1.3)
+          -- (4.4,1.3) -- (4.4,0) -- (6.4,0) -- (6.4,1.3) -- (7.0,1.3);
+    \node[left] at (0,1.3) {\qty{5}{\volt}};
+    \draw[<->] (3.2,1.65) -- node[above] {$t_{on}$} (4.4,1.65);
+    \draw[<->] (3.2,-0.4) -- node[below] {$T$} (6.4,-0.4);
+  \end{tikzpicture}
+  \captionof{figure}{Señal PWM con $D = \qty{37.5}{\percent}$. El LED recibe $I_{on}$ durante
+                     $t_{on}$ y nada el resto del período.}
+  \label{fig:pwm}
+\end{minipage}
+
+\FloatBarrier
+\needspace{14\baselineskip}
+%=======================================================================
+\section{Desarrollo del laboratorio}
+%=======================================================================
+La práctica dura dos semanas. Cada experimento tiene los mismos cuatro pasos. Los pasos~1 y~2
+(\textbf{Datos} y \textbf{Calcule}) se traen resueltos de casa, junto con la simulación en
+Multisim o Proteus; los pasos~3 y~4 (\textbf{Arme y mida} y \textbf{Anote}) se hacen en el
+laboratorio.
+
+\begin{table}[H]
+  \centering
+  \small
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{0.9cm}|>{\centering\arraybackslash}m{0.8cm}|>{\raggedright\arraybackslash}m{3.0cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}m{1.3cm}|}
+    \hline
+    \textbf{Sem.} & \textbf{Exp.} & \textbf{Circuito} & \textbf{En casa: calcule}
+      & \textbf{En el laboratorio: mida} & \textbf{Fuente} \\ \hline
+    \multirow{2}{*}{1}
+      & 1 & Curva del JFET
+          & $I_D$ con la ecuación de Shockley
+          & $I_D$ contra $V_{GS}$; $I_{DSS}$ y $V_P$; curva en modo XY
+          & \qty{12}{\volt} \\ \cline{2-6}
+      & 2 & JFET como fuente de corriente
+          & $R_S$, $V_{GS}$ y $V_{DD(\min)}$; $I$ con solo $R$
+          & $I_D$ con \qty{3}{} a \qty{12}{\volt}; punto Q
+          & $V_+$ y \qty{12}{\volt} \\ \hline
+    \multirow{2}{*}{2}
+      & 3 & MOSFET 2N7000
+          & $I_D$ en el umbral y contra $V_{GS}$; $V_{DS}$ en conducción
+          & $V_{GS(\text{th})}$; curva en modo XY; $R_{DS(\text{on})}$
+          & \qty{12}{} y \qty{5}{\volt} \\ \cline{2-6}
+      & 4 & Atenuador PWM de LEDs
+          & $I_{on}$, potencias e $I_{\text{prom}}$
+          & $I_{\text{prom}}$ y brillo contra $D$; parpadeo
+          & \qty{12}{\volt} \\ \hline
+  \end{tabularx}
+  \caption{Resumen de la práctica.}
+  \label{tab:resumen}
+\end{table}
+
+%-----------------------------------------------------------------------
+\subsection{Experimento 1: curva de transferencia del JFET}
+%-----------------------------------------------------------------------
+Se mide cómo $V_{GS}$ controla la corriente de drenador y se obtienen el $I_{DSS}$ y el $V_P$
+del JFET de cada alumno.
+
+\noindent\begin{minipage}{\linewidth}
+\paso{1}{Datos}
+\noindent\begin{minipage}[c]{0.46\linewidth}
+  \centering
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}m{1.9cm}|}
+    \hline
+    $V_{DD}$ & \qty{12}{\volt} \\ \hline
+    $R_D$ & \qty{470}{\ohm} \\ \hline
+    $R_G$ & \qty{100}{\kilo\ohm} \\ \hline
+    JFET & 2N5457 \\ \hline
+    $I_{DSS}$ (en casa) & \qty{2.1}{\milli\ampere} \\ \hline
+    $V_P$ (en casa) & \qty{-1.4}{\volt} \\ \hline
+  \end{tabularx}
+  \captionof{table}{Experimento 1: datos. $I_{DSS}$ y $V_P$ son los del modelo de simulación;
+                    los de su JFET los medirá aquí.}
+  \label{tab:cond1}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.50\linewidth}
+  \centering
+  \begin{circuitikz}[scale=0.85, transform shape]
+    \draw (3.2,0) node[njfet](J){};
+    \node[right] at ($(J.S)+(0.05,0.35)$) {2N5457};
+    \draw (J.D) -- ++(0,0.3) coordinate(d) to[R, l=$R_D$] ++(0,2.0) coordinate(top);
+    \draw (top) node[circ]{} -- ++(0.8,0) node[right]{$V_{DD}$};
+    \draw (d) to[short, *-o] ++(1.0,0) node[right]{$D$};
+    \draw (J.G) to[R, l_=$R_G$] ++(-2.0,0) node[ocirc]{} node[left]{\texttt{W1}};
+    \draw (J.S) node[ground]{};
+  \end{circuitikz}
+  \captionof{figure}{Experimento 1. Como $I_G \approx 0$, en $R_G$ no cae voltaje y $V_{GS}$
+                     es el voltaje de \texttt{W1}.}
+  \label{fig:exp1}
+\end{minipage}
+\end{minipage}\par\vspace{6pt}
+
+\paso{2}{Calcule (en casa)}
+\begin{enumerate}[label=\alph*), leftmargin=*, itemsep=3pt]
+  \item $I_D$ con~\eqref{eq:shockley} para los $V_{GS}$ de la tabla~\ref{tab:exp1}, y el
+        voltaje en $R_D$ que corresponde a cada uno.
+  \item Compruebe que con $V_{GS} = 0$ el JFET está en saturación:
+        $V_{DS} \ge V_{GS} - V_P$.
+  \item Simule el circuito con un barrido DC de $V_{GS}$ de \qty{0}{\volt} a
+        \qty{-1.6}{\volt}.
+\end{enumerate}
+
+% Conexion con la tarjeta, en los colores del arnes de la Analog Discovery
+% Studio (W1 amarillo, osciloscopio 1 naranja y 2 azul, GND negro,
+% alimentacion roja). Los canales son diferenciales: CH2 va sobre R_D.
+\begin{figure}[H]
+  \centering
+  \begin{circuitikz}[scale=0.85, transform shape]
+    \colorlet{cw1}{yellow!70!black}
+    \colorlet{cch1}{orange!90!black}
+    \colorlet{cch2}{blue!75!black}
+    \colorlet{cvcc}{red!80!black}
+    \coordinate (gnd) at (0,-1.6);
+    \draw (4.2,0) node[njfet](J){};
+    \node[right] at ($(J.S)+(0.05,0.35)$) {2N5457};
+    \draw (J.D) -- ++(0,0.3) coordinate(d) to[R, l_=$R_D$] ++(0,2.0) coordinate(top);
+    \draw (top) -- ++(0,0.6) coordinate(vtop);
+    \coordinate (a) at ($(J.G)+(-2.4,0)$);
+    \draw (a) to[R, l=$R_G$, *-] (J.G);
+    \draw (J.S) -- (J.S |- gnd) node[circ]{};
+    % bus de tierra
+    \coordinate (p2m) at (6.2,0);
+    \coordinate (p2p) at (7.0,0);
+    \coordinate (p12) at (8.6,0);
+    \draw[very thick] (-0.8,-1.6) -- (J.S |- gnd);
+    % tarjeta
+    \coordinate (ytab) at (0,-3.2);
+    \draw[thick, fill=black!6, rounded corners=3pt]
+         (-1.6,-3.2) rectangle (9.4,-4.7);
+    \node[font=\bfseries] at (3.9,-4.25) {Analog Discovery Studio};
+    \coordinate (pw1) at ($(a |- ytab)+(-1.0,0)$);
+    \coordinate (p1p) at (a |- ytab);
+    \coordinate (p1m) at ($(a |- ytab)+(0.6,0)$);
+    \fill[black] (-0.92,-3.32) rectangle (-0.68,-3.08);
+    \node[font=\scriptsize\ttfamily, below] at (-0.8,-3.32) {GND};
+    \foreach \p/\n/\c in {pw1/W1/cw1, p1p/1+/cch1, p1m/1$-$/cch1,
+                          p2m/2$-$/cch2, p2p/2+/cch2, p12/+12V/cvcc}{
+      \fill[\c] ($(\p |- ytab)+(-0.12,-0.12)$) rectangle ($(\p |- ytab)+(0.12,0.12)$);
+      \node[font=\scriptsize\ttfamily, below] at ($(\p |- ytab)+(0,-0.12)$) {\n};
+    }
+    % cables
+    \draw[black, line width=1.3pt] (-0.8,-3.08) -- (-0.8,-1.6) node[circ]{};
+    \draw[cw1, line width=1.3pt]  ($(pw1)+(0,0.12)$) -- (pw1 |- a) -- (a);
+    \draw[cch1, line width=1.3pt] ($(p1p)+(0,0.12)$) -- (a);
+    \draw[cch1, line width=1.3pt, dashed] ($(p1m)+(0,0.12)$) -- (p1m |- gnd) node[circ, black]{};
+    \draw[cch2, line width=1.3pt] ($(p2m |- ytab)+(0,0.12)$) -- (p2m |- d) -- (d) node[circ, black]{};
+    \draw[cch2, line width=1.3pt] ($(p2p |- ytab)+(0,0.12)$) -- (p2p |- top) -- (top) node[circ, black]{};
+    \draw[cvcc, line width=1.3pt] ($(p12 |- ytab)+(0,0.12)$) -- (p12 |- vtop) -- (vtop);
+    % rotulos
+    \node[cch1, font=\scriptsize, above] at ($(a)+(-0.5,0)$) {CH1: $v_{GS}$};
+    \node[cch2, font=\scriptsize, right] at ($(p2p |- top)!0.5!(p2p |- d)$) {CH2: $v_{R_D}$};
+  \end{circuitikz}
+  \caption{Conexión con la Analog Discovery Studio. \texttt{W1} da $V_{GS}$ y \texttt{1+} lo
+           mide. CH2 mide sobre $R_D$: \texttt{2+} arriba y \texttt{2$-$} en el drenador, así
+           que $I_D = v_{\text{CH2}}/R_D$. El experimento~3 usa la misma conexión con el
+           MOSFET y $R_D = \qty{1}{\kilo\ohm}$.}
+  \label{fig:conexion}
+\end{figure}
+
+\paso{3}{Arme y mida (en el laboratorio)}
+\begin{enumerate}[label=\alph*), ref=\alph*, leftmargin=*, itemsep=3pt]
+  \item Arme el circuito y conecte la tarjeta como en la figura~\ref{fig:conexion}.
+        \textbf{El voltaje de \texttt{W1} debe ser siempre negativo o cero}: con la
+        compuerta positiva la unión compuerta-canal conduce.
+  \item Ponga \texttt{W1} en continua con cada $V_{GS}$ de la tabla~\ref{tab:exp1} y mida el
+        voltaje en $R_D$ (CH2); $I_D = v_{R_D}/\qty{470}{\ohm}$. Si con
+        \qty{-1.25}{\volt} todavía circula corriente, siga con \qty{-1.5}{\volt},
+        \qty{-2}{\volt}, \qty{-3}{\volt}\dots{} hasta que $I_D$ sea casi cero.
+  \item Con $I_{DSS}$ (la corriente con $V_{GS} = 0$), busque el $V_{GS}$ con el que
+        $I_D = I_{DSS}/4$ y obtenga $V_P$ con~\eqref{eq:vp}.
+  \item \label{paso:xy}Ponga \texttt{W1} como onda triangular de \qty{10}{\hertz} que vaya de
+        \qty{0}{\volt} a $V_P$ (por ejemplo, amplitud \qty{1}{\volt} y offset
+        \qty{-1}{\volt} si su $V_P$ es de unos \qty{-2}{\volt}). Pase el osciloscopio a modo
+        \textbf{XY} con CH1 en el eje X y CH2 en el eje Y, y capture la curva.
+\end{enumerate}
+
+\noindent\begin{minipage}{\linewidth}
+\paso{4}{Anote}
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{2.2cm}|*{4}{>{\centering\arraybackslash}X|}}
+    \hline
+    $\boldsymbol{V_{GS}}$ & \textbf{$I_D$ teórico} & \textbf{$I_D$ simulado}
+      & \textbf{$v_{R_D}$ medido} & \textbf{$I_D$ medido} \\ \hline
+    \qty{0}{\volt}     & \hueco & & & \\ \hline
+    \qty{-0.25}{\volt} & \hueco & & & \\ \hline
+    \qty{-0.5}{\volt}  & \hueco & & & \\ \hline
+    \qty{-0.75}{\volt} & \hueco & & & \\ \hline
+    \qty{-1.0}{\volt}  & \hueco & & & \\ \hline
+    \qty{-1.25}{\volt} & \hueco & & & \\ \hline
+    \hueco & \multicolumn{2}{c|}{} & & \\ \hline
+    \hueco & \multicolumn{2}{c|}{} & & \\ \hline
+  \end{tabularx}
+  \captionof{table}{Experimento 1: curva de transferencia del JFET. Use las dos últimas filas
+                    si su JFET necesita un $V_{GS}$ más negativo para cortarse.}
+  \label{tab:exp1}
+\end{minipage}\par\vspace{10pt}
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{0.85\linewidth}{|>{\centering\arraybackslash}m{3.4cm}|*{3}{>{\centering\arraybackslash}X|}}
+    \hline
+    & \textbf{Hoja de datos} & \textbf{Simulado} & \textbf{Su JFET} \\ \hline
+    $I_{DSS}$ & \qtyrange{1}{5}{\milli\ampere} & & \hueco \\ \hline
+    $V_P$ con~\eqref{eq:vp} & \qtyrange{-0.5}{-6}{\volt} & & \hueco \\ \hline
+  \end{tabularx}
+  \caption{Experimento 1: los parámetros de su JFET. Los usará en el experimento~2.}
+  \label{tab:param}
+\end{table}
+
+\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{Captura de la curva en modo XY} (paso~3\ref{paso:xy}).
+\cuadrorespuesta
+\end{minipage}\par
+
+%-----------------------------------------------------------------------
+\subsection{Experimento 2: el JFET como fuente de corriente para un LED}
+%-----------------------------------------------------------------------
+Un LED debe recibir siempre la misma corriente aunque el voltaje de alimentación cambie de
+\qty{3}{\volt} a \qty{12}{\volt}. Se comparan tres circuitos (figura~\ref{fig:exp2}): el JFET
+con la compuerta unida a la fuente (A), el JFET autopolarizado (B) y el LED con solo una
+resistencia (C).
+
+\paso{1}{Datos}
+$V_{DD}$ de \qty{3}{}, \qty{4}{}, \qty{5}{} y \qty{12}{\volt}; LED rojo de \qty{1.85}{\volt} a
+\qty{2}{\milli\ampere}. En el circuito B se desea $I_D = I_{DSS}/2$, con
+$R_G = \qty{1}{\mega\ohm}$; en el circuito C, $R = \qty{4.7}{\kilo\ohm}$. En casa use
+$I_{DSS} = \qty{2.1}{\milli\ampere}$ y $V_P = \qty{-1.4}{\volt}$; en el laboratorio, los de su
+JFET (tabla~\ref{tab:param}).
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.30\linewidth}
+    \centering
+    \begin{circuitikz}[scale=0.8, transform shape]
+      \draw (0,0) node[njfet](J){};
+      \coordinate (top) at ($(J.D)+(0,2.4)$);
+      \draw (top) to[leDo, l=LED] (J.D);
+      \draw (top) node[circ]{} node[above]{$V_{DD}$};
+      \draw (J.G) -- ++(-0.5,0) coordinate(gg) -- (gg |- 0,-1.4) -- (J.S |- 0,-1.4);
+      \draw (J.S) -- (J.S |- 0,-1.4) node[circ]{} -- ++(0,-0.4) node[ground]{};
+      \draw[->] ($(J.D)+(-0.35,1.0)$) -- node[left]{$I_{DSS}$} ++(0,-0.6);
+    \end{circuitikz}
+    \caption{A: $R_S = 0$.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.34\linewidth}
+    \centering
+    \begin{circuitikz}[scale=0.8, transform shape]
+      \draw (0,0) node[njfet](J){};
+      \coordinate (top) at ($(J.D)+(0,2.4)$);
+      \draw (top) to[leDo, l=LED] (J.D);
+      \draw (top) node[circ]{} node[above]{$V_{DD}$};
+      \coordinate (gl) at (0,-2.6);
+      \draw (J.S) to[R, l=$R_S$, a=?] (J.S |- gl) node[ground]{};
+      \draw (J.G) -- ++(-0.6,0) coordinate(gg) to[R, l_=$R_G$] (gg |- gl) node[ground]{};
+      \draw[->] ($(J.D)+(-0.35,1.0)$) -- node[left]{$I_D$} ++(0,-0.6);
+    \end{circuitikz}
+    \caption{B: autopolarizado.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.30\linewidth}
+    \centering
+    \begin{circuitikz}[scale=0.8, transform shape]
+      \coordinate (top) at (0,2.4);
+      \draw (top) to[leDo, l=LED] (0,0.6) to[R, l=$R$] (0,-1.6) node[ground]{};
+      \draw (top) node[circ]{} node[above]{$V_{DD}$};
+      \draw[->] (-0.35,1.9) -- node[left]{$I$} ++(0,-0.6);
+    \end{circuitikz}
+    \caption{C: solo resistencia.}
+  \end{subfigure}
+  \caption{Experimento 2: tres maneras de alimentar un LED. En A y B el JFET fija la corriente;
+           en C la corriente depende de $V_{DD}$.}
+  \label{fig:exp2}
+\end{figure}
+
+\paso{2}{Calcule (en casa)}
+\begin{enumerate}[label=\alph*), leftmargin=*, itemsep=3pt]
+  \item $V_{GS}$ y $R_S$ del circuito B con~\eqref{eq:rs}, como en el ejemplo de la
+        tabla~\ref{tab:ejemplo}, y el valor E12 más cercano.
+  \item $V_{DD(\min)}$ de los circuitos A y B con~\eqref{eq:vddmin}.
+  \item La corriente del circuito C para cada $V_{DD}$.
+  \item Simule los tres circuitos con un barrido DC de $V_{DD}$ de \qty{1}{\volt} a
+        \qty{12}{\volt}.
+\end{enumerate}
+
+\paso{3}{Arme y mida (en el laboratorio)}
+\begin{enumerate}[label=\alph*), ref=\alph*, leftmargin=*, itemsep=3pt]
+  \item Recalcule $R_S$ con el $I_{DSS}$ y el $V_P$ que midió en su JFET
+        (tabla~\ref{tab:param}) y elija el valor E12 más cercano de los que trajo.
+  \item Arme el circuito A. Aliméntelo con la fuente programable $V_+$ en \qty{3}{},
+        \qty{4}{} y \qty{5}{\volt} y luego con el riel de \qty{+12}{\volt}. En cada caso mida
+        la corriente con el multímetro en serie con el LED y observe su brillo.
+  \item Repita con el circuito B, donde $I_D = v_{R_S}/R_S$. Con \qty{12}{\volt} mida además
+        $V_{GS}$, $V_{DS}$ y el voltaje en $R_G$.
+  \item Repita con el circuito C.
+\end{enumerate}
+
+\noindent\begin{minipage}{\linewidth}
+\paso{4}{Anote}
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}m{1.6cm}|*{4}{>{\centering\arraybackslash}X|}}
+    \hline
+    \multirow{2}{*}{\textbf{Circuito}} & & \multicolumn{4}{c|}{\textbf{Corriente en el LED}} \\
+    \cline{3-6}
+    & & $V_{DD} = \qty{3}{\volt}$ & \qty{4}{\volt} & \qty{5}{\volt} & \qty{12}{\volt} \\ \hline
+    \multirow{2}{*}{A: $R_S = 0$}  & Simulado & \hueco & & & \\ \cline{2-6}
+                                   & Medido   & \hueco & & & \\ \hline
+    \multirow{2}{=}{\centering B: $R_S = $\\ \rule{1.4cm}{0.4pt}}
+                                   & Simulado & \hueco & & & \\ \cline{2-6}
+                                   & Medido   & \hueco & & & \\ \hline
+    \multirow{2}{=}{\centering C: \qty{4.7}{\kilo\ohm}}
+                                   & Teórico  & \hueco & & & \\ \cline{2-6}
+                                   & Medido   & \hueco & & & \\ \hline
+  \end{tabularx}
+  \captionof{table}{Experimento 2: la corriente en el LED con cada voltaje de alimentación.}
+  \label{tab:exp2}
+\end{minipage}\par\vspace{10pt}
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{0.85\linewidth}{|>{\centering\arraybackslash}m{4.2cm}|*{3}{>{\centering\arraybackslash}X|}}
+    \hline
+    \textbf{Circuito B con \qty{12}{\volt}} & \textbf{Teórico} & \textbf{Simulado} & \textbf{Medido} \\ \hline
+    $V_{GS}$ & \hueco & & \\ \hline
+    $I_D$    & \hueco & & \\ \hline
+    $V_{DS}$ & \hueco & & \\ \hline
+    $V_{R_G}$ (y entonces $I_G$) & \hueco & & \\ \hline
+    $V_{DD(\min)}$ & \hueco & & \\ \hline
+  \end{tabularx}
+  \caption{Experimento 2: punto Q del JFET autopolarizado.}
+  \label{tab:q2}
+\end{table}
+
+%-----------------------------------------------------------------------
+\subsection{Experimento 3: el MOSFET de enriquecimiento}
+%-----------------------------------------------------------------------
+Comienza la semana~2. Se mide el umbral del 2N7000, su curva de transferencia y su resistencia
+cuando conduce, y se comprueba que la compuerta no toma corriente.
+
+\paso{1}{Datos}
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabularx}{0.8\linewidth}{|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}m{5.4cm}|}
+    \hline
+    MOSFET & 2N7000 \\ \hline
+    $V_{GS(\text{th})}$ y $K$ (en casa) & \qty{2.1}{\volt} y \qty{80}{\milli\ampere\per\volt\squared} \\ \hline
+    $R_{DS(\text{on})}$ típica & \qty{2.5}{\ohm} con \qty{5}{\volt};
+                                 \qty{1.2}{\ohm} con \qty{12}{\volt} \\ \hline
+  \end{tabularx}
+  \caption{Experimento 3: datos del 2N7000. Los valores de cada montaje están en la
+           figura~\ref{fig:exp3}.}
+  \label{tab:cond3}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.42\linewidth}
+    \centering
+    \begin{circuitikz}[scale=0.85, transform shape]
+      \draw (0,0) node[nigfete](M){};
+      \node[right] at ($(M.S)+(0.05,0.35)$) {2N7000};
+      \draw (M.D) -- ++(0,0.4) coordinate(dn) to[R, l_=$R_T$, a^=\qty{3.3}{\kilo\ohm}]
+            ++(0,2.0) coordinate(top);
+      \draw (top) node[circ]{} -- ++(1.2,0) node[right]{\qty{+5}{\volt}};
+      \draw (M.G) -- ++(-0.7,0) coordinate(gg) -- (gg |- dn) -- (dn) node[circ]{};
+      \draw (dn) to[short, -o] ++(1.2,0) node[right]{$V_{GS(\text{th})}$};
+      \draw (M.S) node[ground]{};
+    \end{circuitikz}
+    \caption{Umbral: compuerta unida al drenador.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.54\linewidth}
+    \centering
+    \begin{circuitikz}[scale=0.85, transform shape]
+      \draw (0,0) node[nigfete](M){};
+      \node[right] at ($(M.S)+(0.05,0.35)$) {2N7000};
+      \draw (M.D) -- ++(0,0.3) coordinate(d) to[R, l=$R_D$] ++(0,2.0) coordinate(top);
+      \draw (top) node[circ]{} -- ++(1.2,0) node[right]{$V_{DD}$};
+      \draw (d) to[short, *-o] ++(1.2,0) node[right]{$D$};
+      \draw (M.G) to[R, l_=$R_G$, a^=\qty{100}{\kilo\ohm}] ++(-2.6,0)
+            node[ocirc]{} node[left]{\texttt{W1}};
+      \draw (M.S) node[ground]{};
+    \end{circuitikz}
+    \caption{Transferencia y $R_{DS(\text{on})}$.}
+  \end{subfigure}
+  \caption{Experimento 3: circuitos de medida del 2N7000. En (b), $V_{DD} = \qty{12}{\volt}$ y
+           $R_D = \qty{1}{\kilo\ohm}$ para la curva; $V_{DD} = \qty{5}{\volt}$ y
+           $R_D = \qty{100}{\ohm}$ (\qty{0.5}{\watt}) para $R_{DS(\text{on})}$.}
+  \label{fig:exp3}
+\end{figure}
+
+\paso{2}{Calcule (en casa)}
+\begin{enumerate}[label=\alph*), leftmargin=*, itemsep=3pt]
+  \item La corriente del circuito de umbral si $V_{GS} = V_{GS(\text{th})}$. ¿Se parece a la
+        \qty{1}{\milli\ampere} con la que la hoja de datos define el umbral?
+  \item $I_D$ con~\eqref{eq:mos} para los $V_{GS}$ de la tabla~\ref{tab:exp3}. La corriente
+        no puede pasar de $V_{DD}/R_D = \qty{12}{\milli\ampere}$: ¿con qué $V_{GS}$ se llega a
+        ese límite? Desde ahí el MOSFET está en la región óhmica.
+  \item $I_D$ y $V_{DS}$ con~\eqref{eq:rdson} en la medida de $R_{DS(\text{on})}$, con
+        $V_{GS} = \qty{5}{\volt}$ y \qty{12}{\volt}.
+  \item Simule los tres casos.
+\end{enumerate}
+
+\paso{3}{Arme y mida (en el laboratorio)}
+\begin{enumerate}[label=\alph*), ref=\alph*, leftmargin=*, itemsep=3pt]
+  \item Arme el circuito de umbral con el riel de \qty{+5}{\volt} y mida $V_{GS(\text{th})}$
+        y el voltaje en $R_T$.
+  \item Arme el circuito de la figura~\ref{fig:exp3}b con \qty{12}{\volt} y
+        $R_D = \qty{1}{\kilo\ohm}$, con la misma conexión de la figura~\ref{fig:conexion}.
+        Ponga \texttt{W1} en continua con cada $V_{GS}$ de la tabla~\ref{tab:exp3} y mida
+        $v_{R_D}$ y $V_{DS}$.
+  \item \label{paso:xymos}Ponga \texttt{W1} como onda triangular de \qty{10}{\hertz} de
+        \qty{0}{\volt} a \qty{5}{\volt} (amplitud \qty{2.5}{\volt}, offset
+        \qty{2.5}{\volt}) y capture la curva en modo XY.
+  \item Con \texttt{W1} en \qty{5}{\volt}, mida el voltaje en $R_G$. ¿Cuánta corriente toma la
+        compuerta?
+  \item Cambie a $V_{DD} = \qty{5}{\volt}$ y $R_D = \qty{100}{\ohm}$. Con \texttt{W1} en
+        \qty{5}{\volt} mida $V_{DS}$ y $v_{R_D}$. Luego pase el extremo libre de $R_G$ de
+        \texttt{W1} al riel de \qty{+12}{\volt} ($V_{GS} = \qty{12}{\volt}$) y repita.
+\end{enumerate}
+
+\noindent\begin{minipage}{\linewidth}
+\paso{4}{Anote}
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{2.0cm}|*{5}{>{\centering\arraybackslash}X|}}
+    \hline
+    $\boldsymbol{V_{GS}}$ & \textbf{$I_D$ teórico} & \textbf{$I_D$ simulado}
+      & \textbf{$I_D$ medido} & \textbf{$V_{DS}$ medido} & \textbf{Región} \\ \hline
+    \qty{1.5}{\volt} & \hueco & & & & \\ \hline
+    \qty{2.0}{\volt} & \hueco & & & & \\ \hline
+    \qty{2.2}{\volt} & \hueco & & & & \\ \hline
+    \qty{2.4}{\volt} & \hueco & & & & \\ \hline
+    \qty{2.6}{\volt} & \hueco & & & & \\ \hline
+    \qty{3.0}{\volt} & \hueco & & & & \\ \hline
+    \qty{4.0}{\volt} & \hueco & & & & \\ \hline
+    \qty{5.0}{\volt} & \hueco & & & & \\ \hline
+  \end{tabularx}
+  \captionof{table}{Experimento 3: curva de transferencia del 2N7000 con
+                    $V_{DD} = \qty{12}{\volt}$ y $R_D = \qty{1}{\kilo\ohm}$.}
+  \label{tab:exp3}
+\end{minipage}\par\vspace{10pt}
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{5.0cm}|*{3}{>{\centering\arraybackslash}X|}}
+    \hline
+    \textbf{Parámetro} & \textbf{Teórico} & \textbf{Simulado} & \textbf{Medido} \\ \hline
+    $V_{GS(\text{th})}$ e $I_D$ en el umbral & \hueco & & \\ \hline
+    $I_G$ con $V_{GS} = \qty{5}{\volt}$ & \hueco & & \\ \hline
+    $V_{DS}$ e $I_D$ con $V_{GS} = \qty{5}{\volt}$ & \hueco & & \\ \hline
+    $R_{DS(\text{on})}$ con $V_{GS} = \qty{5}{\volt}$ & \hueco & & \\ \hline
+    $V_{DS}$ e $I_D$ con $V_{GS} = \qty{12}{\volt}$ & \hueco & & \\ \hline
+    $R_{DS(\text{on})}$ con $V_{GS} = \qty{12}{\volt}$ & \hueco & & \\ \hline
+  \end{tabularx}
+  \caption{Experimento 3: umbral, corriente de compuerta y resistencia de conducción.}
+  \label{tab:rdson}
+\end{table}
+
+\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{Captura de la curva del MOSFET en modo XY} (paso~3\ref{paso:xymos}).
+\cuadrorespuesta
+\end{minipage}\par
+
+%-----------------------------------------------------------------------
+\subsection{Experimento 4: atenuador PWM de LEDs}
+%-----------------------------------------------------------------------
+Aplicación del MOSFET como interruptor: una señal PWM de \qty{5}{\volt}, como la de un
+microcontrolador o de un temporizador 555, regula el brillo de seis LED alimentados con
+\qty{12}{\volt}. Aquí la señal la da \texttt{W1}.
+
+\noindent\begin{minipage}{\linewidth}
+\paso{1}{Datos}
+\noindent\begin{minipage}[c]{0.44\linewidth}
+  \centering
+  \renewcommand{\arraystretch}{1.1}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}m{2.5cm}|}
+    \hline
+    $V_{DD}$ & \qty{12}{\volt} \\ \hline
+    Cada rama & 3 LED rojos y \qty{330}{\ohm} \\ \hline
+    $V_{\text{LED}}$ a \qty{18}{\milli\ampere} & \qty{2.0}{\volt} \\ \hline
+    PWM (\texttt{W1}) & \qty{0}{} a \qty{5}{\volt}, \qty{1}{\kilo\hertz} \\ \hline
+    $R_G$ y $R_{GS}$ & \qty{1}{\kilo\ohm} y \qty{100}{\kilo\ohm} \\ \hline
+  \end{tabularx}
+  \captionof{table}{Experimento 4: datos. Use la $R_{DS(\text{on})}$ que midió en el
+                    experimento~3.}
+  \label{tab:cond4}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.53\linewidth}
+  \centering
+  \begin{circuitikz}[scale=0.66, transform shape]
+    \foreach \x in {0,2.2}{
+      \draw (\x,5.6) to[leDo] (\x,4.6) to[leDo] (\x,3.6) to[leDo] (\x,2.6)
+            to[R, l=\qty{330}{\ohm}] (\x,1.2);
+    }
+    \draw (0,5.6) -- (2.2,5.6);
+    \draw (1.1,5.6) node[circ]{} -- ++(0,0.4) node[above]{$V_{DD}$};
+    \draw (0,1.2) -- (2.2,1.2);
+    \draw (1.1,0.6) node[nigfete, anchor=D](M){};
+    \draw (1.1,1.2) node[circ]{} -- (M.D);
+    \node[right] at ($(M.S)+(0.05,0.35)$) {2N7000};
+    \draw (2.2,1.2) to[short, -o] ++(1.0,0) node[right]{$D$};
+    \draw (M.G) -- ++(-0.5,0) coordinate(gn) to[R, l_=$R_G$]
+          ++(-2.0,0) node[ocirc]{} node[left]{\texttt{W1}};
+    \draw (gn) node[circ]{} to[R, l=$R_{GS}$] ($(gn |- M.S)+(0,-1.0)$)
+          -- ($(M.S)+(0,-1.0)$);
+    \draw (M.S) -- ++(0,-1.0) node[circ]{} node[ground]{};
+  \end{circuitikz}
+  \captionof{figure}{Experimento 4: atenuador PWM.}
+  \label{fig:exp4}
+\end{minipage}
+\end{minipage}\par\vspace{6pt}
+
+\paso{2}{Calcule (en casa)}
+\begin{enumerate}[label=\alph*), leftmargin=*, itemsep=3pt]
+  \item $I_{on}$ de cada rama y la total con el MOSFET conduciendo ($V_{DS} \approx 0$), la
+        potencia en cada resistencia de \qty{330}{\ohm} y la potencia en el MOSFET con
+        $I_{on}^2 R_{DS(\text{on})}$.
+  \item $I_{\text{prom}}$ total con~\eqref{eq:pwm} para cada ciclo de trabajo de la
+        tabla~\ref{tab:exp4}.
+  \item Simule el circuito con una fuente de pulsos de \qty{1}{\kilo\hertz} y mida la
+        corriente promedio para cada ciclo de trabajo.
+\end{enumerate}
+
+\paso{3}{Arme y mida (en el laboratorio)}
+\begin{enumerate}[label=\alph*), ref=\alph*, leftmargin=*, itemsep=3pt]
+  \item Arme el circuito con el riel de \qty{+12}{\volt}. $R_{GS}$ mantiene apagado el MOSFET
+        si \texttt{W1} se desconecta y $R_G$ protege la salida de \texttt{W1}: no las omita.
+        Ponga \texttt{W1} en \qty{5}{\volt} continuos y mida $V_{DS}$ y la corriente total con
+        el multímetro en serie con el riel.
+  \item Ponga \texttt{W1} como onda cuadrada de \qty{1}{\kilo\hertz}, amplitud
+        \qty{2.5}{\volt} y offset \qty{2.5}{\volt}. Para cada ciclo de trabajo (\emph{Symmetry}
+        en WaveForms) de la tabla~\ref{tab:exp4}, mida la corriente promedio con el multímetro
+        en DC y califique el brillo de 1 (casi apagado) a 5 (máximo).
+  \item \label{paso:pwm}Con $D = \qty{25}{\percent}$, capture $v_{GS}$ (CH1) y $v_{DS}$ (CH2).
+  \item Con $D = \qty{50}{\percent}$, baje la frecuencia a \qty{5}{}, \qty{20}{}, \qty{50}{}
+        y \qty{100}{\hertz} y anote desde qué frecuencia deja de verse el parpadeo.
+\end{enumerate}
+
+\noindent\begin{minipage}{\linewidth}
+\paso{4}{Anote}
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{2.4cm}|*{4}{>{\centering\arraybackslash}X|}}
+    \hline
+    \textbf{Ciclo de trabajo} & \textbf{$I_{\text{prom}}$ teórica} & \textbf{$I_{\text{prom}}$ simulada}
+      & \textbf{$I_{\text{prom}}$ medida} & \textbf{Brillo (1 a 5)} \\ \hline
+    \qty{10}{\percent} & \hueco & & & \\ \hline
+    \qty{25}{\percent} & \hueco & & & \\ \hline
+    \qty{50}{\percent} & \hueco & & & \\ \hline
+    \qty{75}{\percent} & \hueco & & & \\ \hline
+    \qty{90}{\percent} & \hueco & & & \\ \hline
+    \qty{100}{\percent} (\texttt{W1} en \qty{5}{\volt}) & \hueco & & & \\ \hline
+  \end{tabularx}
+  \captionof{table}{Experimento 4: corriente promedio y brillo contra el ciclo de trabajo.}
+  \label{tab:exp4}
+\end{minipage}\par\vspace{10pt}
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{3.4cm}|*{4}{>{\centering\arraybackslash}X|}}
+    \hline
+    \textbf{Frecuencia} & \qty{5}{\hertz} & \qty{20}{\hertz} & \qty{50}{\hertz} & \qty{100}{\hertz} \\ \hline
+    ¿Se ve el parpadeo? & \hueco & & & \\ \hline
+  \end{tabularx}
+  \caption{Experimento 4: el parpadeo con $D = \qty{50}{\percent}$.}
+  \label{tab:parpadeo}
+\end{table}
+
+\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{Captura de $v_{GS}$ y $v_{DS}$ con $D = \qty{25}{\percent}$} (paso~3\ref{paso:pwm}).
+\cuadrorespuesta
+\end{minipage}\par
+
+\FloatBarrier
+%=======================================================================
+\section{Informe final}
+%=======================================================================
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, labelsep=0.6em]
+  \item Adjunte los cálculos y las simulaciones de los cuatro experimentos.
+  \item Compare los valores teóricos, simulados y medidos y explique las diferencias más
+        grandes. Grafique en un mismo eje la curva de transferencia medida de su JFET y la de
+        la ecuación de Shockley con su $I_{DSS}$ y su $V_P$.
+  \item Explique con la tabla~\ref{tab:exp2} por qué el JFET mantiene constante la corriente
+        del LED y la resistencia sola no.
+  \item Compare con la tabla~\ref{tab:bjtmos} el interruptor con MOSFET del experimento~4 y el
+        interruptor con BJT del Laboratorio~6.
+\end{enumerate}
+
+\FloatBarrier
+%=======================================================================
+\section{Cuestionario}
+%=======================================================================
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, labelsep=0.6em]
+\item En el experimento 2, demuestre con~\eqref{eq:autopol} y~\eqref{eq:vddmin} que el voltaje
+mínimo de alimentación de la fuente de corriente es $V_{\text{LED}} + |V_P|$, sin importar el
+valor de $R_S$. ¿Cuánto vale con el $V_P$ de su JFET? ¿Lo confirma la tabla~\ref{tab:exp2}?
+\lineasresp{3}
+
+\item En el Laboratorio~6 el relé (\qty{68.6}{\milli\ampere}) necesitó
+$I_B = \qty{3.6}{\milli\ampere}$ y el 2N2222A cayó $V_{CE(\text{sat})} = \qty{0.12}{\volt}$.
+Si lo maneja un 2N7000 con $V_{GS} = \qty{5}{\volt}$ y la $R_{DS(\text{on})}$ que usted midió,
+¿cuánta corriente toma la compuerta en DC? ¿Cuánto valen $V_{DS}$ y la potencia en el
+transistor en cada caso?
+\lineasresp{3}
+
+\item En el experimento 4, con $D = \qty{30}{\percent}$, ¿qué corriente promedio y qué potencia
+promedio entrega el riel de \qty{12}{\volt}? ¿Por qué a \qty{5}{\hertz} se ve el parpadeo y a
+\qty{1}{\kilo\hertz} no? Según su tabla~\ref{tab:exp4}, ¿el brillo que se percibe es
+proporcional a $D$?
+\lineasresp{3}
+\end{enumerate}
+
+\FloatBarrier
+%=======================================================================
+\section{Conclusiones}
+%=======================================================================
+\begin{itemize}
+    \item Redacte como mínimo 05 conclusiones \textbf{cualitativas} y 05
+          \textbf{cuantitativas}.
+\end{itemize}
+
+\noindent\textbf{Cualitativas}
+\lineasresp{10}
+
+\needspace{6\baselineskip}
+\noindent\textbf{Cuantitativas}
+\lineasresp{10}
+
+\end{document}

@@ -1,0 +1,34 @@
+* Practica 8 - Experimento 4: atenuador PWM de LEDs con el 2N7000
+* dos ramas de 3 LED rojos + 330 Ohm en el riel de +12 V; W1 de 0 a 5 V a 1 kHz
+.include modelos.lib
+VDD dd 0 12
+D1 dd a1 LEDROJO
+D2 a1 a2 LEDROJO
+D3 a2 a3 LEDROJO
+R1 a3 d 330
+D4 dd b1 LEDROJO
+D5 b1 b2 LEDROJO
+D6 b2 b3 LEDROJO
+R2 b3 d 330
+VID d dm 0
+M1 dm g 0 0 M2N7000
+RG w g 100
+VW w 0 pulse(0 5 0 1u 1u 0.5m 1m)
+.control
+set noaskquit
+* conduccion permanente
+alter VW dc = 5
+op
+print i(VID) v(d) v(d)/i(VID) (v(a3)-v(d))/330
+foreach on 0.1m 0.25m 0.5m 0.75m 0.9m
+  alter @VW[pulse] = [ 0 5 0 1u 1u $on 1m ]
+  tran 1u 6m 2m
+  meas tran iprom AVG i(VID) from=2m to=6m
+  meas tran ipico MAX i(VID) from=2m to=6m
+  meas tran vdson MIN v(d) from=2m to=6m
+end
+alter @VW[pulse] = [ 0 5 0 1u 1u 0.25m 1m ]
+tran 1u 4m 2m
+wrdata exp4_pwm25 v(w) v(d) i(VID)
+.endc
+.end

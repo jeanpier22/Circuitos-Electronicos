@@ -1,0 +1,20 @@
+* Practica 8 - Experimento 1: curva de transferencia del JFET 2N5457
+.include modelos.lib
+VDD dd 0 12
+RD dd d 470
+VG g 0 0
+J1 d g 0 J2N5457
+.control
+set noaskquit
+dc VG 0 -1.6 -0.01
+let id = (v(dd)-v(d))/470
+wrdata exp1_transferencia id
+meas dc idss FIND id AT=0
+meas dc vp WHEN id=10u
+foreach vgs 0 -0.25 -0.5 -0.75 -1.0 -1.25
+  alter VG dc = $vgs
+  op
+  print $vgs (v(dd)-v(d))/470 v(d)
+end
+.endc
+.end

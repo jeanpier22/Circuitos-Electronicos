@@ -1,0 +1,25 @@
+* Practica 8 - Experimento 2: JFET autopolarizado como fuente de corriente para un LED
+* rama A: RS = 0 (compuerta a la fuente)  rama B: RS = 390 y RG = 1 M  rama C: solo 4,7 k
+.include modelos.lib
+VDD dd 0 12
+VIA dd dda 0
+DA dda da LEDROJO
+JA da 0 0 J2N5457
+DB dd db LEDROJO
+JB db gb sb J2N5457
+RGB gb 0 1Meg
+RSB sb 0 390
+DC1 dd dc LEDROJO
+RC dc 0 4.7k
+.control
+set noaskquit
+dc VDD 1 12 0.05
+wrdata exp2_fuente i(VIA) v(sb)/390 v(dc)/4.7k
+foreach vdd 2 3 4 5 12
+  alter VDD dc = $vdd
+  op
+  echo "VDD = $vdd"
+  print i(VIA) v(sb)/390 v(dc)/4.7k v(sb) v(db)-v(sb) v(da) v(dd)-v(da)
+end
+.endc
+.end

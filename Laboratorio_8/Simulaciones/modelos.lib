@@ -1,0 +1,11 @@
+* Modelos comunes de la Practica 8
+* JFET canal N 2N5457 (biblioteca de Motorola/ON): IDSS = Beta*Vto^2 = 2,1 mA, VP = -1,37 V
+.model J2N5457 NJF(Beta=1.125m Betatce=-.5 Rd=1 Rs=1 Lambda=2.3m Vto=-1.372 Vtotc=-2.5m
++ Is=181.3f Isr=1.747p N=1 Nr=2 Xti=3 Alpha=2.543u Vk=152.2 Cgd=4p M=.4373 Pb=.5 Fc=.5
++ Cgs=4.627p Kf=6.599E-18 Af=1)
+* MOSFET de enriquecimiento canal N 2N7000, nivel 1 ajustado a mano a la hoja de datos:
+* VGS(th) ~ 2,1 V (a 1 mA), RDS(on) ~ 3 Ohm con VGS = 4,5 V y ~ 1,2 Ohm con VGS = 12 V
+.model M2N7000 NMOS(Level=1 Vto=2.1 Kp=0.167 Lambda=0.01 Rd=0.3 Rs=0.3
++ Cgso=0 Cgdo=0 Cbd=10p)
+* LED rojo de 5 mm (el mismo del Laboratorio 6)
+.model LEDROJO D(IS=5.0E-13 N=3.24 RS=2 CJO=30p)
