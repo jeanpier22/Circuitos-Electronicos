@@ -1,0 +1,1538 @@
+%=======================================================================
+%  LABORATORIO N.o 7 - AMPLIFICADORES CON TRANSISTOR BIPOLAR
+%  Curso : Circuitos Electronicos  (2026-2)
+%  UCSP  - Facultad de Ingenieria - Ing. Electronica y de Telecomunicaciones
+%  Docente     : Ebert San Roman Castillo
+%  Laboratorio : Ing. Jeanpier Ancori Sanchez
+%
+%  Version 2 - Practica de DOS SEMANAS con las tres configuraciones del BJT
+%  y la etapa de potencia (la v1 tenia tres experimentos, sin base comun).
+%  Semana 1: experimentos 1 y 2 (amplificadores de voltaje).
+%  Semana 2: experimentos 3 y 4 (corriente y potencia).
+%    1. Amplificador de VOLTAJE: emisor comun. Es el circuito 3 (punto
+%       medio) del Laboratorio 5 con Cout y RL; el alumno ya lo tiene armado
+%       y polarizado. Se mide Av, Zin, Ai y Ap con RL = 10 k y con RL = 100.
+%    2. Amplificador de VOLTAJE: base comun, sobre la misma placa del exp. 1
+%       (se quita CE, la base va a tierra en AC con CB = 100 uF y la senal
+%       entra por el emisor). Mismo punto Q: Av ~ 10 veces mayor que el
+%       emisor comun pero Zin ~ 11 Ohm y Ai < 1.
+%    3. Amplificador de CORRIENTE: colector comun (seguidor de emisor) con
+%       RL = 100. Primero la carga sin transistor (vo ~ 4 mV), luego con el
+%       seguidor y despues detras del emisor comun: la ganancia en 100 Ohm
+%       pasa de ~0,9 a ~15.
+%    4. Amplificador de POTENCIA: push-pull complementario 2N2222A/2N2907A,
+%       primero en clase B (distorsion de cruce) y luego en clase AB con dos
+%       1N4148. Pout, PDC, rendimiento, Ap.
+%  Mejoras de la v2 en el marco teorico: "tierra para la senal" (el emisor
+%  visto en DC y en AC, y por que VCC es tierra en AC), el nombre de cada
+%  configuracion, la base comun con su circuito y la tabla comparativa con
+%  cuatro columnas.
+%  Formato del Laboratorio 6 (Datos -> Calcule -> Arme y mida -> Anote,
+%  cuadro resumen, cuestionario de 4 preguntas (una por experimento), conclusiones 5 + 5); no se
+%  imprimen los resultados. Marco teorico ampliado a pedido: el alumno no ha
+%  visto aun el modelo de pequena senal, asi que se dan las formulas con
+%  r_e = 26 mV/I_E y un ejemplo resuelto.
+%  Zin se mide con una Rs en serie con W1: Zin = Rs vin/(vs - vin).
+%  Instrumental: Analog Discovery Studio. Exp. 1, 2 y 3 con el riel de +12 V
+%  (0,2 A; consumo < 10 mA). Exp. 4 con las fuentes programables V+ = 5 V y
+%  V- = -5 V (700 mA); corriente pico en RL ~ 50 mA. W1 entrega como maximo
+%  ~5 mA pico en el exp. 4 (Zin ~ 480 Ohm) y ~0,45 mA en el exp. 2
+%  (Zin ~ 11 Ohm, con Rs = 100); los demas, menos de 0,1 mA.
+%
+%  VALORES DE REFERENCIA PARA EL DOCENTE (beta = 200, VBE = 0,7 V,
+%  r_e = 26 mV/IE; no se imprimen):
+%    Exp. 1: VTH = 1,83 V, RTH = 1,53 k, IE = 2,27 mA, re = 11,5 Ohm,
+%      VB/VE/VC = 1,83/1,13/7,0 V.
+%      Av sin RL = -2200/111,5 = -19,7.
+%      Zin = 10k || 1,8k || 200*111,5 = 1,43 k.
+%      RL = 10 k : Av = -1803/111,5 = -16,2 ; Ai = 16,2*1,43/10 = 2,3 ;
+%                  Ap = 37 (15,7 dB).
+%      RL = 100  : Av = -95,7/111,5 = -0,86 ; Ai = 12,3 ; Ap = 10,6 (10 dB).
+%      Con W1 = 50 mV pico y Rs = 1 k: vin ~ 30 mV pico, vo ~ 0,48 V pico.
+%    Exp. 2 (base comun, mismo punto Q, RE = 490 sin desacoplar, Rs = 100,
+%      W1 = 50 mV pico): Zin = 490 || 11,5 = 11,2 Ohm ;
+%      vin = 50 mV * 11,2/111,2 = 5,0 mV pico.
+%      Av sin RL = 2200/11,5 = 191 ; vo = 0,96 V pico ;
+%      Av(vs -> vo) = 2200/(100 + 11,5) = 19,7 (igual que el emisor comun).
+%      RL = 10 k : Av = 1803/11,5 = 157 ; Ai = 157*11,2/10k = 0,18
+%                  (= alfa RC/(RC + RL)) ; Ap = 28 (14,5 dB).
+%      Con 0,2 V pico en W1 la salida se deforma (ie ~ 0,8 IE).
+%    Exp. 3: VTH = 6 V, RTH = 23,5 k, IE = 5,3/(1k + 23,5k/200) = 4,75 mA,
+%      re = 5,5 Ohm, VE = 4,75 V, P_RE = 23 mW.
+%      RE || RL = 90,9 ; Av = 90,9/96,4 = 0,943 ;
+%      Zin = 23,5k || 200*96,4 = 23,5k || 19,3k = 10,6 k ;
+%      Ai = 0,943*10,6k/100 = 100 ; Ap = 94 (19,8 dB).
+%      Recorte del semiciclo negativo en vo = -IE (RE||RL) = -0,43 V.
+%      Cascada (CE sin RL -> seguidor -> 100 Ohm), vin = 20 mV pico:
+%      Av1 = -(2,2k || 10,6k)/111,5 = -16,3 ; Av = -16,3*0,943 = -15,4
+%      (contra -0,86 con el CE directo a 100 Ohm).
+%      Sin transistor (RL = 100 detras de Rs = 10 k): vo = 0,4*100/10,1k
+%      = 4 mV pico, contra ~0,19 V con el seguidor.
+%    Exp. 4 (+-5 V, RL = 47 Ohm, W1 = 3 V pico, Rs = 100):
+%      Clase B: Vp ~ 3 - 0,7 = 2,3 V ; Pout = 2,3^2/94 = 56 mW ;
+%        PDC = 2*5*2,3/(pi*47) = 156 mW ; eta = (pi/4)(2,3/5) = 36 %.
+%        PD(max) por transistor = 25/(pi^2*47) = 54 mW.
+%      Clase AB: I por los diodos = (10 - 1,3)/2 k = 4,35 mA (43 mW extra);
+%        Zin ~ RB1 || RB2 = 500 Ohm ; Vp ~ 2,4 V ; Pout ~ 61 mW ;
+%        PDC ~ 156 + 43 = 200 mW ; eta ~ 30 % ; Av ~ 0,95.
+%    Cuestionario 1: sin CE, Av = -2200/(11,5 + 490) = -4,4 ; Zin sube a
+%      10k || 1,8k || 100k = 1,51 k.
+%    Cuestionario 2 (base comun): con Rs = 1 k, Av(vs -> vo) =
+%      2200/(1000 + 11,5) = 2,2 ; con Rs = 0 seria 191.
+%    Cuestionario 3: vo max sin recorte = 0,43 V pico ; con RE = 470 Ohm,
+%      IE ~ 10 mA, vo max ~ 10 mA * 82,5 = 0,83 V pico (P_RE = 47 mW).
+%    Cuestionario 4: con Vp = 4,3 V, eta = (pi/4)(4,3/5) = 67,5 % ;
+%      Pout = 4,3^2/94 = 197 mW.
+%
+%  SIMULACION (ngspice 26 de Fusion/Eagle; modelos BC548B de NXP, 2N2222A,
+%  2N2907A y 1N4148; netlists y grafica en ../Simulaciones):
+%    Exp. 1: VB/VE/VC = 1,82/1,16/6,82 V, IC = 2,36 mA (beta ~ 303).
+%      Av sin RL = -19,5 ; Zin = 1,46 k.
+%      RL = 10 k : Av = -16,0 ; Ai = 2,33 ; Ap = 37,2.
+%      RL = 100  : Av = -0,85 ; Ai = 12,5 ; Ap = 10,6.
+%    Exp. 2: VB/VE/VC = 1,82/1,16/6,82 V (el mismo punto Q del exp. 1).
+%      Zin = 12,4 Ohm ; vin = 5,5 mV pico ; Av sin RL = 173 ;
+%      Av(vs -> vo) = 19,0.
+%      RL = 10 k : Av = 144 ; Ai = 0,175 ; Ap = 25.
+%      Con 0,2 V pico en W1: vo +2,96/-3,15 V (asimetrica, se deforma).
+%    Exp. 3: VB = 5,39 V, VE = 4,71 V, IC = 4,68 mA (beta ~ 181).
+%      Av = 0,937 ; Zin = 10,4 k ; Ai = 97,8 ; Ap = 91,7.
+%      Con 1,2 V pico en W1 el minimo de vo se aplana en -0,43 V.
+%      Cascada: Av1 = -16,1 ; Av total = -15,0.
+%    Exp. 4 clase B : vo pico 2,22 V ; Av(rms) = 0,68 (cruce) ;
+%      Pout = 43,7 mW ; PDC = 126 mW ; eta = 34,6 %.
+%    Exp. 4 clase AB: VB1/VB2 = +0,65/-0,65 V, Iq = 0,6 mA ;
+%      vo +2,32/-2,28 V ; Av(rms) = 0,92 ; Zin = 483 Ohm ;
+%      Pout = 55,4 mW ; Pin = 6,4 mW ; Ap = 8,7 ; PDC = 196 mW ;
+%      eta = 28 %.
+%=======================================================================
+
+\documentclass[11pt,a4paper]{article}
+
+%------------------------------------------------------------- idioma
+% Compilar con XeLaTeX (no con pdflatex): Trebuchet MS es una fuente TrueType
+% del sistema y solo fontspec, bajo XeLaTeX o LuaLaTeX, sabe cargarla.
+\usepackage{fontspec}
+\setmainfont{Trebuchet MS}[
+  Path            = C:/Windows/Fonts/,
+  Extension       = .ttf,
+  UprightFont     = trebuc,
+  BoldFont        = trebucbd,
+  ItalicFont      = trebucit,
+  BoldItalicFont  = trebucbi,
+  Ligatures       = TeX
+]
+\usepackage[spanish,es-nodecimaldot]{babel}
+\usepackage{microtype}
+
+%----------------------------------------------------------- geometria
+\usepackage[left=2.4cm,right=2.4cm,top=3.1cm,bottom=2.6cm,headheight=30pt,
+            footskip=1.2cm]{geometry}
+
+%------------------------------------------------------------ graficos
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{float}
+\usepackage{placeins}
+\usepackage[font=small,labelfont=bf,labelsep=period]{caption}
+\usepackage{subcaption}
+\graphicspath{{imagenes/}}
+\usepackage[american,siunitx]{circuitikz}
+% babel-spanish activa < > " y rompe las opciones de TikZ sin esta libreria.
+\usetikzlibrary{calc,patterns,babel,arrows.meta,positioning}
+
+%-------------------------------------------------------------- tablas
+\usepackage{array}
+\usepackage{tabularx}
+\usepackage{multirow}
+
+%----------------------------------------------------- matematicas / SI
+\usepackage{amsmath,amssymb}
+\usepackage{siunitx}
+\sisetup{
+  output-decimal-marker = {,},
+  per-mode              = symbol,
+  mode                  = match,
+  detect-weight         = true,
+  detect-family         = true
+}
+
+%--------------------------------------------------------------- listas
+\usepackage{enumitem}
+\setlist[itemize]{itemsep=3pt,topsep=4pt,parsep=0pt}
+\setlist[enumerate]{itemsep=8pt,topsep=4pt,parsep=0pt}
+
+%------------------------------------------------------------ comandos
+\usepackage{pgffor}
+
+% Lineas punteadas para respuestas del alumno: \lineasresp{n}
+\newcommand{\lineasresp}[1]{%
+  \par\vspace{6pt}%
+  \foreach \i in {1,...,#1}{\noindent\rule{\linewidth}{0.4pt}\par\vspace{8pt}}%
+}
+
+% Recuadro "Figura / Comentario": una celda alta para pegar la captura del
+% osciloscopio y otra debajo para el comentario.
+\newcommand{\cuadrorespuesta}{%
+  \par\vspace{6pt}\noindent
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}X|}
+    \hline
+    \rule{0pt}{4.4cm}\raisebox{2.1cm}{\textcolor{black!45}{Figura}}\\
+    \hline
+    \rule{0pt}{2.0cm}\raisebox{0.9cm}{\textcolor{black!45}{Comentario}}\\
+    \hline
+  \end{tabularx}\par\vspace{8pt}%
+}
+
+% Celda vacia de altura comoda para escribir a mano.
+\newcommand{\hueco}{\rule{0pt}{0.5cm}}
+
+% Paralelo de resistencias: R_1 \pll R_2
+\newcommand{\pll}{\mathbin{\|}}
+
+%----------------------------------------------------- compaginacion
+\usepackage{needspace}
+% \needspace mide mal el espacio libre despues de figuras y tablas [H] y deja
+% paginas medio vacias; \Needspace es la variante exacta del mismo paquete.
+\let\needspace\Needspace
+\usepackage{etoolbox}
+\pretocmd{\section}{\needspace{5\baselineskip}}{}{}
+\pretocmd{\subsection}{\needspace{4\baselineskip}}{}{}
+\widowpenalty=10000
+\clubpenalty=10000
+
+%---------------------------------------------------- encabezado / pie
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\footnotesize UCSP --- Facultad de Ingeniería\\
+              Ing. Electrónica y de Telecomunicaciones}
+\fancyhead[R]{\footnotesize 2026-2 Circuitos Electrónicos\\
+              Ebert San Román Castillo}
+\fancyfoot[L]{\footnotesize Laboratorio N.\textsuperscript{o} 7 --- Amplificadores con transistor bipolar}
+\fancyfoot[R]{\footnotesize Página \thepage\ de \pageref{LastPage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.4pt}
+\usepackage{lastpage}
+
+%------------------------------------------------------- numeracion
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+\setcounter{secnumdepth}{3}
+
+%-------------------------------------------------------- hiperenlaces
+\usepackage[hidelinks,pdfusetitle]{hyperref}
+\usepackage{xurl}
+\hypersetup{
+  pdftitle={Laboratorio 7 - Amplificadores con transistor bipolar},
+  pdfsubject={Circuitos Electronicos - Guia de practicas},
+  pdfauthor={Ebert San Roman Castillo; Jeanpier Ancori Sanchez},
+  pdfkeywords={electronica, transistor, BJT, amplificador, ganancia de voltaje,
+               ganancia de corriente, ganancia de potencia, emisor comun,
+               colector comun, seguidor de emisor, push-pull, clase B, clase AB,
+               distorsion de cruce, rendimiento, impedancia de entrada,
+               Analog Discovery Studio, Proteus, Multisim, osciloscopio}
+}
+
+% babel-spanish rotula las tablas como "Cuadro"; los originales dicen "Tabla".
+\addto\captionsspanish{\renewcommand{\tablename}{Tabla}}
+
+\begin{document}
+
+%=======================================================================
+%  CABECERA DE LA GUIA
+%=======================================================================
+\begin{center}
+    {\normalsize\bfseries SEGUNDA UNIDAD: TRANSISTOR DE UNIÓN BIPOLAR (BJT)}
+\end{center}
+
+\vspace{0.55cm}
+
+\begingroup
+\renewcommand{\tabularxcolumn}[1]{m{#1}}
+\renewcommand{\arraystretch}{2.0}
+\setlength{\tabcolsep}{12pt}
+\noindent
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}m{2.2cm}|>{\centering\arraybackslash}X|>{\centering\arraybackslash}m{3.0cm}|}
+\hline
+\rule{0pt}{2.1cm}{\fontsize{58}{58}\selectfont\bfseries 7}
+    & \begin{minipage}[c]{\linewidth}\centering
+          {\large\bfseries Guía de Prácticas}\\[7pt]
+          {\Large\bfseries Amplificadores con\\ Transistor Bipolar}
+      \end{minipage}
+    & {\Large\bfseries Nota}\\
+\hline
+\multicolumn{3}{|l|}{\rule{0pt}{1.3cm}\large\textbf{Grupo:}~\rule{4.6cm}{0.4pt}%
+    \hfill\large\textbf{Fecha:}~\rule{4.6cm}{0.4pt}\hspace{2mm}}\\
+\hline
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\large\textbf{Alumno(s):}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
+\multicolumn{3}{|l|}{\rule{0pt}{1.2cm}\phantom{\large\textbf{Alumno(s):}}~\rule{11.2cm}{0.4pt}\hspace{2mm}}\\
+\hline
+\end{tabularx}
+\endgroup
+
+\vspace{0.8cm}
+
+% Encabezado de cada paso dentro de un experimento: \paso{1}{Datos}
+\newcommand{\paso}[2]{%
+  \par\needspace{10\baselineskip}\vspace{8pt}\noindent
+  \colorbox{black!8}{\makebox[\dimexpr\linewidth-2\fboxsep\relax][l]{%
+    \textbf{Paso #1 \,·\, #2}}}\par\vspace{4pt}}
+
+%=======================================================================
+\section{Objetivos}
+%=======================================================================
+\begin{itemize}
+    \item Calcular, simular y medir las ganancias de voltaje, de corriente y de potencia y la
+          impedancia de entrada del transistor en sus tres configuraciones: emisor común, base
+          común y colector común.
+    \item Distinguir qué amplifica cada configuración y explicar por qué el emisor común
+          pierde casi toda su ganancia con una carga pequeña y cómo un seguidor de emisor lo
+          resuelve.
+    \item Comparar una etapa de potencia push-pull en clase B y en clase AB: distorsión de
+          cruce, potencia entregada a la carga y rendimiento.
+\end{itemize}
+
+%=======================================================================
+\section{Contenido teórico}
+%=======================================================================
+\begin{itemize}
+    \item El transistor como amplificador: punto Q, señal pequeña, capacitores de acoplo y de
+          desacoplo.
+    \item Ganancias de voltaje, corriente y potencia; impedancias de entrada y de salida;
+          decibelios.
+    \item Configuraciones en emisor común, base común y colector común; etapas de potencia
+          clase B y clase AB.
+\end{itemize}
+
+\noindent\textbf{Duración:} dos sesiones. \textbf{Semana~1:} experimentos~1 y~2 (amplificadores
+de voltaje). \textbf{Semana~2:} experimentos~3 y~4 (amplificadores de corriente y de
+potencia).
+
+%=======================================================================
+\section{Equipos y materiales}
+%=======================================================================
+\noindent\textbf{Laboratorio:} Electrónica de Comunicaciones.
+
+\vspace{0.25cm}
+\noindent\textbf{Equipos y dispositivos:}
+\begin{itemize}
+    \item Tarjeta Analog Discovery Studio: riel fijo de \qty{+12}{\volt}, fuentes programables
+          $V_+$ y $V_-$, generador de funciones \texttt{W1} y osciloscopio de dos canales.
+\end{itemize}
+
+\noindent\textbf{Software:}
+\begin{itemize}
+    \item Simulador Multisim o Proteus.
+\end{itemize}
+
+\vspace{0.25cm}
+\needspace{6\baselineskip}
+\noindent\textbf{Materiales y fungibles} (deben ser adquiridos por los alumnos):
+\begin{itemize}
+    % --- Semiconductores
+    \item 02 transistores NPN BC548B, 03 NPN 2N2222A y 02 PNP 2N2907A (uno de repuesto de cada
+          uno). Sus terminales están en distinto orden: revise la hoja de datos antes de armar.
+    \item 03 diodos de señal 1N4148 (uno de repuesto).
+    % --- Resistencias (la que mas disipa es RE = 1 k del exp. 3: 23 mW;
+    %     RL = 47 Ohm del exp. 4 recibe ~60 mW)
+    \item Resistencia a \qty{0.5}{\watt}: 01 de \qty{47}{\ohm}.
+    \item Resistencias a \qty{0.25}{\watt}:
+          02 de \qty{10}{\kilo\ohm},
+          01 de \qty{1.8}{\kilo\ohm},
+          01 de \qty{2.2}{\kilo\ohm},
+          01 de \qty{390}{\ohm},
+          04 de \qty{100}{\ohm},
+          03 de \qty{1}{\kilo\ohm} y
+          02 de \qty{47}{\kilo\ohm}.
+    % --- Capacitores
+    \item Capacitores electrolíticos de \qty{25}{\volt}: 03 de \qty{10}{\micro\farad},
+          01 de \qty{47}{\micro\farad} y 03 de \qty{100}{\micro\farad}.
+    % --- Montaje
+    \item Protoboard.
+    \item Jumpers macho-macho para protoboard.
+    \item Alicates para cortar y pelar alambre.
+    \item Multímetro.
+    \item Lentes de protección y mandil.
+\end{itemize}
+
+\noindent Los experimentos~1 y~2 usan el circuito del punto medio del Laboratorio~5: si todavía
+lo tiene armado, tráigalo. Guarde el seguidor del experimento~3 armado hasta terminar la
+cascada.
+
+\FloatBarrier
+%=======================================================================
+\section{Conocimientos previos}
+%=======================================================================
+
+%-----------------------------------------------------------------------
+\subsection{¿Qué es amplificar?}
+%-----------------------------------------------------------------------
+En el Laboratorio~6 el transistor solo estaba en corte o en saturación. Para amplificar se lo
+deja en la \textbf{región activa}, en un punto Q cerca del centro de la recta de carga
+(Laboratorio~5), y se le suma una señal pequeña. Cada voltaje y cada corriente tiene entonces
+dos partes: la \textbf{continua} (DC) del punto Q, que se escribe con mayúsculas ($V_C$,
+$I_C$), y la \textbf{alterna} (AC) de la señal, con minúsculas ($v_c$, $i_c$):
+\begin{equation*}
+  v_C(t) = V_C + v_c(t).
+\end{equation*}
+Una pequeña variación de la corriente de base produce una variación $\beta$ veces mayor en la
+corriente de colector. Esa es la base de los tres tipos de amplificación:
+\begin{itemize}
+  \item \textbf{De corriente:} $i_c = \beta\, i_b$; la carga recibe mucha más corriente de la
+        que entrega la fuente de señal.
+  \item \textbf{De voltaje:} la corriente $i_c$ pasa por una resistencia y, por la ley de Ohm,
+        produce un voltaje mucho mayor que el de entrada.
+  \item \textbf{De potencia:} como $p = v\,i$, si hay ganancia de voltaje, de corriente o de
+        ambas, la carga recibe más potencia de señal que la que entrega la fuente. Esa potencia
+        extra \textbf{no la crea el transistor}: sale de la fuente DC.
+\end{itemize}
+
+\noindent\textbf{Capacitores.} Los capacitores \textbf{de acoplo} ($C_{in}$ y $C_{out}$)
+dejan pasar la señal y bloquean la continua, para que el generador y la carga no muevan el
+punto Q. Los capacitores \textbf{de desacoplo} ($C_E$ y $C_B$) ponen un punto del circuito a
+tierra solo para la señal (sección~\ref{sec:tierra}). A la frecuencia de trabajo
+(\qty{1}{\kilo\hertz}) todos se comportan como cortocircuitos.
+
+\noindent\textbf{Cómo se analiza un amplificador.} En dos pasos:
+\begin{enumerate}[label=\arabic*), leftmargin=*, itemsep=4pt]
+  \item \textbf{Análisis DC:} los capacitores son circuitos abiertos; se calcula el punto Q
+        como en el Laboratorio~5 y, con él, la corriente de emisor $I_E$.
+  \item \textbf{Análisis AC:} los capacitores y la fuente DC son cortocircuitos (la fuente
+        $V_{CC}$ queda conectada a tierra). El transistor se reemplaza por su
+        \textbf{resistencia dinámica de emisor}
+        \begin{equation}
+          r_e = \frac{\qty{26}{\milli\volt}}{I_E},
+          \label{eq:re}
+        \end{equation}
+        que es la resistencia que la señal ``ve'' en el diodo base-emisor. Desde la base, una
+        resistencia $R$ en el emisor se ve $\beta$ veces mayor: $\beta R$.
+\end{enumerate}
+
+%-----------------------------------------------------------------------
+\subsection{Tierra para la señal}
+\label{sec:tierra}
+%-----------------------------------------------------------------------
+Un terminal puede estar a varios voltios en DC y, aun así, estar \textbf{a tierra para la
+señal}: basta con que en él el voltaje \emph{no varíe}. Hay dos formas de lograrlo.
+
+\noindent\textbf{1. Con un capacitor de desacoplo.} La oposición de un capacitor al paso de la
+corriente es su reactancia,
+\begin{equation}
+  X_C = \frac{1}{2\pi f C}.
+  \label{eq:xc}
+\end{equation}
+En DC ($f = 0$) es infinita: el capacitor es un circuito abierto. A \qty{1}{\kilo\hertz}, un
+capacitor de \qty{100}{\micro\farad} tiene $X_C \approx \qty{1.6}{\ohm}$: es casi un cable. Si
+se pone en paralelo con una resistencia de \qty{390}{\ohm}, casi toda la corriente de la señal
+se va por el capacitor y la resistencia deja de contar para la señal
+(figura~\ref{fig:dcac}).
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.42\linewidth}
+    \centering
+    \begin{circuitikz}[scale=0.8, transform shape]
+      \draw (0,0) node[npn](Q){};
+      \coordinate (e2) at ($(Q.E)+(0,-1.7)$);
+      \draw (Q.E) to[R, l_=$R_{E1}$, a^=\qty{100}{\ohm}] (e2)
+                  to[R, l_=$R_{E2}$, a^=\qty{390}{\ohm}] ++(0,-1.7) node[ground]{};
+      \draw[dashed, black!50] (e2) -- ++(1.4,0) coordinate(ce);
+      \draw[black!50] (ce) to[C, color=black!50] ++(0,-1.7) -- ++(0,-0.01);
+      \node[black!60, right, align=left, font=\small] at ($(ce)+(0.3,-0.85)$) {$C_E$\\abierto};
+      \draw (Q.E) ++(-0.2,-0.2) node[left, font=\small]{emisor};
+    \end{circuitikz}
+    \caption{En DC: el emisor ve $R_{E1} + R_{E2} = \qty{490}{\ohm}$. El punto Q queda
+             estable.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.42\linewidth}
+    \centering
+    \begin{circuitikz}[scale=0.8, transform shape]
+      \draw (0,0) node[npn](Q){};
+      \coordinate (e2) at ($(Q.E)+(0,-1.7)$);
+      \draw (Q.E) to[R, l_=$R_{E1}$, a^=\qty{100}{\ohm}] (e2);
+      \draw[black!40] (e2) to[R, color=black!40] ++(0,-1.7) coordinate(g);
+      \draw (e2) to[short, *-] ++(1.4,0) -- ++(0,-1.7) -- (g) node[ground]{};
+      \node[right, align=left, font=\small] at ($(e2)+(1.5,-0.85)$) {$C_E$ = cable\\[1pt]($R_{E2}$ no\\cuenta)};
+      \draw (Q.E) ++(-0.2,-0.2) node[left, font=\small]{emisor};
+    \end{circuitikz}
+    \caption{En AC (\qty{1}{\kilo\hertz}): la señal solo ve $R_{E1} = \qty{100}{\ohm}$.}
+  \end{subfigure}
+  \caption{El emisor del amplificador del experimento~1 visto en DC y en AC. Con
+           \qty{490}{\ohm} el punto Q casi no depende de $\beta$; con \qty{100}{\ohm} la
+           ganancia es mayor.}
+  \label{fig:dcac}
+\end{figure}
+
+\noindent Así se consiguen las dos cosas a la vez: un punto Q estable, porque en DC hay mucha
+resistencia de emisor, y una buena ganancia, porque la señal ve poca. ¿Por qué no desacoplar
+toda la resistencia de emisor? Porque entonces la ganancia dependería solo de $r_e$, que cambia
+con la temperatura, de un transistor a otro e incluso durante cada ciclo de la señal: la
+ganancia sería inestable y la salida saldría deformada. Dejar $R_{E1}$ sin desacoplar es un
+término medio.
+
+\noindent\textbf{2. Con la fuente de alimentación.} Una fuente DC ideal mantiene su voltaje
+fijo: en ella la señal vale cero. Por eso $V_{CC}$, aunque esté a \qty{12}{\volt}, es tierra
+para la señal, y en el análisis AC se reemplaza por un cable a tierra.
+
+\noindent\textbf{El nombre de cada configuración.} El terminal \textbf{común} es el que
+comparten la entrada y la salida: el que queda a tierra para la señal.
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}m{3.0cm}|*{4}{>{\centering\arraybackslash}X|}}
+    \hline
+    \textbf{Configuración} & \textbf{Entra por} & \textbf{Sale por}
+      & \textbf{Terminal común} & \textbf{Lo pone a tierra para la señal} \\ \hline
+    Emisor común   & base   & colector & emisor   & $C_E$ \\ \hline
+    Base común     & emisor & colector & base     & $C_B$ \\ \hline
+    Colector común & base   & emisor   & colector & la fuente $V_{CC}$ \\ \hline
+  \end{tabularx}
+  \caption{Las tres configuraciones del transistor bipolar.}
+  \label{tab:configuraciones}
+\end{table}
+
+%-----------------------------------------------------------------------
+\subsection{Las ganancias y las impedancias}
+\label{sec:ganancias}
+%-----------------------------------------------------------------------
+Un amplificador se describe con cinco números (figura~\ref{fig:bloque}):
+
+\begin{figure}[H]
+  \centering
+  \begin{circuitikz}[scale=0.85, transform shape]
+    \draw (0,0) to[sV, l=$v_s$] (0,2.4) to[R, l=$R_s$, -o] (2.4,2.4)
+          node[above]{$v_{in}$};
+    \draw (2.4,2.4) to[short, i_=$i_{in}$] (3.6,2.4) to[R, l_=$Z_{in}$] (3.6,0);
+    \draw[thick, fill=black!5] (4.4,-0.4) rectangle (7.0,2.8);
+    \node[align=center] at (5.7,1.2) {Amplificador\\[2pt] $A_v,\ A_i,\ A_p$};
+    \draw (3.6,2.4) -- (4.4,2.4);
+    \draw (7.0,2.4) to[R, l=$Z_{out}$] (8.6,2.4) to[short, -o, i=$i_o$] (9.6,2.4)
+          node[above]{$v_o$} to[R, l=$R_L$] (9.6,0);
+    \draw (0,0) -- (9.6,0);
+    \draw (0,0) node[ground]{};
+  \end{circuitikz}
+  \caption{Un amplificador visto desde afuera. La fuente ve la impedancia de entrada
+           $Z_{in}$; la carga ve una fuente con impedancia de salida $Z_{out}$.}
+  \label{fig:bloque}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{2.0}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}m{4.2cm}|>{\centering\arraybackslash}m{3.6cm}|>{\raggedright\arraybackslash}X|}
+    \hline
+    \textbf{Magnitud} & \textbf{Definición} & \textbf{Qué indica} \\ \hline
+    Ganancia de voltaje & $A_v = \dfrac{v_o}{v_{in}}$ & Cuántas veces crece el voltaje. Si es
+      negativa, la salida está invertida (desfasada \ang{180}). \\ \hline
+    Ganancia de corriente & $A_i = \dfrac{i_o}{i_{in}}$ & Cuántas veces crece la corriente;
+      $i_o = v_o/R_L$ e $i_{in} = v_{in}/Z_{in}$. \\ \hline
+    Ganancia de potencia & $A_p = \dfrac{p_o}{p_{in}} = |A_v|\,A_i$ & Cuántas veces crece la
+      potencia de la señal. \\ \hline
+    Impedancia de entrada & $Z_{in} = \dfrac{v_{in}}{i_{in}}$ & Cuánto carga el amplificador a
+      la fuente de señal. Conviene que sea alta. \\ \hline
+    Impedancia de salida & $Z_{out}$ & Cuánto cae la salida al conectar la carga. Conviene que
+      sea baja. \\ \hline
+  \end{tabularx}
+  \caption{Las magnitudes de un amplificador.}
+  \label{tab:magnitudes}
+\end{table}
+
+\noindent Las tres ganancias están relacionadas: basta con medir $A_v$ y $Z_{in}$.
+\begin{equation}
+  A_i = \frac{v_o/R_L}{v_{in}/Z_{in}} = |A_v|\,\frac{Z_{in}}{R_L}
+  \qquad\qquad
+  A_p = |A_v|\,A_i = A_v^2\,\frac{Z_{in}}{R_L}
+  \label{eq:aiap}
+\end{equation}
+\noindent La carga y la impedancia de salida forman un divisor de tensión, así que la ganancia
+con carga es menor que sin ella:
+\begin{equation}
+  A_{v(\text{con } R_L)} = A_{v(\text{sin carga})}\,\frac{R_L}{R_L + Z_{out}}.
+  \label{eq:divisor}
+\end{equation}
+
+\noindent\textbf{En decibelios.} $A_v(\unit{dB}) = 20\log_{10}|A_v|$ y
+$A_p(\unit{dB}) = 10\log_{10} A_p$. Una ganancia de potencia de 100 son \qty{20}{dB}.
+
+\noindent\textbf{Cómo se mide $\boldsymbol{Z_{in}}$} (en el simulador y en la tarjeta). Se pone
+una resistencia conocida $R_s$ entre el generador y la entrada (figura~\ref{fig:bloque}) y se
+miden los dos voltajes pico $v_s$ y $v_{in}$. Por $R_s$ pasa $i_{in} = (v_s - v_{in})/R_s$,
+de modo que
+\begin{equation}
+  Z_{in} = R_s\,\frac{v_{in}}{v_s - v_{in}}.
+  \label{eq:zin}
+\end{equation}
+Funciona mejor si $R_s$ es del orden de $Z_{in}$: si es mucho menor, $v_s$ y $v_{in}$ casi no
+se diferencian.
+
+%-----------------------------------------------------------------------
+\subsection{Amplificador de voltaje: emisor común}
+%-----------------------------------------------------------------------
+La señal entra por la base y sale por el colector; el emisor va a tierra para la señal a
+través de $C_E$ (figura~\ref{fig:ce-teo}). Solo la parte $R_{E1}$ de la resistencia de emisor
+queda sin desacoplar: baja la ganancia, pero la hace estable y menos dependiente de $r_e$.
+
+\par\needspace{8cm}\vspace{8pt}\noindent
+\begin{minipage}[c]{0.56\linewidth}
+  \centering
+  \begin{circuitikz}[scale=0.8, transform shape]
+    \draw (4.6,0) node[npn](Q){};
+    \coordinate (gnd) at (0,-4.2);
+    \coordinate (top) at (0,3.4);
+    \coordinate (b) at ($(Q.B)+(-0.9,0)$);
+    \draw (b |- top) to[R, l_=$R_1$] (b) to[R, l_=$R_2$] (b |- gnd);
+    \draw (b) to[short, *-] (Q.B);
+    \coordinate (in) at ($(b)+(-1.8,0)$);
+    \draw (in) to[C, l=$C_{in}$] (b);
+    \draw (in |- gnd) to[sV, l=$v_{in}$] (in);
+    \coordinate (c) at ($(Q.C)+(0,0.5)$);
+    \draw (c |- top) to[R, l_=$R_C$] (c) -- (Q.C);
+    \draw (b |- top) -- (c |- top) node[circ]{} -- ++(0.8,0) node[right]{$V_{CC}$};
+    \coordinate (e2) at ($(Q.E)+(0,-1.7)$);
+    \draw (Q.E) to[R, l_=$R_{E1}$] (e2) to[R, l_=$R_{E2}$] (e2 |- gnd);
+    \draw (e2) to[short, *-] ++(1.3,0) coordinate(ce) to[C, l=$C_E$] (ce |- gnd);
+    \draw (c) to[C, l=$C_{out}$, *-] ++(2.4,0) coordinate(o)
+              to[R, l=$R_L$, *-] (o |- gnd);
+    \draw (o) to[short, -o] ++(0.6,0) node[right]{$v_o$};
+    \draw (in |- gnd) -- (o |- gnd);
+    \draw (Q.E |- gnd) node[ground]{};
+  \end{circuitikz}
+  \captionof{figure}{Emisor común: la señal entra por la base y sale por el colector.}
+  \label{fig:ce-teo}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.42\linewidth}
+  \begin{align}
+    A_v &= -\frac{R_C \pll R_L}{r_e + R_{E1}} \label{eq:avce}\\[8pt]
+    Z_{in} &= R_1 \pll R_2 \pll \beta\,(r_e + R_{E1}) \label{eq:zince}\\[8pt]
+    Z_{out} &\approx R_C \label{eq:zoutce}
+  \end{align}
+\end{minipage}
+\par\vspace{10pt}\noindent
+donde $R_a \pll R_b = R_a R_b/(R_a + R_b)$. El signo menos indica que la salida está
+invertida. Es la configuración más usada porque da ganancia de voltaje \emph{y} de corriente,
+pero su $Z_{out}$ es alta: con una carga pequeña, $R_C \pll R_L$ se hace pequeño y la ganancia
+se desploma.
+
+\needspace{14\baselineskip}
+\noindent\textbf{Ejemplo resuelto} (valores distintos a los de la práctica). Un emisor común
+con $I_E = \qty{1.3}{\milli\ampere}$, $R_C = \qty{3.3}{\kilo\ohm}$,
+$R_{E1} = \qty{150}{\ohm}$, $R_1 \pll R_2 = \qty{4}{\kilo\ohm}$, $\beta = 150$ y
+$R_L = \qty{4.7}{\kilo\ohm}$.
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{2.1}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{2.4cm}|>{\centering\arraybackslash}X|}
+    \hline
+    \textbf{Paso} & \textbf{Cálculo} \\ \hline
+    $r_e$ & $\dfrac{\qty{26}{\milli\volt}}{\qty{1.3}{\milli\ampere}} = \qty{20}{\ohm}$ \\ \hline
+    $A_v$ & $R_C \pll R_L = \qty{1.94}{\kilo\ohm}$, \qquad
+            $A_v = -\dfrac{1940}{20 + 150} = \num{-11.4}$ \quad (\qty{21.1}{dB}) \\ \hline
+    $Z_{in}$ & $\beta\,(r_e + R_{E1}) = 150 \times 170 = \qty{25.5}{\kilo\ohm}$, \qquad
+               $Z_{in} = \num{4} \pll \qty{25.5}{\kilo\ohm} = \qty{3.46}{\kilo\ohm}$ \\ \hline
+    $A_i$, $A_p$ & $A_i = \num{11.4} \times \dfrac{\num{3.46}}{\num{4.7}} = \num{8.4}$, \qquad
+                   $A_p = \num{11.4} \times \num{8.4} = 96$ \quad (\qty{19.8}{dB}) \\ \hline
+  \end{tabularx}
+  \caption{Ejemplo de cálculo de un emisor común.}
+  \label{tab:ejemplo}
+\end{table}
+
+%-----------------------------------------------------------------------
+\subsection{Amplificador de voltaje: base común}
+%-----------------------------------------------------------------------
+La señal entra por el \textbf{emisor} y sale por el colector; la base va a tierra para la
+señal a través de $C_B$ (figura~\ref{fig:cb-teo}). La polarización es la misma del emisor
+común: solo cambia por dónde entra la señal. Como la señal mueve directamente la corriente de
+emisor, la corriente de entrada es casi toda $i_e$ y la de salida es $i_c = \alpha\,i_e$, con
+$\alpha = \beta/(\beta + 1) \approx 1$.
+
+\par\needspace{7.5cm}\vspace{8pt}\noindent
+\begin{minipage}[c]{0.56\linewidth}
+  \centering
+  \begin{circuitikz}[scale=0.8, transform shape]
+    \draw (3.4,0) node[npn](Q){};
+    \coordinate (gnd) at (0,-4.0);
+    \coordinate (top) at (0,3.0);
+    \coordinate (b) at ($(Q.B)+(-0.9,0)$);
+    \draw (b |- top) to[R, l_=$R_1$] (b) to[R, l_=$R_2$] (b |- gnd);
+    \draw (b) to[short, *-] (Q.B);
+    \draw (b) -- ++(-1.3,0) coordinate(cb) to[C, l_=$C_B$] (cb |- gnd);
+    \coordinate (c) at ($(Q.C)+(0,0.5)$);
+    \draw (c |- top) to[R, l_=$R_C$] (c) -- (Q.C);
+    \draw (cb |- top) -- (c |- top) node[circ]{} -- ++(0.8,0) node[right]{$V_{CC}$};
+    \coordinate (e) at ($(Q.E)+(0,-1.1)$);
+    \draw (Q.E) -- (e) to[R, l_=$R_E$] (e |- gnd);
+    \draw (e) to[C, l_=$C_{in}$, *-] ++(1.7,0) coordinate(in)
+              to[R, l_=$R_s$] ++(1.7,0) coordinate(s)
+              to[sV, l_=$v_s$] (s |- gnd);
+    \node[above] at (e) {$v_{in}$};
+    \draw (c) to[C, l=$C_{out}$, *-] ++(1.8,0) -- ++(2.6,0) coordinate(o)
+              to[short, *-o] ++(0.7,0) node[right]{$v_o$};
+    \draw (o) to[R, l=$R_L$] (o |- gnd);
+    \draw (cb |- gnd) -- (o |- gnd);
+    \draw (b |- gnd) node[ground]{};
+  \end{circuitikz}
+  \captionof{figure}{Base común: la señal entra por el emisor y sale por el colector.}
+  \label{fig:cb-teo}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.42\linewidth}
+  \begin{align}
+    A_v &= \frac{R_C \pll R_L}{r_e} \label{eq:avcb}\\[8pt]
+    Z_{in} &= R_E \pll r_e \approx r_e \label{eq:zincb}\\[8pt]
+    A_i &\approx \alpha\,\frac{R_C}{R_C + R_L} < 1 \label{eq:aicb}\\[8pt]
+    Z_{out} &\approx R_C \label{eq:zoutcb}
+  \end{align}
+\end{minipage}
+\par\vspace{10pt}\noindent
+La ganancia de voltaje es alta y \textbf{sin inversión}, pero la impedancia de entrada es de
+apenas unos ohmios. Una fuente de señal con resistencia interna $R_s$ pierde casi todo su voltaje
+en ella: de la fuente a la salida, la ganancia queda en
+\begin{equation}
+  \frac{v_o}{v_s} \approx \frac{R_C \pll R_L}{R_s + r_e}.
+  \label{eq:avscb}
+\end{equation}
+Por eso la base común se usa con fuentes de impedancia muy baja y en altas frecuencias (radio,
+amplificador cascodo), donde su mejor respuesta en frecuencia compensa esa desventaja.
+
+%-----------------------------------------------------------------------
+\subsection{Amplificador de corriente: colector común (seguidor de emisor)}
+%-----------------------------------------------------------------------
+La señal entra por la base y sale por el \textbf{emisor}; el colector va directo a $V_{CC}$
+(figura~\ref{fig:cc-teo}). El emisor ``sigue'' a la base a \qty{0.7}{\volt} por debajo, así que
+$A_v$ es casi 1 y sin inversión. Su utilidad está en las impedancias: una carga $R_L$ en el
+emisor se ve desde la base $\beta$ veces mayor, y la salida tiene impedancia muy baja.
+
+\par\vspace{8pt}\noindent
+\begin{minipage}[c]{0.56\linewidth}
+  \centering
+  \begin{circuitikz}[scale=0.8, transform shape]
+    \draw (5.4,0) node[npn](Q){};
+    \coordinate (gnd) at (0,-3.6);
+    \coordinate (top) at (0,2.8);
+    \coordinate (b) at ($(Q.B)+(-0.9,0)$);
+    \draw (b |- top) to[R, l_=$R_1$] (b) to[R, l_=$R_2$] (b |- gnd);
+    \draw (b) to[short, *-] (Q.B);
+    \coordinate (in) at ($(b)+(-1.8,0)$);
+    \coordinate (s)  at ($(in)+(-1.6,0)$);
+    \draw (in) to[C, l_=$C_{in}$] (b);
+    \draw (s) to[R, l=$R_s$] (in);
+    \draw (s |- gnd) to[sV, l=$v_s$] (s);
+    \draw (Q.C) -- (Q.C |- top);
+    \draw (b |- top) -- (Q.C |- top) node[circ]{} -- ++(0.8,0) node[right]{$V_{CC}$};
+    \coordinate (e) at ($(Q.E)+(0,-0.5)$);
+    \draw (Q.E) -- (e) to[R, l_=$R_E$] (e |- gnd);
+    \draw (e) to[C, l=$C_{out}$, *-] ++(2.4,0) coordinate(o)
+              to[R, l=$R_L$, *-] (o |- gnd);
+    \draw (o) to[short, -o] ++(0.6,0) node[right]{$v_o$};
+    \draw (s |- gnd) -- (o |- gnd);
+    \draw (Q.E |- gnd) node[ground]{};
+  \end{circuitikz}
+  \captionof{figure}{Colector común: la señal entra por la base y sale por el emisor.}
+  \label{fig:cc-teo}
+\end{minipage}\hfill
+\begin{minipage}[c]{0.42\linewidth}
+  \begin{align}
+    A_v &= \frac{R_E \pll R_L}{r_e + R_E \pll R_L} \approx 1 \label{eq:avcc}\\[8pt]
+    Z_{in} &= R_1 \pll R_2 \pll \beta\,(r_e + R_E \pll R_L) \label{eq:zincc}\\[8pt]
+    Z_{out} &\approx r_e + \frac{R_s \pll R_1 \pll R_2}{\beta} \label{eq:zoutcc}
+  \end{align}
+\end{minipage}
+\par\vspace{10pt}\noindent
+Con $Z_{in}$ grande y $R_L$ pequeña, por~\eqref{eq:aiap} la ganancia de corriente es grande
+aunque $A_v < 1$. Por eso se usa como \textbf{etapa separadora} (\emph{buffer}) entre un
+emisor común y una carga pequeña.
+
+\noindent\textbf{Límite de la salida.} En el semiciclo negativo el transistor solo puede
+apagarse; quien empuja corriente por la carga es $I_E$. La salida se recorta en
+\begin{equation}
+  v_{o(\min)} = -I_E\,(R_E \pll R_L).
+  \label{eq:recorte}
+\end{equation}
+
+%-----------------------------------------------------------------------
+\subsection{Amplificador de potencia: push-pull clase B y clase AB}
+%-----------------------------------------------------------------------
+Para entregar potencia a una carga pequeña (un altavoz, un motor) se usan dos seguidores de
+emisor complementarios, un NPN y un PNP, con fuente doble $\pm V_{CC}$
+(figura~\ref{fig:pp-teo}). El NPN conduce en el semiciclo positivo y el PNP en el negativo:
+cada uno ``empuja'' (\emph{push}) o ``jala'' (\emph{pull}) la corriente de la carga.
+
+\begin{figure}[!tbp]
+  \centering
+  \begin{subfigure}[b]{0.40\linewidth}
+    \centering
+    \begin{circuitikz}[scale=0.68, transform shape]
+      \draw (5,1.8) node[npn](Q1){};
+      \draw (5,-1.8) node[pnp](Q2){};
+      \draw (Q1.E) -- (Q2.E);
+      \coordinate (o) at ($(Q1.E)!0.5!(Q2.E)$);
+      \coordinate (bb) at ($(Q1.B)!0.5!(Q2.B)+(-0.8,0)$);
+      \draw (Q1.B) -| (bb) |- (Q2.B);
+      \draw (Q1.C) -- ++(0,0.5) node[above]{$+V_{CC}$};
+      \draw (Q2.C) -- ++(0,-0.5) node[below]{$-V_{CC}$};
+      \draw (o) to[short, *-] ++(1.6,0) coordinate(ro)
+                to[R, l=$R_L$] ++(0,-2.2) node[ground]{};
+      \draw (ro) to[short, *-o] ++(0.6,0) node[above]{$v_o$};
+      \draw (bb) to[short, *-] ++(-0.9,0) coordinate(s)
+                 to[sV, l_=$v_{in}$] ++(0,-2.2) node[ground]{};
+      \node[right, font=\small] at (Q1.east) {NPN};
+      \node[right, font=\small] at (Q2.east) {PNP};
+    \end{circuitikz}
+    \caption{Clase B.}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.52\linewidth}
+    \centering
+    \begin{circuitikz}[scale=0.68, transform shape]
+      \draw (5,1.8) node[npn](Q1){};
+      \draw (5,-1.8) node[pnp](Q2){};
+      \draw (Q1.E) -- (Q2.E);
+      \coordinate (o) at ($(Q1.E)!0.5!(Q2.E)$);
+      \coordinate (b1) at ($(Q1.B)+(-0.9,0)$);
+      \coordinate (b2) at ($(Q2.B)+(-0.9,0)$);
+      \coordinate (m)  at ($(b1)!0.5!(b2)$);
+      \draw (Q1.B) -- (b1);
+      \draw (Q2.B) -- (b2);
+      \draw (b1) to[D, l=$D_1$, *-*] (m) to[D, l=$D_2$, -*] (b2);
+      \draw (Q1.C) |- ($(b1)+(0,2.0)$) coordinate(tp);
+      \draw (tp) to[R, l_=$R_{B1}$] (b1);
+      \draw (Q2.C) |- ($(b2)+(0,-2.0)$) coordinate(bt);
+      \draw (b2) to[R, l_=$R_{B2}$] (bt);
+      \node[above] at (Q1.C |- tp) {$+V_{CC}$};
+      \node[below] at (Q2.C |- bt) {$-V_{CC}$};
+      \draw (o) to[short, *-] ++(1.6,0) coordinate(ro)
+                to[R, l=$R_L$] ++(0,-2.2) node[ground]{};
+      \draw (ro) to[short, *-o] ++(0.6,0) node[above]{$v_o$};
+      \coordinate (in) at ($(m)+(-1.9,0)$);
+      \draw (in) to[C, l=$C_{in}$] (m);
+      \draw (in) to[sV, l_=$v_{in}$] ++(0,-2.2) node[ground]{};
+    \end{circuitikz}
+    \caption{Clase AB.}
+  \end{subfigure}
+  \caption{Etapa push-pull complementaria. El NPN conduce en el semiciclo positivo y el PNP en
+           el negativo; en la clase AB los diodos polarizan a los dos al borde de conducir.}
+  \label{fig:pp-teo}
+\end{figure}
+
+\noindent\textbf{Clase B.} Las bases van juntas a la entrada. Sin señal, ninguno conduce: no
+hay consumo en reposo, pero mientras $|v_{in}| < \qty{0.7}{\volt}$ los dos están cortados y la
+salida se queda en cero. Esa ``muesca'' en cada cruce por cero es la \textbf{distorsión de
+cruce}.
+
+\noindent\textbf{Clase AB.} Dos diodos entre las bases (figura~\ref{fig:pp-teo}b) les dan
+\qty{0.7}{\volt} a cada una, de modo que los dos transistores quedan al borde de conducir. La
+distorsión de cruce desaparece a cambio de una pequeña corriente de reposo.
+
+\noindent\textbf{Potencias.} Para una salida senoidal de pico $V_p$ en la carga $R_L$:
+\begin{align}
+  P_{out} &= \frac{V_p^2}{2R_L} = \frac{V_{o(\text{rms})}^2}{R_L} \label{eq:pout}\\[4pt]
+  P_{DC} &= V_{CC}\,I_{+} + |V_{EE}|\,I_{-} \;\approx\; \frac{2\,V_{CC}\,V_p}{\pi\,R_L}
+     \quad\text{(clase B)} \label{eq:pdc}\\[4pt]
+  \eta &= \frac{P_{out}}{P_{DC}} = \frac{\pi}{4}\,\frac{V_p}{V_{CC}} \quad\text{(clase B)}
+     \label{eq:eta}
+\end{align}
+donde $I_+$ e $I_-$ son las corrientes \textbf{promedio} (las que lee un multímetro en DC) de
+cada fuente. El rendimiento máximo de la clase B es $\pi/4 = \qty{78.5}{\percent}$, cuando
+$V_p = V_{CC}$. En la clase AB hay que sumarle a $P_{DC}$ el consumo de los diodos y sus
+resistencias. Cada transistor disipa como máximo
+$P_{D(\max)} = V_{CC}^2/(\pi^2 R_L)$.
+
+\needspace{10\baselineskip}
+\noindent\textbf{Resumen de las configuraciones.}
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.3}
+  \begin{tabularx}{\linewidth}{|>{\raggedright\arraybackslash}m{2.6cm}|*{4}{>{\centering\arraybackslash}X|}}
+    \hline
+    & \textbf{Emisor común} & \textbf{Base común} & \textbf{Colector común} & \textbf{Push-pull} \\ \hline
+    Amplifica sobre todo & voltaje & voltaje & corriente & potencia \\ \hline
+    $A_v$ & alta, invertida & alta, sin invertir & $\approx 1$ & $\approx 1$ \\ \hline
+    $A_i$ & media & $< 1$ & alta & alta \\ \hline
+    $Z_{in}$ & media (\unit{\kilo\ohm}) & muy baja (\unit{\ohm}) & alta (decenas de \unit{\kilo\ohm}) & media \\ \hline
+    $Z_{out}$ & alta ($\approx R_C$) & alta ($\approx R_C$) & muy baja (\unit{\ohm}) & muy baja \\ \hline
+    Uso típico & etapa de entrada & altas frecuencias & separador (\emph{buffer}) & etapa de salida \\ \hline
+    Experimento & 1 & 2 & 3 & 4 \\ \hline
+  \end{tabularx}
+  \caption{Comparación de las configuraciones de la práctica.}
+  \label{tab:comparacion}
+\end{table}
+
+\FloatBarrier
+\needspace{14\baselineskip}
+%=======================================================================
+\section{Desarrollo del laboratorio}
+%=======================================================================
+La práctica dura dos semanas. Cada experimento tiene los mismos cuatro pasos. Los pasos~1 y~2
+(\textbf{Datos} y \textbf{Calcule}) se traen resueltos de casa, junto con la simulación en
+Multisim o Proteus; los pasos~3 y~4 (\textbf{Arme y mida} y \textbf{Anote}) se hacen en el
+laboratorio. Use $\beta = 200$, $V_{BE} = \qty{0.7}{\volt}$ y
+$r_e = \qty{26}{\milli\volt}/I_E$.
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{1.1cm}|>{\centering\arraybackslash}m{0.8cm}|>{\raggedright\arraybackslash}m{2.7cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}m{1.3cm}|}
+    \hline
+    \textbf{Sem.} & \textbf{Exp.} & \textbf{Circuito} & \textbf{En casa: calcule}
+      & \textbf{En el laboratorio: mida} & \textbf{Fuente} \\ \hline
+    \multirow{2}{*}{1} & 1 & Emisor común (voltaje)
+      & Punto Q, $r_e$, $A_v$, $Z_{in}$, $A_i$ y $A_p$ con $R_L = \qty{10}{\kilo\ohm}$ y
+        \qty{100}{\ohm}
+      & $V_B$, $V_E$, $V_C$; $v_s$, $v_{in}$ y $v_o$ con cada carga
+      & \qty{+12}{\volt} \\ \cline{2-6}
+    & 2 & Base común (voltaje)
+      & $A_v$, $Z_{in}$, $A_i$ y $A_p$; ganancia desde la fuente
+      & $v_s$, $v_{in}$ y $v_o$ sin carga y con $R_L = \qty{10}{\kilo\ohm}$
+      & \qty{+12}{\volt} \\ \hline
+    \multirow{2}{*}{2} & 3 & Colector común (corriente) y cascada
+      & Punto Q, $A_v$, $Z_{in}$, $A_i$, $A_p$ y el límite de recorte; $A_v$ de la cascada
+      & La carga sin y con transistor; el recorte; $v_o$ de la cascada en \qty{100}{\ohm}
+      & \qty{+12}{\volt} \\ \cline{2-6}
+    & 4 & Push-pull clase B y AB (potencia)
+      & $P_{out}$, $P_{DC}$, $\eta$ y $P_{D(\max)}$
+      & Formas de onda; $v_o$, $I_+$ e $I_-$; $A_p$ en clase AB
+      & $\pm\qty{5}{\volt}$ \\ \hline
+  \end{tabularx}
+  \caption{Resumen de la práctica.}
+  \label{tab:resumen}
+\end{table}
+
+\noindent\textbf{Cómo simular las ganancias.} En Multisim o Proteus ponga una fuente senoidal
+de \qty{1}{\kilo\hertz} con la amplitud indicada en cada experimento y haga un
+\textbf{análisis transitorio} de \qty{0}{} a \qty{20}{\milli\second} (deje pasar los primeros
+milisegundos, mientras se cargan los capacitores). Mida con los cursores, o con un
+osciloscopio virtual, los valores pico de $v_s$, $v_{in}$ y $v_o$, y calcule $A_v$, $Z_{in}$
+con~\eqref{eq:zin}, $A_i$ y $A_p$ con~\eqref{eq:aiap}. Los voltajes DC del punto Q se obtienen
+con un análisis de punto de operación (\emph{DC operating point}).
+
+\noindent\textbf{Cómo medir con la tarjeta.} El osciloscopio tiene dos canales, así que cada
+medición se hace en dos capturas, siempre con acoplamiento DC y los canales \texttt{1$-$} y
+\texttt{2$-$} a \texttt{GND}:
+\begin{itemize}
+  \item \textbf{Captura A:} CH1 en $v_s$ (la salida de \texttt{W1}) y CH2 en $v_{in}$ (después de
+        $R_s$). Da $Z_{in}$ con~\eqref{eq:zin}.
+  \item \textbf{Captura B:} CH1 en $v_{in}$ y CH2 en $v_o$. Da $A_v$.
+\end{itemize}
+Use la herramienta \emph{Measurements} de WaveForms para leer la amplitud o el valor pico a
+pico de cada canal; promedie varias adquisiciones (\emph{Average}) cuando la señal sea de pocos
+milivoltios.
+
+%-----------------------------------------------------------------------
+\subsection{Experimento 1: amplificador de voltaje en emisor común}
+%-----------------------------------------------------------------------
+Es el circuito del punto medio del Laboratorio~5, ahora con una resistencia $R_s$ para medir
+$Z_{in}$ y un capacitor $C_{out}$ que lleva la señal a la carga.
+
+\paso{1}{Datos}
+$V_{CC} = \qty{12}{\volt}$ (riel fijo); \texttt{W1}: senoidal de \qty{1}{\kilo\hertz} y
+\qty{50}{\milli\volt} de amplitud (pico); transistor BC548B. Los valores de los componentes
+están en la figura~\ref{fig:ce}. Se prueban tres cargas: sin $R_L$,
+$R_L = \qty{10}{\kilo\ohm}$ (la entrada de otra etapa) y $R_L = \qty{100}{\ohm}$ (una carga
+pequeña).
+
+\begin{figure}[H]
+  \centering
+  \begin{circuitikz}[scale=0.85, transform shape]
+    \draw (7.4,0) node[npn](Q){};
+    \node[right] at (Q.east) {BC548B};
+    \coordinate (gnd) at (0,-4.4);
+    \coordinate (top) at (0,3.8);
+    \coordinate (b) at ($(Q.B)+(-1.0,0)$);
+    % divisor de base
+    \draw (b |- top) to[R, l_=$R_1$, a^=\qty{10}{\kilo\ohm}] (b);
+    \draw (b) to[R, l_=$R_2$, a^=\qty{1.8}{\kilo\ohm}] (b |- gnd);
+    \draw (b) to[short, *-] (Q.B);
+    % entrada
+    \coordinate (in) at ($(b)+(-2.4,0)$);
+    \coordinate (s)  at ($(in)+(-2.6,0)$);
+    \draw (in) to[C, l=$C_{in}$, a=\qty{10}{\micro\farad}] (b);
+    \draw (s) to[R, l=$R_s$, a=\qty{1}{\kilo\ohm}, -*] (in);
+    \node[above] at (in) {$v_{in}$};
+    \draw (s |- gnd) to[sV, l=\texttt{W1}] (s);
+    \node[above] at (s) {$v_s$};
+    % colector
+    \coordinate (c) at ($(Q.C)+(0,0.6)$);
+    \draw (c |- top) to[R, l_=$R_C$, a^=\qty{2.2}{\kilo\ohm}] (c) -- (Q.C);
+    \draw (b |- top) -- (c |- top) node[circ]{} -- ++(1.8,0) node[right]{$V_{CC} = \qty{+12}{\volt}$};
+    % emisor
+    \coordinate (e2) at ($(Q.E)+(0,-1.8)$);
+    \draw (Q.E) to[R, l_=$R_{E1}$, a^=\qty{100}{\ohm}] (e2)
+                to[R, l_=$R_{E2}$, a^=\qty{390}{\ohm}] (e2 |- gnd);
+    \draw (e2) to[short, *-] ++(2.3,0) coordinate(ce)
+               to[C, l={$C_E$ \qty{100}{\micro\farad}}] (ce |- gnd);
+    % salida
+    \draw (c) to[C, l=$C_{out}$, a=\qty{10}{\micro\farad}, *-] ++(3.6,0) coordinate(o)
+              to[R, l=$R_L$, *-] (o |- gnd);
+    \draw (o) to[short, -o] ++(1.0,0) node[right]{$v_o$};
+    % tierra
+    \draw (s |- gnd) -- (o |- gnd);
+    \draw (Q.E |- gnd) node[ground]{};
+  \end{circuitikz}
+  \caption{Experimento 1: amplificador en emisor común. $R_s$ solo sirve para medir $Z_{in}$.
+           La franja de $C_{out}$ va hacia la carga (el colector está a unos
+           \qty{7}{\volt}) y la de $C_E$ hacia tierra.}
+  \label{fig:ce}
+\end{figure}
+
+\paso{2}{Calcule (en casa)}
+\begin{enumerate}[label=\alph*), leftmargin=*, itemsep=3pt]
+  \item El punto Q: $V_{TH}$, $R_{TH}$, $I_E$, $V_B$, $V_E$ y $V_C$ (como en el
+        Laboratorio~5). Con $I_E$, calcule $r_e$ con~\eqref{eq:re}.
+  \item $A_v$ sin carga y con cada $R_L$ con~\eqref{eq:avce} (sin carga,
+        $R_C \pll R_L = R_C$), y $Z_{in}$ con~\eqref{eq:zince}.
+  \item $A_i$ y $A_p$ con~\eqref{eq:aiap} para $R_L = \qty{10}{\kilo\ohm}$ y
+        $R_L = \qty{100}{\ohm}$; exprese $A_v$ y $A_p$ en decibelios. Siga el ejemplo de la
+        tabla~\ref{tab:ejemplo}.
+  \item Simule el circuito con las tres cargas y anote $v_s$, $v_{in}$ y $v_o$.
+\end{enumerate}
+
+\paso{3}{Arme y mida (en el laboratorio)}
+\begin{enumerate}[label=\alph*), ref=\alph*, leftmargin=*, itemsep=3pt]
+  \item Arme el circuito sin $R_L$ y aliméntelo con el riel de \qty{+12}{\volt}. Con
+        \texttt{W1} apagado, mida $V_B$, $V_E$ y $V_C$ con el multímetro. Si $V_C$ no está
+        entre \qtyrange{6}{8}{\volt}, revise el montaje antes de seguir.
+  \item Encienda \texttt{W1} y haga las capturas A y B. Compruebe en la captura B que $v_o$
+        está invertida respecto de $v_{in}$ y que no está recortada.
+  \item \label{paso:carga}Repita la captura B con $R_L = \qty{10}{\kilo\ohm}$ y con
+        $R_L = \qty{100}{\ohm}$. La captura A no cambia: $Z_{in}$ casi no depende de la carga.
+\end{enumerate}
+
+\paso{4}{Anote}
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{3.0cm}|*{3}{>{\centering\arraybackslash}X|}}
+    \hline
+    \textbf{Punto Q} & Teórico & Simulado & Medido \\ \hline
+    $V_B$ & \hueco & & \\ \hline
+    $V_E$ & \hueco & & \\ \hline
+    $V_C$ & \hueco & & \\ \hline
+    $I_E$ y $r_e$ & \hueco & & \\ \hline
+  \end{tabularx}
+  \caption{Experimento 1: punto de operación.}
+  \label{tab:exp1dc}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{3.0cm}|*{6}{>{\centering\arraybackslash}X|}}
+    \hline
+    & \multicolumn{3}{c|}{$\boldsymbol{R_L = \qty{10}{\kilo\ohm}}$}
+    & \multicolumn{3}{c|}{$\boldsymbol{R_L = \qty{100}{\ohm}}$} \\
+    \cline{2-7}
+    \textbf{Parámetro} & Teórico & Simulado & Medido & Teórico & Simulado & Medido \\
+    \hline
+    $v_s$ (pico)      & \qty{50}{\milli\volt} & & & \qty{50}{\milli\volt} & & \\ \hline
+    $v_{in}$ (pico)   & \hueco & & & & & \\ \hline
+    $v_o$ (pico)      & \hueco & & & & & \\ \hline
+    $Z_{in}$          & \hueco & & & & & \\ \hline
+    $A_v$             & \hueco & & & & & \\ \hline
+    $A_i$             & \hueco & & & & & \\ \hline
+    $A_p$             & \hueco & & & & & \\ \hline
+    $A_p$ (\unit{dB}) & \hueco & & & & & \\ \hline
+  \end{tabularx}
+  \caption{Experimento 1: ganancias con carga. $Z_{in}$ con~\eqref{eq:zin}; $A_i$ y $A_p$
+           con~\eqref{eq:aiap}.}
+  \label{tab:exp1ac}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{0.75\linewidth}{|>{\centering\arraybackslash}m{3.2cm}|*{3}{>{\centering\arraybackslash}X|}}
+    \hline
+    \textbf{Sin carga} & Teórico & Simulado & Medido \\ \hline
+    $v_o$ (pico) & \hueco & & \\ \hline
+    $A_v$        & \hueco & & \\ \hline
+  \end{tabularx}
+  \caption{Experimento 1: ganancia de voltaje sin carga.}
+  \label{tab:exp1sin}
+\end{table}
+
+\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{Captura B con $R_L = \qty{10}{\kilo\ohm}$} (paso~3\ref{paso:carga}).
+\cuadrorespuesta
+\end{minipage}\par
+
+%-----------------------------------------------------------------------
+\subsection{Experimento 2: amplificador de voltaje en base común}
+%-----------------------------------------------------------------------
+Se arma sobre la misma placa del experimento~1, con el mismo punto Q. Solo cambian el terminal
+por donde entra la señal y el que queda a tierra para la señal (tabla~\ref{tab:configuraciones}).
+
+\paso{1}{Datos}
+$V_{CC} = \qty{12}{\volt}$ (riel fijo); \texttt{W1}: senoidal de \qty{1}{\kilo\hertz} y
+\qty{50}{\milli\volt} de amplitud; transistor BC548B; $R_s = \qty{100}{\ohm}$. La resistencia de
+emisor queda entera sin desacoplar: $R_E = R_{E1} + R_{E2} = \qty{490}{\ohm}$. Se prueban dos
+cargas: sin $R_L$ y $R_L = \qty{10}{\kilo\ohm}$. Los valores están en la
+figura~\ref{fig:cb}.
+
+\begin{figure}[H]
+  \centering
+  \begin{circuitikz}[scale=0.85, transform shape]
+    \draw (5.6,0) node[npn](Q){};
+    \node[left] at ($(Q.C)+(-0.1,0.1)$) {BC548B};
+    \coordinate (gnd) at (0,-5.4);
+    \coordinate (top) at (0,3.6);
+    \coordinate (b) at ($(Q.B)+(-2.1,0)$);
+    \draw (b |- top) to[R, l_=$R_1$, a^=\qty{10}{\kilo\ohm}] (b);
+    \draw (b) to[R, l_=$R_2$, a^=\qty{1.8}{\kilo\ohm}] (b |- gnd);
+    \draw (b) to[short, *-] (Q.B);
+    \draw (b) -- ++(-2.2,0) coordinate(cb)
+          to[C, l_={$C_B$\ \qty{100}{\micro\farad}}] (cb |- gnd);
+    \coordinate (c) at ($(Q.C)+(0,0.6)$);
+    \draw (c |- top) to[R, l_=$R_C$, a^=\qty{2.2}{\kilo\ohm}] (c) -- (Q.C);
+    \draw (cb |- top) -- (c |- top) node[circ]{} -- ++(1.6,0) node[right]{$V_{CC} = \qty{+12}{\volt}$};
+    \coordinate (e) at ($(Q.E)+(0,-1.0)$);
+    \draw (Q.E) -- (e) to[R, l_=$R_{E1}$, a^=\qty{100}{\ohm}] ++(0,-1.8) coordinate(e2)
+                       to[R, l_=$R_{E2}$, a^=\qty{390}{\ohm}] (e2 |- gnd);
+    \draw (e) to[C, l={$C_{in}$\ \qty{100}{\micro\farad}}, *-] ++(2.6,0) coordinate(in)
+              to[R, l_=$R_s$, a^=\qty{100}{\ohm}] ++(2.4,0) coordinate(s)
+              to[sV, l_=\texttt{W1}] (s |- gnd);
+    \node[above left] at (e) {$v_{in}$};
+    \node[above] at (s) {$v_s$};
+    \draw (c) to[C, l=$C_{out}$, a=\qty{10}{\micro\farad}, *-] ++(2.6,0) -- ++(3.2,0) coordinate(o)
+              to[short, *-o] ++(1.0,0) node[right]{$v_o$};
+    \draw (o) to[R, l=$R_L$] (o |- gnd);
+    \draw (cb |- gnd) -- (o |- gnd);
+    \draw (b |- gnd) node[ground]{};
+  \end{circuitikz}
+  \caption{Experimento 2: amplificador en base común. $C_B$ pone la base a tierra para la
+           señal (franja hacia tierra) y la señal entra por el emisor. La franja de $C_{in}$
+           va hacia $R_s$: el emisor está a unos \qty{1.1}{\volt}. $v_{in}$ se mide en el
+           emisor.}
+  \label{fig:cb}
+\end{figure}
+
+\paso{2}{Calcule (en casa)}
+\begin{enumerate}[label=\alph*), leftmargin=*, itemsep=3pt]
+  \item Explique por qué el punto Q es el mismo del experimento~1 (análisis DC: los
+        capacitores son circuitos abiertos).
+  \item $Z_{in}$ con~\eqref{eq:zincb} y el $v_{in}$ que llega al emisor:
+        $v_{in} = v_s\,Z_{in}/(R_s + Z_{in})$.
+  \item $A_v$ sin carga y con $R_L = \qty{10}{\kilo\ohm}$ con~\eqref{eq:avcb}, y la ganancia
+        desde la fuente con~\eqref{eq:avscb}.
+  \item $A_i$ y $A_p$ con $R_L = \qty{10}{\kilo\ohm}$ con~\eqref{eq:aiap}. Compruebe que $A_i$
+        coincide con~\eqref{eq:aicb}.
+  \item Simule el circuito con \qty{50}{\milli\volt} y con \qty{0.2}{\volt} de amplitud en
+        \texttt{W1}.
+\end{enumerate}
+
+\paso{3}{Arme y mida (en el laboratorio)}
+\begin{enumerate}[label=\alph*), ref=\alph*, leftmargin=*, itemsep=3pt]
+  \item Sobre la placa del experimento~1: retire $C_E$ y $C_{in}$, cambie $R_s$ por
+        \qty{100}{\ohm}, conecte $C_B$ de la base a tierra y lleve la señal al emisor a través
+        del nuevo $C_{in}$ de \qty{100}{\micro\farad}.
+  \item Con \texttt{W1} apagado, mida $V_B$, $V_E$ y $V_C$: deben ser los del experimento~1.
+  \item \label{paso:cbmed}Encienda \texttt{W1} y haga las capturas A y B. En el emisor la señal
+        es de pocos milivoltios sobre \qty{1.1}{\volt} de DC: ajuste el \emph{offset} del canal
+        a \qty{-1.1}{\volt}, use una escala de \qtyrange{2}{5}{\milli\volt} por división y
+        active \emph{Average}. Compruebe que $v_o$ está \textbf{en fase} con $v_{in}$.
+  \item Repita la captura B con $R_L = \qty{10}{\kilo\ohm}$.
+  \item \label{paso:cbdist}Sin $R_L$, suba \texttt{W1} a \qty{0.2}{\volt} y observe cómo se
+        deforma $v_o$: un semiciclo sale más grande que el otro.
+\end{enumerate}
+
+\paso{4}{Anote}
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{3.0cm}|*{6}{>{\centering\arraybackslash}X|}}
+    \hline
+    & \multicolumn{3}{c|}{\textbf{Sin carga}}
+    & \multicolumn{3}{c|}{$\boldsymbol{R_L = \qty{10}{\kilo\ohm}}$} \\
+    \cline{2-7}
+    \textbf{Parámetro} & Teórico & Simulado & Medido & Teórico & Simulado & Medido \\
+    \hline
+    $V_B$, $V_E$, $V_C$ & \hueco & & & \multicolumn{3}{c|}{---} \\ \hline
+    $v_s$ (pico)      & \qty{50}{\milli\volt} & & & \qty{50}{\milli\volt} & & \\ \hline
+    $v_{in}$ (pico)   & \hueco & & & & & \\ \hline
+    $v_o$ (pico)      & \hueco & & & & & \\ \hline
+    $Z_{in}$          & \hueco & & & & & \\ \hline
+    $A_v = v_o/v_{in}$ & \hueco & & & & & \\ \hline
+    $v_o/v_s$         & \hueco & & & & & \\ \hline
+    $A_i$             & \multicolumn{3}{c|}{---} & & & \\ \hline
+    $A_p$ y $A_p$ (\unit{dB}) & \multicolumn{3}{c|}{---} & & & \\ \hline
+  \end{tabularx}
+  \caption{Experimento 2: el amplificador en base común.}
+  \label{tab:exp2}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{4.6cm}|*{2}{>{\centering\arraybackslash}X|}}
+    \hline
+    \textbf{Medido, con $\boldsymbol{R_L = \qty{10}{\kilo\ohm}}$} & \textbf{Emisor común (exp.~1)}
+      & \textbf{Base común (exp.~2)} \\ \hline
+    $A_v$ (con su signo) & \hueco & \\ \hline
+    $Z_{in}$             & \hueco & \\ \hline
+    $A_i$                & \hueco & \\ \hline
+    $A_p$                & \hueco & \\ \hline
+  \end{tabularx}
+  \caption{Experimento 2: las dos configuraciones con el mismo punto Q.}
+  \label{tab:cecb}
+\end{table}
+
+\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{Captura B sin carga} (paso~3\ref{paso:cbmed}).
+\cuadrorespuesta
+\end{minipage}\par
+
+\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{Captura de la deformación con \qty{0.2}{\volt}} (paso~3\ref{paso:cbdist}).
+\cuadrorespuesta
+\end{minipage}\par
+
+%-----------------------------------------------------------------------
+\subsection{Experimento 3: amplificador de corriente en colector común}
+%-----------------------------------------------------------------------
+Comienza la semana~2. El experimento~1 mostró que el emisor común no puede alimentar una carga
+de \qty{100}{\ohm}. Un seguidor de emisor sí puede: no amplifica el voltaje, pero sí la
+corriente. Para comprobarlo se comparan dos corrientes: la que entrega la fuente de señal,
+$i_{in} = (v_s - v_{in})/R_s$, y la que recibe la carga, $i_o = v_o/R_L$.
+
+\paso{1}{Datos}
+$V_{CC} = \qty{12}{\volt}$ (riel fijo); \texttt{W1}: senoidal de \qty{1}{\kilo\hertz} y
+\qty{0.4}{\volt} de amplitud; transistor 2N2222A; $R_L = \qty{100}{\ohm}$. Los valores están
+en la figura~\ref{fig:cc}.
+
+\begin{figure}[H]
+  \centering
+  \begin{circuitikz}[scale=0.85, transform shape]
+    \draw (7.4,0) node[npn](Q){};
+    \node[right] at (Q.east) {2N2222A};
+    \coordinate (gnd) at (0,-4.3);
+    \coordinate (top) at (0,2.6);
+    \coordinate (b) at ($(Q.B)+(-1.0,0)$);
+    % divisor de base
+    \draw (b |- top) to[R, l_=$R_1$, a^=\qty{47}{\kilo\ohm}] (b);
+    \draw (b) to[R, l_=$R_2$, a^=\qty{47}{\kilo\ohm}] (b |- gnd);
+    \draw (b) to[short, *-] (Q.B);
+    % entrada
+    \coordinate (in) at ($(b)+(-2.4,0)$);
+    \coordinate (s)  at ($(in)+(-2.6,0)$);
+    \draw (in) to[C, l=$C_{in}$, a=\qty{10}{\micro\farad}] (b);
+    \draw (s) to[R, l=$R_s$, a=\qty{10}{\kilo\ohm}, -*] (in);
+    \node[above] at (in) {$v_{in}$};
+    \draw (s |- gnd) to[sV, l=\texttt{W1}] (s);
+    \node[above] at (s) {$v_s$};
+    % colector directo a VCC
+    \draw (Q.C) -- (Q.C |- top);
+    \draw (b |- top) -- (Q.C |- top) node[circ]{} -- ++(3.6,0) node[right]{$V_{CC} = \qty{+12}{\volt}$};
+    % emisor
+    \coordinate (e) at ($(Q.E)+(0,-0.5)$);
+    \draw (Q.E) -- (e) to[R, l_=$R_E$, a^=\qty{1}{\kilo\ohm}] (e |- gnd);
+    \draw (e) to[C, l=$C_{out}$, a=\qty{100}{\micro\farad}, *-] ++(3.6,0) coordinate(o)
+              to[R, l=$R_L$, a=\qty{100}{\ohm}, *-] (o |- gnd);
+    \draw (o) to[short, -o] ++(1.0,0) node[right]{$v_o$};
+    % tierra
+    \draw (s |- gnd) -- (o |- gnd);
+    \draw (Q.E |- gnd) node[ground]{};
+  \end{circuitikz}
+  \caption{Experimento 3: seguidor de emisor. La franja de $C_{out}$ va hacia $R_L$ (el
+           emisor está a unos \qty{4.7}{\volt}).}
+  \label{fig:cc}
+\end{figure}
+
+\paso{2}{Calcule (en casa)}
+\begin{enumerate}[label=\alph*), leftmargin=*, itemsep=3pt]
+  \item \textbf{Sin transistor:} si $R_L$ se conecta directamente detrás de $R_s$, ¿cuánto vale
+        $v_o = v_s\,R_L/(R_s + R_L)$? Es lo que la fuente de señal puede dar sola.
+  \item El punto Q ($V_{TH}$, $R_{TH}$, $I_E$, $V_E$) y $r_e$.
+  \item $A_v$ con~\eqref{eq:avcc} y $Z_{in}$ con~\eqref{eq:zincc}; $i_{in}$, $i_o$, y $A_i$ y
+        $A_p$ con~\eqref{eq:aiap}. Compárelos con los del emisor común con
+        $R_L = \qty{100}{\ohm}$.
+  \item El voltaje de salida a partir del cual se recorta el semiciclo negativo,
+        con~\eqref{eq:recorte}.
+  \item Calcule la ganancia de la \textbf{cascada} de la figura~\ref{fig:cascada}: la carga
+        del emisor común es ahora la $Z_{in}$ del seguidor, así que
+        $A_{v1} = -(R_C \pll Z_{in2})/(r_e + R_{E1})$, y la ganancia total es
+        $A_v = A_{v1}\,A_{v2}$.
+  \item Simule el seguidor con \qty{0.4}{\volt} y con \qty{1.2}{\volt} de amplitud en
+        \texttt{W1}, y la cascada con \qty{20}{\milli\volt}.
+\end{enumerate}
+
+\paso{3}{Arme y mida (en el laboratorio)}
+\begin{enumerate}[label=\alph*), ref=\alph*, leftmargin=*, itemsep=3pt]
+  \item \textbf{Sin transistor:} conecte $R_L = \qty{100}{\ohm}$ directamente detrás de
+        $R_s = \qty{10}{\kilo\ohm}$, con \texttt{W1} en \qty{0.4}{\volt}, y mida $v_o$.
+  \item Arme el seguidor. Con \texttt{W1} apagado, mida $V_B$ y $V_E$.
+  \item Encienda \texttt{W1} con \qty{0.4}{\volt} y haga las capturas A y B. Compruebe que
+        $v_o$ está en fase con $v_{in}$ y casi del mismo tamaño, y compárelo con el $v_o$ sin
+        transistor.
+  \item \label{paso:recorte}Suba la amplitud de \texttt{W1} hasta que el semiciclo negativo de
+        $v_o$ se aplane. Capture la forma de onda y mida el voltaje donde se recorta.
+  \item \label{paso:cascada}Arme la cascada de la figura~\ref{fig:cascada}. Vuelva a armar el
+        emisor común del experimento~1 (con $C_E$ y sin $C_B$), quítele $R_s$ y $R_L$ y una su
+        $C_{out}$ con la base del seguidor
+        (en lugar de $C_{in}$ y $R_s$ del seguidor). Ponga \texttt{W1} en
+        \qty{20}{\milli\volt} y mida $v_o$ en los \qty{100}{\ohm}.
+\end{enumerate}
+
+\begin{figure}[H]
+  \centering
+  \begin{tikzpicture}[>=Stealth, every node/.style={font=\small},
+      bloque/.style={draw, thick, fill=black!5, minimum height=1.2cm, align=center,
+                     text width=2.8cm}]
+    \node (w1) [draw, circle, minimum size=0.9cm] {\texttt{W1}};
+    \node (ce) [bloque, right=1.4cm of w1] {Emisor común\\(exp.~1, sin $R_L$)};
+    \node (cc) [bloque, right=1.4cm of ce] {Seguidor de emisor\\(exp.~3, sin $R_s$)};
+    \node (rl) [draw, thick, minimum width=0.6cm, minimum height=1.2cm,
+                right=1.4cm of cc] {\rotatebox{90}{\qty{100}{\ohm}}};
+    \draw[->] (w1) -- node[above]{$v_{in}$} (ce);
+    \draw[->] (ce) -- node[above]{$C_{out}$} (cc);
+    \draw[->] (cc) -- node[above]{$v_o$} (rl);
+  \end{tikzpicture}
+  \caption{Experimento 3: cascada. El emisor común da la ganancia de voltaje y el seguidor la
+           corriente que necesita la carga de \qty{100}{\ohm}.}
+  \label{fig:cascada}
+\end{figure}
+
+\paso{4}{Anote}
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{4.4cm}|*{3}{>{\centering\arraybackslash}X|}}
+    \hline
+    \textbf{Parámetro} & Teórico & Simulado & Medido \\ \hline
+    $v_o$ sin transistor   & \hueco & & \\ \hline
+    $V_B$ y $V_E$          & \hueco & & \\ \hline
+    $I_E$ y $r_e$          & \hueco & & \\ \hline
+    $v_s$ (pico)           & \qty{0.4}{\volt} & & \\ \hline
+    $v_{in}$ (pico)        & \hueco & & \\ \hline
+    $v_o$ (pico)           & \hueco & & \\ \hline
+    $Z_{in}$               & \hueco & & \\ \hline
+    $A_v$                  & \hueco & & \\ \hline
+    $i_{in} = (v_s - v_{in})/R_s$ & \hueco & & \\ \hline
+    $i_o = v_o/R_L$        & \hueco & & \\ \hline
+    $A_i = i_o/i_{in}$     & \hueco & & \\ \hline
+    $A_p$ y $A_p$ (\unit{dB}) & \hueco & & \\ \hline
+    $v_o$ donde se recorta & \hueco & & \\ \hline
+  \end{tabularx}
+  \caption{Experimento 3: el seguidor de emisor con $R_L = \qty{100}{\ohm}$.}
+  \label{tab:exp3}
+\end{table}
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{5.6cm}|*{3}{>{\centering\arraybackslash}X|}}
+    \hline
+    \textbf{$A_v$ en \qty{100}{\ohm}} & Teórico & Simulado & Medido \\ \hline
+    Emisor común solo (tabla~\ref{tab:exp1ac}) & \hueco & & \\ \hline
+    Emisor común + seguidor (cascada)          & \hueco & & \\ \hline
+  \end{tabularx}
+  \caption{Experimento 3: la misma carga con y sin seguidor.}
+  \label{tab:cascada}
+\end{table}
+
+\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{Captura del recorte del seguidor} (paso~3\ref{paso:recorte}).
+\cuadrorespuesta
+\end{minipage}\par
+
+%-----------------------------------------------------------------------
+\subsection{Experimento 4: amplificador de potencia push-pull}
+%-----------------------------------------------------------------------
+Dos seguidores complementarios entregan potencia a una carga de \qty{47}{\ohm}. Primero se
+arma la clase B para ver la distorsión de cruce y luego se corrige con la clase AB.
+
+\paso{1}{Datos}
+Fuentes programables de la tarjeta: $V_+ = \qty{+5}{\volt}$ y $V_- = \qty{-5}{\volt}$;
+\texttt{W1}: senoidal de \qty{1}{\kilo\hertz} y \qty{3}{\volt} de amplitud; transistores
+2N2222A (NPN) y 2N2907A (PNP); $R_L = \qty{47}{\ohm}$, \qty{0.5}{\watt};
+$R_s = \qty{100}{\ohm}$.
+
+\begin{figure}[H]
+  \centering
+  \begin{subfigure}[b]{0.46\linewidth}
+    \centering
+    \begin{circuitikz}[scale=0.78, transform shape]
+      \draw (5,1.8) node[npn](Q1){};
+      \draw (5,-1.8) node[pnp](Q2){};
+      \node[right] at (Q1.east) {2N2222A};
+      \node[right] at (Q2.east) {2N2907A};
+      \draw (Q1.E) -- (Q2.E);
+      \coordinate (o) at ($(Q1.E)!0.5!(Q2.E)$);
+      \coordinate (bb) at ($(Q1.B)!0.5!(Q2.B)+(-0.8,0)$);
+      \draw (Q1.B) -| (bb) |- (Q2.B);
+      \draw (Q1.C) -- ++(0,0.5) node[above]{$V_+ = \qty{+5}{\volt}$};
+      \draw (Q2.C) -- ++(0,-0.5) node[below]{$V_- = \qty{-5}{\volt}$};
+      \draw (o) to[short, *-] ++(2.1,0) coordinate(ro)
+                to[R, l=$R_L$] ++(0,-2.2) node[ground]{};
+      \draw (ro) to[short, *-o] ++(0.8,0) node[above]{$v_o$};
+      \coordinate (s) at ($(bb)+(-2.2,0)$);
+      \draw (s) to[R, l=$R_s$, -*] (bb);
+      \node[below left] at (bb) {$v_{in}$};
+      \draw (s) to[sV, l_=\texttt{W1}] ++(0,-2.2) node[ground]{};
+    \end{circuitikz}
+    \caption{Clase B.}
+    \label{fig:claseb}
+  \end{subfigure}
+  \hfill
+  \begin{subfigure}[b]{0.50\linewidth}
+    \centering
+    \begin{circuitikz}[scale=0.78, transform shape]
+      \draw (5,1.8) node[npn](Q1){};
+      \draw (5,-1.8) node[pnp](Q2){};
+      \node[right] at (Q1.east) {2N2222A};
+      \node[right] at (Q2.east) {2N2907A};
+      \draw (Q1.E) -- (Q2.E);
+      \coordinate (o) at ($(Q1.E)!0.5!(Q2.E)$);
+      \coordinate (b1) at ($(Q1.B)+(-0.9,0)$);
+      \coordinate (b2) at ($(Q2.B)+(-0.9,0)$);
+      \coordinate (m)  at ($(b1)!0.5!(b2)$);
+      \draw (Q1.B) -- (b1);
+      \draw (Q2.B) -- (b2);
+      \draw (b1) to[D, l=$D_1$, *-*] (m) to[D, l=$D_2$, -*] (b2);
+      \draw (Q1.C) |- ($(b1)+(0,2.0)$) coordinate(tp);
+      \draw (tp) to[R, l_=$R_{B1}$, a^=\qty{1}{\kilo\ohm}] (b1);
+      \draw (Q2.C) |- ($(b2)+(0,-2.0)$) coordinate(bt);
+      \draw (b2) to[R, l_=$R_{B2}$, a^=\qty{1}{\kilo\ohm}] (bt);
+      \node[above] at ($(Q1.C |- tp)$) {$V_+$};
+      \node[below] at ($(Q2.C |- bt)$) {$V_-$};
+      \draw (o) to[short, *-] ++(2.1,0) coordinate(ro)
+                to[R, l=$R_L$] ++(0,-2.2) node[ground]{};
+      \draw (ro) to[short, *-o] ++(0.8,0) node[above]{$v_o$};
+      \coordinate (in) at ($(m)+(-2.4,0)$);
+      \draw (in) to[C, l=$C_{in}$, a=\qty{47}{\micro\farad}] (m);
+      \coordinate (s) at ($(in)+(-1.8,0)$);
+      \draw (s) to[R, l=$R_s$, -*] (in);
+      \node[below] at (in) {$v_{in}$};
+      \draw (s) to[sV, l_=\texttt{W1}] ++(0,-2.2) node[ground]{};
+    \end{circuitikz}
+    \caption{Clase AB.}
+    \label{fig:claseab}
+  \end{subfigure}
+  \caption{Experimento 4: etapa de potencia push-pull. En la clase AB los diodos 1N4148 (con
+           la franja hacia $V_-$) mantienen a cada transistor al borde de conducir.}
+  \label{fig:pushpull}
+\end{figure}
+
+\paso{2}{Calcule (en casa)}
+\begin{enumerate}[label=\alph*), leftmargin=*, itemsep=3pt]
+  \item Para la clase B, con $V_p \approx \qty{3}{\volt} - \qty{0.7}{\volt}$: $P_{out}$
+        con~\eqref{eq:pout}, $P_{DC}$ con~\eqref{eq:pdc}, $\eta$ con~\eqref{eq:eta} y la
+        potencia máxima que disipa cada transistor. Compruebe que no pasa de la que admite el
+        encapsulado TO-92.
+  \item Para la clase AB: la corriente por los diodos, $(V_+ - V_- - 2V_D)/(R_{B1} + R_{B2})$,
+        y la potencia que agrega a $P_{DC}$. Estime $Z_{in}$ (casi toda es
+        $R_{B1} \pll R_{B2}$).
+  \item Simule las dos clases. Anote $v_o$ pico y eficaz (rms), las corrientes promedio de
+        $V_+$ y $V_-$ y, en la clase AB, $v_{in}$ y la corriente eficaz por $R_s$.
+\end{enumerate}
+
+\paso{3}{Arme y mida (en el laboratorio)}
+\begin{enumerate}[label=\alph*), ref=\alph*, leftmargin=*, itemsep=3pt]
+  \item Programe $V_+ = \qty{5}{\volt}$ y $V_- = \qty{-5}{\volt}$ en WaveForms
+        (\emph{Supplies}) y arme la clase B. Ponga el multímetro, en la escala de
+        \unit{\milli\ampere} DC, en serie con $V_+$; necesitará medir también $I_-$.
+  \item \label{paso:cruce}Con \texttt{W1} en \qty{3}{\volt}, capture $v_{in}$ (CH1) y $v_o$
+        (CH2). Haga zoom sobre un cruce por cero y mida el ancho de la muesca. Anote
+        $v_o$ pico, $v_o$ rms e $I_+$; luego mueva el multímetro a $V_-$ y anote $I_-$.
+  \item Arme la clase AB y repita el paso anterior. Añada la captura A (CH1 en $v_s$, CH2 en
+        $v_{in}$, en valores rms) para calcular la corriente de entrada,
+        $i_{in(\text{rms})} = (v_{s} - v_{in})/R_s$.
+  \item Toque los transistores: deben estar apenas tibios. Si se calientan, apague y revise
+        el montaje.
+\end{enumerate}
+
+\paso{4}{Anote}
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{3.6cm}|*{6}{>{\centering\arraybackslash}X|}}
+    \hline
+    & \multicolumn{3}{c|}{\textbf{Clase B}} & \multicolumn{3}{c|}{\textbf{Clase AB}} \\
+    \cline{2-7}
+    \textbf{Parámetro} & Teórico & Simulado & Medido & Teórico & Simulado & Medido \\
+    \hline
+    $v_o$ pico                       & \hueco & & & & & \\ \hline
+    $v_o$ rms                        & \hueco & & & & & \\ \hline
+    $A_v = v_{o}/v_{in}$ (rms)       & \hueco & & & & & \\ \hline
+    $I_+$ e $I_-$ (promedio)         & \hueco & & & & & \\ \hline
+    $P_{out} = v_{o(\text{rms})}^2/R_L$ & \hueco & & & & & \\ \hline
+    $P_{DC}$                         & \hueco & & & & & \\ \hline
+    $\eta = P_{out}/P_{DC}$          & \hueco & & & & & \\ \hline
+    $i_{in}$ rms                     & \multicolumn{3}{c|}{---} & & & \\ \hline
+    $P_{in} = v_{in}\,i_{in}$ (rms)  & \multicolumn{3}{c|}{---} & & & \\ \hline
+    $A_p = P_{out}/P_{in}$           & \multicolumn{3}{c|}{---} & & & \\ \hline
+  \end{tabularx}
+  \caption{Experimento 4: la etapa de potencia. En la clase B la corriente de entrada es tan
+           pequeña que no se puede medir con $R_s = \qty{100}{\ohm}$.}
+  \label{tab:exp4}
+\end{table}
+
+\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{Captura de la distorsión de cruce en clase B} (paso~3\ref{paso:cruce}).
+\cuadrorespuesta
+\end{minipage}\par
+
+\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{Captura de la salida en clase AB.}
+\cuadrorespuesta
+\end{minipage}\par
+
+\FloatBarrier
+%=======================================================================
+\section{Informe final}
+%=======================================================================
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, labelsep=0.6em]
+  \item Adjunte los cálculos y las simulaciones de los cuatro experimentos.
+  \item Compare los valores teóricos, simulados y medidos y explique las diferencias más
+        grandes.
+  \item Con las tablas~\ref{tab:cecb}, \ref{tab:exp3} y~\ref{tab:cascada}, explique qué
+        amplifica cada configuración (emisor común, base común y colector común) y por qué la
+        cascada funciona mejor que cada etapa por separado.
+  \item Complete la tabla~\ref{tab:comparacion} con los valores \emph{medidos} de $A_v$, $A_i$
+        y $Z_{in}$ de cada experimento.
+\end{enumerate}
+
+\FloatBarrier
+%=======================================================================
+\section{Cuestionario}
+%=======================================================================
+\begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, labelsep=0.6em]
+\item En el experimento 1, ¿cuánto valdrían $A_v$ y $Z_{in}$ (sin carga) si se retira el
+capacitor $C_E$? ¿Qué se gana y qué se pierde al dejar sin desacoplar toda la resistencia de
+emisor?
+\lineasresp{3}
+
+\item En el experimento 2, ¿cuánto valdría la ganancia desde la fuente, $v_o/v_s$ (sin carga),
+si $R_s$ fuera de \qty{1}{\kilo\ohm}? ¿Por qué la base común necesita una fuente de señal de
+impedancia muy baja, y por qué entonces se usa en altas frecuencias?
+\lineasresp{3}
+
+\item El seguidor de emisor tiene $A_v < 1$. ¿De dónde sale entonces la potencia extra que
+recibe la carga? ¿Hasta qué amplitud de salida funciona sin recortar con
+$R_L = \qty{100}{\ohm}$, y cómo cambiaría ese límite si $R_E$ fuera de \qty{470}{\ohm}?
+\lineasresp{3}
+
+\item ¿Cuál sería el rendimiento de la clase B si la salida llegara a $V_p = \qty{4.3}{\volt}$?
+¿Por qué el rendimiento medido en la clase AB es menor que el de la clase B, si la señal sale
+mejor?
+\lineasresp{3}
+\end{enumerate}
+
+\FloatBarrier
+%=======================================================================
+\section{Conclusiones}
+%=======================================================================
+\begin{itemize}
+    \item Redacte como mínimo 05 conclusiones \textbf{cualitativas} y 05
+          \textbf{cuantitativas}.
+\end{itemize}
+
+\noindent\textbf{Cualitativas}
+\lineasresp{10}
+
+\needspace{6\baselineskip}
+\noindent\textbf{Cuantitativas}
+\lineasresp{10}
+
+\end{document}

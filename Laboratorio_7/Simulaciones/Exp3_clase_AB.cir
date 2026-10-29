@@ -1,0 +1,33 @@
+* Practica 7 - Experimento 3b: push-pull clase AB con dos diodos 1N4148
+.include modelos.lib
+VP vp 0 5
+VN vn 0 -5
+VS s 0 dc 0 sin(0 3 1k)
+RS s in 100
+CIN in m 47u
+RB1 vp b1 1k
+D1 b1 m D1N4148
+D2 m b2 D1N4148
+RB2 b2 vn 1k
+Q1 vp b1 o Q2N2222A
+Q2 vn b2 o Q2N2907A
+RL o 0 47
+.control
+set noaskquit
+op
+print v(b1) v(b2) v(o) @q1[ic] i(vp)
+tran 2u 12m 8m
+meas tran vinrms RMS v(in) from=8m to=12m
+meas tran vorms RMS v(o) from=8m to=12m
+meas tran vop MAX v(o) from=8m to=12m
+meas tran vom MIN v(o) from=8m to=12m
+meas tran iinrms RMS i(vs) from=8m to=12m
+meas tran ipavg AVG i(vp) from=8m to=12m
+meas tran inavg AVG i(vn) from=8m to=12m
+let pout = vorms^2/47
+let pin = vinrms*iinrms
+let pdc = 5*(abs(ipavg)+abs(inavg))
+print pout pin pdc pout/pin pout/pdc vorms/vinrms vinrms/iinrms
+wrdata exp3_claseAB v(in) v(o)
+.endc
+.end

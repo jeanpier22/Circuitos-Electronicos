@@ -1,0 +1,35 @@
+* Practica 7 - Experimento 2: amplificador de corriente en colector comun
+* (seguidor de emisor) con RL = 100 Ohm
+.include modelos.lib
+VCC vcc 0 12
+VS s 0 dc 0 sin(0 0.4 1k)
+RS s in 10k
+CIN in b 10u
+R1 vcc b 47k
+R2 b 0 47k
+Q1 vcc b e Q2N2222A
+RE e 0 1k
+COUT e o 100u
+RL o 0 100
+.control
+set noaskquit
+op
+print v(b) v(e) @q1[ic] @q1[ib]
+tran 10u 60m 40m
+meas tran vsp  PP v(s)
+meas tran vinp PP v(in)
+meas tran vop  PP v(o)
+meas tran vomin MIN v(o)
+let av = vop/vinp
+let iin = (vsp-vinp)/10k
+let zin = vinp/iin
+let ai = (vop/100)/iin
+let ap = av*ai
+print av zin ai ap
+* limite de recorte: subir la entrada hasta que el semiciclo negativo se aplane
+alter vs sin = [ 0 1.2 1k ]
+tran 10u 60m 40m
+meas tran vomax MAX v(o)
+meas tran vomin2 MIN v(o)
+.endc
+.end

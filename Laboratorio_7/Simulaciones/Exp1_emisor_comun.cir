@@ -1,0 +1,37 @@
+* Practica 7 - Experimento 1: amplificador de voltaje en emisor comun
+* Circuito 3 del Laboratorio 5 (punto medio) + Rs para medir Zin + Cout y RL
+.include modelos.lib
+VCC vcc 0 12
+VS s 0 dc 0 sin(0 50m 1k)
+RS s in 1k
+CIN in b 10u
+R1 vcc b 10k
+R2 b 0 1.8k
+Q1 c b e BC548B
+RC vcc c 2.2k
+RE1 e e2 100
+RE2 e2 0 390
+CE e2 0 100u
+COUT c o 10u
+RL o 0 10k
+.control
+set noaskquit
+op
+print v(b) v(e) v(c) v(c)-v(e) @q1[ic] @q1[ib]
+foreach rl 1e9 10k 100
+  alter rl resistance=$rl
+  tran 10u 12m 8m
+  meas tran vsp  PP v(s)
+  meas tran vinp PP v(in)
+  meas tran vop  PP v(o)
+  let av = -vop/vinp
+  let iin = (vsp-vinp)/1k
+  let zin = vinp/iin
+  let io = vop/$rl
+  let ai = io/iin
+  let ap = -av*ai
+  echo "RL=$rl"
+  print av zin ai ap
+end
+.endc
+.end

@@ -1,0 +1,44 @@
+* Practica 7 - Experimento 2: amplificador de voltaje en base comun
+* Mismo punto Q del experimento 1 (sin CE): la base va a tierra en AC con CB
+* y la senal entra por el emisor.
+.include modelos.lib
+VCC vcc 0 12
+VS s 0 dc 0 sin(0 50m 1k)
+RS s in 100
+CIN in e 100u
+R1 vcc b 10k
+R2 b 0 1.8k
+CB b 0 100u
+Q1 c b e BC548B
+RC vcc c 2.2k
+RE1 e e2 100
+RE2 e2 0 390
+COUT c o 10u
+RL o 0 10k
+.control
+set noaskquit
+op
+print v(b) v(e) v(c) @q1[ic]
+foreach rl 1e9 10k
+  alter rl resistance=$rl
+  tran 5u 60m 40m
+  meas tran vsp  PP v(s)
+  meas tran vinp PP v(e)
+  meas tran vop  PP v(o)
+  let av = vop/vinp
+  let avs = vop/vsp
+  let iin = (vsp-vinp)/100
+  let zin = vinp/iin
+  let ai = (vop/$rl)/iin
+  let ap = av*ai
+  echo "RL=$rl"
+  print av avs zin ai ap
+end
+* distorsion con mas senal
+alter rl resistance=10k
+alter vs sin = [ 0 0.2 1k ]
+tran 5u 60m 40m
+meas tran vomax MAX v(o) from=40m to=60m
+meas tran vomin MIN v(o) from=40m to=60m
+.endc
+.end
