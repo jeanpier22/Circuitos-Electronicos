@@ -5,56 +5,68 @@
 %  Docente     : Ebert San Roman Castillo
 %  Laboratorio : Ing. Jeanpier Ancori Sanchez
 %
-%  Version 1 - Rehecha en LaTeX desde "Lab. 05 - Aplicaciones con el
-%  transistor en corte y saturacion" del docente (2026-1). Se conservan sus
-%  cuatro circuitos: interruptor de un LED (fig. 2), inversor (fig. 3), NOR
-%  con diodos (fig. 4) y NAND con diodos (fig. 5).
-%    - Formato del Laboratorio 5 (preambulo, cabecera, encabezado/pie,
-%      numeracion en romanos, \cuadrorespuesta, marcadores del osciloscopio,
-%      cuestionario de 3 preguntas, conclusiones 5 + 5, "Experimento N").
-%    - Cambios respecto al original:
-%        * Alimentacion: riel fijo de +5 V de la Analog Discovery Studio
-%          (1 A) en vez de la fuente V2..V6 de 5 V.
-%        * Entradas logicas: un jumper al riel de +5 V (1) o a GND (0). En el
-%          experimento 1 la entrada la da ademas W1 como onda cuadrada de
-%          0 a 5 V (amplitud 2,5 V, offset 2,5 V: dentro de los +-5 V de W1).
-%        * El "cambie R hasta que deje de funcionar" del original se hace una
-%          sola vez, en el experimento 1, con un potenciometro en la base: el
-%          limite medido da el beta del transistor. El de R20 (NAND) pasa al
-%          cuestionario.
-%        * Diodos 1N4148 o 1N4004 (el original pedia 1N4004); en DC da igual.
-%        * Resistencias a 1/4 W, como en el Laboratorio 5: la que mas disipa
-%          es RC = 220 Ohm del experimento 1, 35 mW con 12,7 mA.
-%        * La tabla del original tenia columnas "B (F5 y F6)" que no
-%          correspondian a ninguna figura; aqui cada compuerta tiene su tabla.
+%  Version 2 - Pedido del docente: que el alumno CALCULE los valores del
+%  interruptor a partir de condiciones dadas. Junta en una sola practica la
+%  version 1 (rehecha desde "Lab. 05 - Aplicaciones con el transistor en
+%  corte y saturacion") con la "Parte 1. Diseno de circuito en corte y
+%  saturacion" del "Lab. 06 - Diseno con transistor bipolar BJT" del docente
+%  (2026-1: V_BB = V_CC = 10 V, I_C(sat) = 30 mA, LED azul).
+%  Tres experimentos, todos con la misma estructura (Datos -> Calcule ->
+%  Arme y mida -> Anote) y un cuadro resumen al inicio del desarrollo:
+%    1. Diseno del interruptor de un LED azul y prueba "al limite" con
+%       R_B = 47 k en BC548B y 2N2222A (reemplaza al potenciometro de la v1).
+%    2. Compuertas NOR y NAND con diodos (las de la v1). El inversor NOT de
+%       la v1 sale: el experimento 1 ya es un inversor.
+%    3. Rele de 5 V con diodo volante.
+%  Cambios frente al original del docente: I_C(sat) = 20 mA y no 30 mA (30 mA
+%  es el maximo absoluto de un LED de 5 mm y con 12 V obligaria a R_C de
+%  1 W); V_CC = 12 V y V_BB = 5 V por los rieles de la Analog Discovery
+%  Studio. La parte 2 del original (divisor de tension) la cubre el Lab. 5.
+%  Formato: cuestionario de 3 preguntas, conclusiones 5 + 5; no se imprimen
+%  los resultados.
 %
-%  VALORES DE REFERENCIA PARA EL DOCENTE (calculados a mano; beta = 150,
-%  VBE = 0,7 V, VCE(sat) = 0,2 V, LED rojo VF = 2,0 V a 12 mA y 1,85 V a
+%  VALORES DE REFERENCIA PARA EL DOCENTE (a mano: V_BE = 0,7 V,
+%  V_CE(sat) = 0,2 V, LED azul 3,0 V, LED rojo 2,0 V a 12 mA y 1,85 V a
 %  2 mA, diodo 0,65 V; no se imprimen):
-%    Exp. 1 (RB = 10 k, RC = 220):
-%      A = 5 V : IB = 0,43 mA, IC(sat) = 12,7 mA, beta forzado = 29,5,
-%                VCE ~ 0,1-0,2 V, LED encendido -> saturacion.
-%      A = 0 V : IB = IC = 0, LED apagado -> corte. VC "ideal" = 5 V, pero el
-%                LED apagado deja pasar solo la corriente del instrumento y
-%                cae ~1,2-1,5 V: se mide ~3,5-3,8 V. Sirve para discutir.
-%      RB(max) = beta (5 - 0,7) / IC(sat) = 51 k (beta 150), 68 k (beta 200).
-%    Exp. 2 NOT (RB = RC = 1 k, LED + 330 a tierra):
-%      A = 0 : corte, VC = 5 - 1k*(5-1,85)/1,33k = 2,6-2,7 V, LED encendido
-%              (~2,3 mA).
-%      A = 1 : IB = 4,3 mA, IC = 4,8 mA, VC ~ 0,1 V, LED apagado, saturacion
-%              profunda (beta forzado ~ 1,1).
-%    Exp. 3 NOR (diodos + RB = 1 k + 22 k a tierra):
+%    Exp. 1: R_C = (12 - 3 - 0,2)/20 mA = 440 -> 470 Ohm (E12, hacia arriba),
+%      I_C(sat) = 18,7 mA, P_RC = 165 mW (0,5 W). I_B = 1,87 mA,
+%      R_B = 4,3/1,87 mA = 2,30 k -> 2,2 k (hacia abajo), I_B = 1,95 mA,
+%      beta forzado = 9,6. V_BB = 0: corte; con el multimetro (10 MOhm) el
+%      LED azul cae ~2 V y se mide V_C ~ 10 V.
+%      Al limite con h_FE(min) = 200: R_B = 200*4,3/18,7 mA = 46 k -> 47 k.
+%    Exp. 2 NOR (diodos + R_B = 1 k + 22 k a tierra):
 %      00 : corte, D = 2,6-2,7 V, LED encendido.
-%      01, 10, 11 : nodo X = 4,35 V, IB ~ 3,6 mA, saturacion, D ~ 0,1 V.
-%    Exp. 4 NAND (22 k de pull-up, D3 en serie con la base):
-%      00, 01, 10 : X ~ 0,6 V, no alcanza para D3 + VBE (~1,3 V): corte,
+%      01, 10, 11 : nodo X = 4,35 V, I_B ~ 3,6 mA, saturacion, D ~ 0,1 V.
+%    Exp. 2 NAND (22 k de pull-up, D3 en serie con la base):
+%      00, 01, 10 : X ~ 0,6 V, no alcanza para D3 + V_BE (~1,3 V): corte,
 %                   E = 2,6-2,7 V, LED encendido.
-%      11 : X ~ 1,35 V, IB = (5 - 1,35)/22k = 0,17 mA, IC(sat) = 4,8 mA,
+%      11 : X ~ 1,35 V, I_B = (5 - 1,35)/22 k = 0,17 mA, I_C(sat) = 4,8 mA,
 %           beta forzado = 29, saturacion, E ~ 0,1-0,2 V.
-%      RP(max) = beta (5 - 1,4)/4,8 mA = 112 k (beta 150).
-%      Entrada al aire: en la NAND cuenta como 1 (el diodo no conduce); en
-%      la NOR cuenta como 0 (la 22 k lleva el nodo a tierra).
-%  Sin simulacion todavia: ngspice no esta instalado en este equipo.
+%      Cuestionario 2: R_P(max) = beta (5 - 1,4)/4,8 mA = 112 k (beta 150).
+%      Entrada al aire: en la NAND cuenta como 1 (el diodo no conduce); en la
+%      NOR cuenta como 0 (la 22 k lleva el nodo a tierra).
+%    Exp. 3 (rele SRD-05VDC-SL-C, ~70 Ohm, 2N2222A, I_B <= 4 mA):
+%      I_C(sat) = 4,8/70 = 68,6 mA ; con beta forzado 20, I_B = 3,43 mA,
+%      R_B = 1,25 k -> 1,2 k, I_B = 3,58 mA, beta forzado 19,2
+%      (h_FE(min) = 50 a 150 mA). Al abrir, con 1N4004: V_C = 5,7 V.
+%      Cuestionario 3: 0,1 H * 68,6 mA / 1 us = 6,9 kV >> V_CEO = 40 V.
+%    Cuestionario 1: con h_FE(min) = 75 del 2N2222A, R_B = 17 k -> 15 k,
+%      beta forzado = 65.
+%
+%  SIMULACION (ngspice 26 de Fusion/Eagle; modelos BC548B de NXP, 2N2222A,
+%  1N4004 y LED azul y rojo ajustados a mano; netlists, datos y graficas en
+%  ../Simulaciones):
+%    Exp. 1, BC548B, R_B = 2,2 k: V_BE 0,746 V, V_CE 0,059 V, I_B 1,93 mA,
+%            I_C 19,0 mA, V_LED 2,99 V. 2N2222A: V_CE 0,049 V.
+%            R_B = 47 k : BC548B V_CE = 0,17 V (satura justo, beta ~ 207)
+%                         2N2222A V_CE = 1,42 V (activa, beta ~ 178) <-- clave
+%    Exp. 2 NOR : 00 -> D 2,65 V ; 01, 10, 11 -> X 4,36 V, I_B 3,59 mA,
+%                 D 0,015 V.
+%           NAND: 00, 01, 10 -> X 0,46-0,49 V, V_BE 0,44-0,46 V, E 2,65 V ;
+%                 11 -> X 1,18 V, I_B 0,174 mA, I_C 4,94 mA, E 0,056 V.
+%    Exp. 3, L = 0,1 H supuesta: I_C 69,8 mA, I_B 3,50 mA, V_CE 0,118 V.
+%            Pico al abrir: 5,79 V con 1N4004; 3,4 kV sin diodo (el modelo
+%            no tiene ruptura; en la realidad el transistor se dana).
 %=======================================================================
 
 \documentclass[11pt,a4paper]{article}
@@ -166,8 +178,12 @@
   \end{table}%
 }
 
+
 %----------------------------------------------------- compaginacion
 \usepackage{needspace}
+% \needspace mide mal el espacio libre despues de figuras y tablas [H] y deja
+% paginas medio vacias; \Needspace es la variante exacta del mismo paquete.
+\let\needspace\Needspace
 \usepackage{etoolbox}
 \pretocmd{\section}{\needspace{5\baselineskip}}{}{}
 \pretocmd{\subsection}{\needspace{4\baselineskip}}{}{}
@@ -202,7 +218,7 @@
   pdfsubject={Circuitos Electronicos - Guia de practicas},
   pdfauthor={Ebert San Roman Castillo; Jeanpier Ancori Sanchez},
   pdfkeywords={electronica, transistor, BJT, corte, saturacion, interruptor,
-               compuertas logicas, inversor, NOR, NAND, LED,
+               diseno, beta forzado, compuertas logicas, NOT, NOR, NAND, rele, diodo volante, TTL, LED,
                Analog Discovery Studio, Proteus, Multisim, osciloscopio}
 }
 
@@ -245,26 +261,34 @@
 
 \vspace{0.8cm}
 
+% Encabezado de cada paso dentro de un experimento: \paso{1}{Datos}
+\newcommand{\paso}[2]{%
+  \par\needspace{10\baselineskip}\vspace{8pt}\noindent
+  \colorbox{black!8}{\makebox[\dimexpr\linewidth-2\fboxsep\relax][l]{%
+    \textbf{Paso #1 \,·\, #2}}}\par\vspace{4pt}}
+
 %=======================================================================
 \section{Objetivos}
 %=======================================================================
 \begin{itemize}
-    \item Diseñar la polarización de base de un transistor bipolar para que trabaje como
-          interruptor: en corte (interruptor abierto) o en saturación (interruptor cerrado).
-    \item Comprobar experimentalmente la condición de saturación y encontrar el valor de
-          la resistencia de base con el que el transistor deja de saturarse.
-    \item Armar y verificar compuertas lógicas NOT, NOR y NAND con diodos y un transistor
-          trabajando entre corte y saturación.
+    \item Calcular las resistencias de base y de colector de un transistor bipolar que trabaja
+          como interruptor, a partir de las condiciones de la carga y de la hoja de datos, y
+          comprobar por simulación y por medición que queda en corte o en saturación.
+    \item Explicar por qué una resistencia de base calculada con el $\beta$ justo puede no
+          saturar a otro transistor.
+    \item Verificar compuertas NOR y NAND con diodos y un transistor, y manejar un relé
+          protegiendo al transistor con un diodo volante.
 \end{itemize}
 
 %=======================================================================
 \section{Contenido teórico}
 %=======================================================================
 \begin{itemize}
-    \item Transistor de unión bipolar (BJT): regiones de trabajo (corte, activa y
-          saturación).
+    \item Regiones de trabajo del transistor de unión bipolar (BJT): corte, activa y
+          saturación.
     \item El transistor como interruptor: corriente de saturación y $\beta$ forzado.
-    \item Compuertas lógicas con diodos y transistores (lógica DTL).
+    \item Compuertas lógicas con diodos y transistores (lógica DTL); cargas inductivas y
+          diodo volante.
 \end{itemize}
 
 %=======================================================================
@@ -275,8 +299,8 @@
 \vspace{0.25cm}
 \noindent\textbf{Equipos y dispositivos:}
 \begin{itemize}
-    \item Tarjeta Analog Discovery Studio: riel fijo de \qty{+5}{\volt}, generador de
-          funciones \texttt{W1} y osciloscopio de dos canales.
+    \item Tarjeta Analog Discovery Studio: rieles fijos de \qty{+12}{\volt} y
+          \qty{+5}{\volt}, generador de funciones \texttt{W1} y osciloscopio de dos canales.
 \end{itemize}
 
 \noindent\textbf{Software:}
@@ -289,23 +313,29 @@
 \noindent\textbf{Materiales y fungibles} (deben ser adquiridos por los alumnos):
 \begin{itemize}
     % --- Semiconductores
-    \item 02 transistores de unión bipolar NPN 2N2222A o BC548B (uno de repuesto). Sus
-          terminales están en distinto orden: revise la hoja de datos antes de armar.
-    \item 04 diodos 1N4148 o 1N4004 (uno de repuesto).
-    \item 04 LED rojos de \qty{5}{\milli\metre} (uno de repuesto).
-    % --- Resistencias (la que mas disipa es RC = 220 Ohm: 35 mW)
+    \item 02 transistores de unión bipolar NPN BC548B y 02 2N2222A (uno de repuesto de cada
+          uno). Sus terminales están en distinto orden: revise la hoja de datos antes de armar.
+    \item 02 LED azules y 04 LED rojos de \qty{5}{\milli\metre} (uno de repuesto de cada color).
+    \item 05 diodos rectificadores 1N4004 (uno de repuesto).
+    \item 01 relé de \qty{5}{\volt} con un contacto normalmente abierto (tipo
+          SRD-05VDC-SL-C, bobina de unos \qty{70}{\ohm}).
+    % --- Resistencias (la que mas disipa es RC = 470 Ohm del exp. 1: 165 mW)
+    \item Resistencias a \qty{0.5}{\watt}: 02 de \qty{470}{\ohm}.
     \item Resistencias a \qty{0.25}{\watt}:
-          02 de \qty{10}{\kilo\ohm},
-          02 de \qty{220}{\ohm},
-          06 de \qty{1}{\kilo\ohm},
-          04 de \qty{330}{\ohm} y
+          02 de \qty{2.2}{\kilo\ohm},
+          01 de \qty{47}{\kilo\ohm},
+          04 de \qty{1}{\kilo\ohm},
+          02 de \qty{1.2}{\kilo\ohm},
+          03 de \qty{330}{\ohm} y
           03 de \qty{22}{\kilo\ohm}.
-    \item 01 potenciómetro lineal de \qty{100}{\kilo\ohm}.
+          Traiga además algunos valores vecinos (\qty{1.8}{\kilo\ohm},
+          \qty{2.7}{\kilo\ohm}, \qty{1.5}{\kilo\ohm}) por si su diseño previo da un valor
+          distinto.
     % --- Montaje
     \item Protoboard.
     \item Jumpers macho-macho para protoboard.
     \item Alicates para cortar y pelar alambre.
-    \item Multímetro (con prueba de diodos y, si es posible, medición de $h_{FE}$).
+    \item Multímetro (con prueba de diodos).
     \item Lentes de protección y mandil.
 \end{itemize}
 
@@ -317,257 +347,264 @@
 %-----------------------------------------------------------------------
 \subsection{El transistor como interruptor}
 %-----------------------------------------------------------------------
-Un transistor que conmuta trabaja solo en los dos extremos de su recta de carga
-(figura~\ref{fig:interruptor}):
-\begin{itemize}
-  \item \textbf{Corte} ($V_{BE} < \qty{0.5}{\volt}$): no hay corriente de base ni de colector.
-        Entre colector y emisor el transistor se comporta como un \textbf{interruptor
-        abierto}.
-  \item \textbf{Saturación}: la base recibe más corriente de la que el colector puede usar.
-        $V_{CE}$ baja a $V_{CE(\text{sat})}\approx\qty{0.2}{\volt}$ y el transistor se comporta
-        como un \textbf{interruptor cerrado}.
-\end{itemize}
+Un transistor que conmuta trabaja solo en dos estados: en \textbf{corte} no circula
+corriente de colector y es un \textbf{interruptor abierto}; en \textbf{saturación}
+$V_{CE} \approx \qty{0.2}{\volt}$ y es un \textbf{interruptor cerrado}
+(figura~\ref{fig:generico}).
 
 \begin{figure}[H]
   \centering
-  \begin{tikzpicture}[x=0.85cm,y=1.35cm,font=\small]
-    \draw[->] (0,0) -- (11.6,0) node[above] {$V_{CE}$};
-    \draw[->] (0,0) -- (0,4.4) node[left] {$I_C$};
-    \draw[very thick] (0,3.6) -- (10.4,0);
-    \draw[dashed,black!45] (0.3,3.5) -- (10.1,0.1);
-    \node[left]  at (0,3.6) {$I_{C(\text{sat})}$};
-    \node[below] at (10.4,0) {$V_{CC}$};
-    \node[below] at (0,0) {0};
-    % saturacion
-    \fill[red] (0.2,3.53) circle (3.2pt);
-    \node[right,red!80!black,align=left] at (0.55,3.75)
-         {\textbf{Saturación}: $V_{CE}\approx\qty{0.2}{\volt}$ --- interruptor cerrado};
-    % corte
-    \fill[blue] (10.4,0) circle (3.2pt);
-    \node[above,blue!80!black,align=center] at (9.3,0.55)
-         {\textbf{Corte}: $I_C \approx 0$\\ interruptor abierto};
-    \node[black!55,font=\scriptsize,rotate=-19] at (5.2,2.05) {región activa: no se usa};
-  \end{tikzpicture}
-  \caption{El transistor como interruptor: solo trabaja en los dos extremos de la recta de
-           carga.}
-  \label{fig:interruptor}
+  \begin{circuitikz}[scale=0.85, transform shape]
+    \draw (4.2,0) node[npn](Q){};
+    \coordinate (c)   at ($(Q.C)+(0,0.5)$);
+    \coordinate (top) at ($(c)+(0,3.4)$);
+    \draw (top) to[R, l=$R_C$] ++(0,-1.7) to[generic, l=carga] (c) -- (Q.C);
+    \draw (top) node[circ]{} -- ++(1.6,0) node[right]{$V_{CC}$};
+    \draw ($(Q.B)+(-3.0,0)$) node[left]{$V_{BB}$}
+          to[R, l=$R_B$, o-, i>^=$I_B$] (Q.B);
+    \draw (Q.C) ++(0,0.25) node[right, font=\small]{$\downarrow I_C$};
+    \draw (Q.E) node[ground]{};
+  \end{circuitikz}
+  \caption{Interruptor con transistor NPN. La carga puede ser un LED o la bobina de un relé.}
+  \label{fig:generico}
 \end{figure}
 
-Si la carga del colector es un LED en serie con $R_C$, la corriente máxima que el colector
-puede llevar es:
-\begin{equation}
-  I_{C(\text{sat})} = \frac{V_{CC} - V_{LED} - V_{CE(\text{sat})}}{R_C}
-  \label{eq:icsat}
-\end{equation}
-Con la entrada en $V_A$, la corriente de base la fija $R_B$:
-\begin{equation}
-  I_B = \frac{V_A - V_{BE}}{R_B}
-  \label{eq:ib}
-\end{equation}
-El transistor se satura si la base entrega al menos la corriente que el colector necesita
-dividida entre $\beta$:
-\begin{equation}
-  \beta\,I_B \;\geq\; I_{C(\text{sat})}
-  \qquad\Longleftrightarrow\qquad
-  \beta_{\text{forzado}} = \frac{I_{C(\text{sat})}}{I_B} \;<\; \beta
-  \label{eq:sat}
-\end{equation}
-El cociente $I_{C(\text{sat})}/I_B$ se llama \textbf{$\beta$ forzado}: es el $\beta$ que el
-circuito le impone al transistor. Como $\beta$ varía mucho entre unidades y con la
-temperatura, en diseño se deja margen y se busca $\beta_{\text{forzado}}\approx 10$. De
-\eqref{eq:ib} y \eqref{eq:sat}, la mayor resistencia de base que todavía satura al transistor
-es:
-\begin{equation}
-  R_{B(\max)} = \frac{\beta\,(V_A - V_{BE})}{I_{C(\text{sat})}}
-  \label{eq:rbmax}
-\end{equation}
-
-%-----------------------------------------------------------------------
-\subsection{¿Cómo saber si el transistor está saturado?}
-\label{sec:identificar}
-%-----------------------------------------------------------------------
-\noindent\textbf{Por cálculo.} Se supone que el transistor está en la región activa y se
-comprueba si esa suposición es posible:
-\begin{enumerate}[label=\arabic*), leftmargin=*, itemsep=3pt]
-  \item Calcule $I_B$ con~\eqref{eq:ib}. Si $V_A < \qty{0.7}{\volt}$ no hay corriente de
-        base: el transistor está en \textbf{corte} y no hace falta seguir.
-  \item Calcule $I_{C(\text{sat})}$ con~\eqref{eq:icsat}: es la mayor corriente que la malla
-        del colector puede dar.
-  \item Calcule la corriente que pediría la región activa, $\beta\,I_B$, y compárelas:
-        \begin{itemize}
-          \item Si $\beta\,I_B < I_{C(\text{sat})}$: la suposición vale. El transistor está en
-                \textbf{región activa}, $I_C = \beta\,I_B$ y
-                $V_{CE} = V_{CC} - V_{LED} - I_C\,R_C$ queda por encima de
-                \qty{0.2}{\volt}.
-          \item Si $\beta\,I_B \geq I_{C(\text{sat})}$: la malla del colector no puede dar
-                tanta corriente. El transistor está en \textbf{saturación},
-                $I_C = I_{C(\text{sat})}$ y $V_{CE} = V_{CE(\text{sat})}\approx\qty{0.2}{\volt}$.
-        \end{itemize}
-  \item Si satura, calcule el $\beta$ forzado $I_{C(\text{sat})}/I_B$. Cuanto más pequeño
-        frente a $\beta$, más profunda es la saturación; con $\approx 10$ se satura con
-        cualquier transistor del mismo tipo.
+\noindent\textbf{Cómo se diseña.} Se parte de lo que la carga necesita:
+\begin{enumerate}[label=\arabic*), leftmargin=*, itemsep=4pt]
+  \item \textbf{Corriente de saturación} y resistencia de colector:
+        \begin{equation}
+          R_C = \frac{V_{CC} - V_{\text{carga}} - V_{CE(\text{sat})}}{I_{C(\text{sat})}}
+          \label{eq:rc}
+        \end{equation}
+        Si la carga es la bobina de un relé no hay $R_C$:
+        $I_{C(\text{sat})} = (V_{CC} - V_{CE(\text{sat})})/R_{\text{bobina}}$.
+  \item \textbf{Corriente de base}, con un $\beta$ forzado mucho menor que el $\beta$ del
+        transistor (la regla práctica es 10):
+        \begin{equation}
+          I_B = \frac{I_{C(\text{sat})}}{\beta_{\text{forzado}}}
+          \label{eq:ib}
+        \end{equation}
+  \item \textbf{Resistencia de base:}
+        \begin{equation}
+          R_B = \frac{V_{BB} - V_{BE}}{I_B}
+          \label{eq:rb}
+        \end{equation}
+  \item \textbf{Valores comerciales (E12):} $R_C$ se redondea \textbf{hacia arriba} y $R_B$
+        \textbf{hacia abajo}. Con ellos se recalculan $I_{C(\text{sat})}$, $I_B$ y
+        $\beta_{\text{forzado}} = I_{C(\text{sat})}/I_B$, y se revisa la potencia
+        $P = I^2R$ de cada resistencia.
 \end{enumerate}
 
-\needspace{12\baselineskip}
-\noindent\textbf{Ejemplo resuelto} (valores distintos a los de la práctica). $V_{CC} =
-\qty{5}{\volt}$, LED con $V_{LED} = \qty{2}{\volt}$, $R_C = \qty{330}{\ohm}$, $\beta = 100$ y
-entrada $V_A = \qty{5}{\volt}$. Primero:
-\[
-  I_{C(\text{sat})} = \frac{5 - 2 - \num{0.2}}{330} = \qty{8.48}{\milli\ampere}
-\]
+\noindent\textbf{¿Por qué $\beta_{\text{forzado}} = 10$?} El $\beta$ cambia mucho de una
+unidad a otra: la hoja de datos solo garantiza un mínimo ($h_{FE(\min)}$). Si $R_B$ se
+calcula con el $\beta$ justo,
+\begin{equation}
+  R_{B(\max)} = \frac{\beta\,(V_{BB} - V_{BE})}{I_{C(\text{sat})}},
+  \label{eq:rbmax}
+\end{equation}
+un transistor con un $\beta$ menor no se satura: queda en la región activa, $V_{CE}$ sube y
+la carga recibe menos corriente.
+
+\needspace{14\baselineskip}
+\noindent\textbf{Ejemplo resuelto} (valores distintos a los de la práctica). LED rojo de
+\qty{2}{\volt} con $I_{C(\text{sat})} = \qty{15}{\milli\ampere}$, $V_{CC} = \qty{9}{\volt}$ y
+$V_{BB} = \qty{3.3}{\volt}$.
 \begin{table}[H]
   \centering
-  \renewcommand{\arraystretch}{1.3}
-  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{2.6cm}|*{2}{>{\centering\arraybackslash}X|}}
+  \renewcommand{\arraystretch}{2.1}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{2.6cm}|>{\centering\arraybackslash}X|>{\centering\arraybackslash}m{2.8cm}|}
     \hline
-    & $\boldsymbol{R_B = \qty{100}{\kilo\ohm}}$ & $\boldsymbol{R_B = \qty{4.7}{\kilo\ohm}}$ \\
-    \hline
-    $I_B$ & $\dfrac{5 - \num{0.7}}{\qty{100}{\kilo\ohm}} = \qty{43}{\micro\ampere}$
-          & $\dfrac{5 - \num{0.7}}{\qty{4.7}{\kilo\ohm}} = \qty{0.915}{\milli\ampere}$ \\ \hline
-    $\beta\,I_B$ & \qty{4.3}{\milli\ampere} & \qty{91.5}{\milli\ampere} \\ \hline
-    Comparación & $\qty{4.3}{\milli\ampere} < \qty{8.48}{\milli\ampere}$
-                & $\qty{91.5}{\milli\ampere} \geq \qty{8.48}{\milli\ampere}$ \\ \hline
-    Región & \textbf{Activa} & \textbf{Saturación} \\ \hline
-    $I_C$ & $\beta\,I_B = \qty{4.3}{\milli\ampere}$
-          & $I_{C(\text{sat})} = \qty{8.48}{\milli\ampere}$ \\ \hline
-    $V_{CE}$ & $5 - 2 - (\qty{4.3}{\milli\ampere})(\qty{330}{\ohm}) = \qty{1.58}{\volt}$
-             & $\approx\qty{0.2}{\volt}$ \\ \hline
-    $\beta$ forzado & --- & $\dfrac{\num{8.48}}{\num{0.915}} = \num{9.3}$ \\ \hline
-    LED & Enciende a medias & Enciende con todo su brillo \\ \hline
+    \textbf{Paso} & \textbf{Cálculo} & \textbf{E12} \\ \hline
+    $R_C$ & $\dfrac{9 - 2 - \num{0.2}}{\qty{15}{\milli\ampere}} = \qty{453}{\ohm}$
+          & \qty{470}{\ohm} (arriba) \\ \hline
+    $I_{C(\text{sat})}$, $I_B$ & $\dfrac{\num{6.8}}{\qty{470}{\ohm}} = \qty{14.5}{\milli\ampere}$,
+            \qquad $\dfrac{\qty{14.5}{\milli\ampere}}{10} = \qty{1.45}{\milli\ampere}$ & --- \\ \hline
+    $R_B$ & $\dfrac{\num{3.3} - \num{0.7}}{\qty{1.45}{\milli\ampere}} = \qty{1.79}{\kilo\ohm}$
+          & \qty{1.5}{\kilo\ohm} (abajo) \\ \hline
+    Comprobación & $I_B = \dfrac{\num{2.6}}{\qty{1.5}{\kilo\ohm}} = \qty{1.73}{\milli\ampere}$,
+                   \qquad $\beta_{\text{forzado}} = \dfrac{\num{14.5}}{\num{1.73}} = \num{8.4}$
+                 & $\leq 10$: satura \\ \hline
   \end{tabularx}
-  \caption{Ejemplo: el mismo circuito con dos resistencias de base.}
+  \caption{Ejemplo de diseño de un interruptor para un LED.}
   \label{tab:ejemplo}
 \end{table}
-Con $R_B = \qty{100}{\kilo\ohm}$ el transistor \emph{no} es un buen interruptor: queda en la
-región activa, con \qty{1.58}{\volt} entre colector y emisor, y el LED recibe la mitad de la
-corriente. Con \qty{4.7}{\kilo\ohm} se satura con $\beta$ forzado $\approx 10$.
 
-\needspace{12\baselineskip}
-\noindent\textbf{Por medición.} Con el circuito armado, mida $V_{BE}$ y $V_{CE}$ con el
-multímetro y compare con la tabla~\ref{tab:criterios}. La prueba más rápida es comparar el
-voltaje de la base con el del colector: si $V_C < V_B$, la unión base-colector está en
-directa y el transistor está saturado.
+%-----------------------------------------------------------------------
+\subsection{¿Corte, activa o saturación?}
+\label{sec:identificar}
+%-----------------------------------------------------------------------
+\noindent\textbf{Por cálculo.} Calcule $I_B$ siguiendo el camino de la base (reste
+\qty{0.7}{\volt} por cada diodo que conduce). Si no hay corriente de base, el transistor está
+en \textbf{corte}. Si la hay, compare $\beta\,I_B$ con $I_{C(\text{sat})}$: si
+$\beta\,I_B \geq I_{C(\text{sat})}$, está en \textbf{saturación}; si no, está en la
+\textbf{región activa}.
+
+\noindent\textbf{Por medición.} Mida $V_{BE}$ y $V_{CE}$ y use la tabla~\ref{tab:criterios}.
 
 \begin{table}[H]
   \centering
   \renewcommand{\arraystretch}{1.3}
-  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{2.1cm}|*{4}{>{\centering\arraybackslash}X|}}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{2.1cm}|*{3}{>{\centering\arraybackslash}X|}}
     \hline
-    \textbf{Región} & $\boldsymbol{V_{BE}}$ & $\boldsymbol{V_{CE}}$ & \textbf{Uniones B-E / B-C}
-      & $\boldsymbol{I_C/I_B}$ \\
+    \textbf{Región} & $\boldsymbol{V_{BE}}$ & $\boldsymbol{V_{CE}}$ & \textbf{El interruptor está} \\
     \hline
-    Corte      & $< \qty{0.5}{\volt}$ & $\approx V_{CC}$ (sin corriente)
-               & inversa / inversa & --- ($I_B \approx 0$) \\ \hline
-    Activa     & \qtyrange{0.6}{0.7}{\volt} & $> \qty{0.3}{\volt}$ ($V_C > V_B$)
-               & directa / inversa & $\approx \beta$ \\ \hline
-    Saturación & \qtyrange{0.7}{0.8}{\volt} & $\leq \qty{0.3}{\volt}$ ($V_C < V_B$)
-               & directa / directa & $< \beta$ ($\beta$ forzado) \\ \hline
+    Corte      & $< \qty{0.5}{\volt}$ & $\approx V_{CC}$ & abierto \\ \hline
+    Activa     & \qtyrange{0.6}{0.7}{\volt} & $> \qty{0.3}{\volt}$ & a medias (no sirve) \\ \hline
+    Saturación & \qtyrange{0.7}{0.8}{\volt} & $\leq \qty{0.3}{\volt}$ & cerrado \\ \hline
   \end{tabularx}
   \caption{Cómo identificar la región de trabajo a partir de lo que se mide.}
   \label{tab:criterios}
 \end{table}
 
-En las compuertas se usa el mismo procedimiento. $I_B$ se calcula siguiendo el camino de la
-base, restando \qty{0.7}{\volt} por cada diodo que conduce. El LED de salida está en paralelo
-con el transistor: cuando este se satura, sus \qty{0.2}{\volt} no alcanzan para encender el
-LED, así que $I_{C(\text{sat})} = (V_{CC} - V_{CE(\text{sat})})/R_C$.
-
 %-----------------------------------------------------------------------
 \subsection{Compuertas lógicas con diodos y un transistor}
 %-----------------------------------------------------------------------
-Se usan dos niveles: \qty{0}{\volt} es el \textbf{0 lógico} y \qty{5}{\volt} es el
-\textbf{1 lógico}. Un transistor en emisor común que conmuta entre corte y saturación es un
-\textbf{inversor}: con la entrada en 1 se satura y su colector queda en
-$V_{CE(\text{sat})}\approx 0$; con la entrada en 0 se corta y su colector sube hacia
-$V_{CC}$.
-
-Delante del inversor se puede poner una red de diodos:
+Con \qty{0}{\volt} como \textbf{0 lógico} y \qty{5}{\volt} como \textbf{1 lógico}, un
+transistor que conmuta es un \textbf{inversor}: con la entrada en 1 se satura y su colector
+queda cerca de \qty{0}{\volt}; con la entrada en 0 se corta y su colector sube. Delante del
+inversor se pone una red de diodos:
 \begin{itemize}
-  \item \textbf{Red OR} (figura~\ref{fig:nor}): los ánodos van a las entradas. Basta con que
-        una entrada esté en 1 para que su diodo conduzca y el nodo común suba. Seguida del
-        inversor forma una compuerta \textbf{NOR}.
-  \item \textbf{Red AND} (figura~\ref{fig:nand}): los cátodos van a las entradas y una
-        resistencia lleva el nodo común hacia $V_{CC}$. Basta con que una entrada esté en 0
-        para que su diodo conduzca y fije el nodo en unos \qty{0.7}{\volt}. Seguida del
-        inversor forma una compuerta \textbf{NAND}.
+  \item \textbf{Red OR} (figura~\ref{fig:nor}): basta con que una entrada esté en 1 para que
+        su diodo conduzca y llegue corriente a la base. Con el inversor forma una \textbf{NOR}.
+  \item \textbf{Red AND} (figura~\ref{fig:nand}): basta con que una entrada esté en 0 para que
+        su diodo conduzca y le quite la corriente a la base. Con el inversor forma una
+        \textbf{NAND}.
 \end{itemize}
-En cada compuerta, un LED en la salida indica el nivel lógico: encendido es 1 y apagado es 0.
+Un LED en la salida indica el nivel: encendido es 1 y apagado es 0.
+
+%-----------------------------------------------------------------------
+\subsection{Cargas inductivas y diodo volante}
+%-----------------------------------------------------------------------
+La bobina de un relé se opone a que su corriente cambie. Cuando el transistor se corta, la
+bobina genera un voltaje $v_L = L\,di/dt$ que puede llegar a cientos de voltios y dañar al
+transistor. El \textbf{diodo volante}, en paralelo con la bobina y con el cátodo hacia
+$V_{CC}$, le da a esa corriente un camino y limita el colector a
+$V_{CC} + \qty{0.7}{\volt}$.
 
 \FloatBarrier
 \needspace{14\baselineskip}
 %=======================================================================
 \section{Desarrollo del laboratorio}
 %=======================================================================
-Todos los circuitos se alimentan con el riel de \qty{+5}{\volt} de la tarjeta. Para
-poner una entrada en 1 se conecta con un jumper al riel de \qty{+5}{\volt}; para ponerla en 0,
-a \texttt{GND}. No deje ninguna entrada al aire.
+Cada experimento tiene los mismos cuatro pasos. Los pasos~1 y~2 (\textbf{Datos} y
+\textbf{Calcule}) se traen resueltos de casa, junto con la simulación en Multisim o Proteus;
+los pasos~3 y~4 (\textbf{Arme y mida} y \textbf{Anote}) se hacen en el laboratorio. Use
+$V_{BE} = \qty{0.7}{\volt}$ y $V_{CE(\text{sat})} = \qty{0.2}{\volt}$.
+
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.35}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{1.0cm}|>{\raggedright\arraybackslash}m{3.0cm}|>{\raggedright\arraybackslash}X|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}m{1.3cm}|}
+    \hline
+    \textbf{Exp.} & \textbf{Circuito} & \textbf{En casa: calcule} & \textbf{En el laboratorio: mida}
+      & \textbf{Riel} \\ \hline
+    1 & Interruptor de un LED azul
+      & $R_C$, $R_B$ y $\beta_{\text{forzado}}$; $R_{B(\max)}$ con $h_{FE(\min)}$
+      & $V_{BE}$, $V_{CE}$, $I_B$, $I_C$ con la entrada en 1 y en 0; $V_{CE}$ con
+        $R_B = \qty{47}{\kilo\ohm}$ en los dos transistores
+      & \qty{+12}{\volt} \\ \hline
+    2 & Compuertas NOR y NAND
+      & Estado del transistor y salida para cada combinación de entradas
+      & La salida, el nodo $X$ y $V_{BE}$ en cada combinación
+      & \qty{+5}{\volt} \\ \hline
+    3 & Relé con diodo volante
+      & $I_{C(\text{sat})}$, $R_B$ y $\beta_{\text{forzado}}$
+      & $V_{CE}$, $I_B$, $I_C$; el pico del colector al abrir el relé
+      & \qty{+5}{\volt} \\ \hline
+  \end{tabularx}
+  \caption{Resumen de la práctica.}
+  \label{tab:resumen}
+\end{table}
 
 %-----------------------------------------------------------------------
-\subsection{Diseño previo (traerlo resuelto al laboratorio)}
-\label{sec:diseno}
+\subsection{Experimento 1: interruptor de un LED azul}
 %-----------------------------------------------------------------------
-\begin{enumerate}[label=\roman*., leftmargin=*, labelsep=0.6em]
-  \item Mida el $\beta$ ($h_{FE}$) de su transistor con el multímetro. Si su multímetro no
-        tiene esa función, use $\beta = 150$. Mida también la caída $V_{LED}$ de su LED con
-        la prueba de diodos.
-  \item Para el experimento 1, con $A = \qty{0}{\volt}$ y con $A = \qty{5}{\volt}$, siga el
-        procedimiento \emph{por cálculo} de \emph{Conocimientos previos}
-        (sección~\ref{sec:identificar}), como en el
-        ejemplo de la tabla~\ref{tab:ejemplo}: $I_B$, $I_{C(\text{sat})}$, $\beta\,I_B$,
-        región de trabajo, $I_C$, $V_{CE}$ y $\beta$ forzado. Calcule también
-        $R_{B(\max)}$ con~\eqref{eq:rbmax}.
-  \item Haga lo mismo para cada compuerta y cada combinación de entradas: decida si el
-        transistor está en corte o en saturación y calcule el voltaje de salida. Anote los
-        resultados en la columna \emph{Teórico} de las tablas.
-  \item Simule los cuatro experimentos en Multisim o Proteus y complete la columna
-        \emph{Simulado}.
-\end{enumerate}
+Una salida lógica de \qty{5}{\volt} debe encender un LED azul alimentado con \qty{12}{\volt}.
 
-\FloatBarrier
-%-----------------------------------------------------------------------
-\subsection{Experimento 1: el transistor como interruptor de un LED}
-%-----------------------------------------------------------------------
+\paso{1}{Datos}
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabularx}{0.8\linewidth}{|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}m{4.4cm}|}
+    \hline
+    $V_{CC}$ & \qty{12}{\volt} \\ \hline
+    $V_{BB}$ (entrada $A$) & \qty{5}{\volt} (1) y \qty{0}{\volt} (0) \\ \hline
+    Corriente del LED, $I_{C(\text{sat})}$ & \qty{20}{\milli\ampere} \\ \hline
+    $V_{LED}$ (LED azul) & \qty{3.0}{\volt} \\ \hline
+    $\beta_{\text{forzado}}$ & 10 \\ \hline
+    Transistor & BC548B ($h_{FE(\min)} = 200$) \\ \hline
+  \end{tabularx}
+  \caption{Experimento 1: datos de diseño.}
+  \label{tab:cond1}
+\end{table}
+
 \begin{figure}[H]
   \centering
-  \begin{circuitikz}[scale=0.95, transform shape]
+  \begin{circuitikz}[scale=0.9, transform shape]
     \draw (4.2,0) node[npn](Q){};
-    \node[right] at (Q.east) {2N2222A};
+    \node[right] at (Q.east) {BC548B};
     \coordinate (c)   at ($(Q.C)+(0,0.5)$);
     \coordinate (l)   at ($(c)+(0,1.9)$);
     \coordinate (top) at ($(l)+(0,2.0)$);
-    \draw (top) to[R, l=$R_C$, a=\qty{220}{\ohm}] (l)
-                to[leDo, l=LED] (c) -- (Q.C);
-    \draw (top) node[circ]{} -- ++(1.8,0) node[right]{$V_{CC} = \qty{+5}{\volt}$};
+    \draw (top) to[R, l=$R_C$, a=?] (l)
+                to[leDo, l=LED azul] (c) -- (Q.C);
+    \draw (top) node[circ]{} -- ++(1.8,0) node[right]{$V_{CC} = \qty{+12}{\volt}$};
     \draw (c) to[short, *-o] ++(2.0,0) node[right]{$C$};
     \draw ($(Q.B)+(-3.0,0)$) node[left]{$A$}
-          to[R, l=$R_B$, a=\qty{10}{\kilo\ohm}, o-] (Q.B);
+          to[R, l=$R_B$, a=?, o-] (Q.B);
     \draw (Q.E) node[ground]{};
   \end{circuitikz}
-  \caption{Experimento 1: el transistor enciende y apaga un LED. $R_B$ se reemplaza después
-           por el potenciómetro (paso~\ref{paso:pot}).}
+  \caption{Experimento 1: interruptor de un LED azul.}
   \label{fig:led}
 \end{figure}
+
+\paso{2}{Calcule (en casa)}
+\begin{enumerate}[label=\alph*), leftmargin=*, itemsep=3pt]
+  \item $R_C$ con~\eqref{eq:rc}, $I_B$ con~\eqref{eq:ib} y $R_B$ con~\eqref{eq:rb}, como en el
+        ejemplo de la tabla~\ref{tab:ejemplo}. Elija los valores E12 y recalcule
+        $I_{C(\text{sat})}$, $I_B$, $\beta_{\text{forzado}}$ y la potencia en $R_C$.
+  \item $R_{B(\max)}$ con~\eqref{eq:rbmax} y $\beta = 200$. Debe salir cerca de
+        \qty{47}{\kilo\ohm}.
+  \item Simule el circuito con sus valores, con la entrada en \qty{5}{\volt} y en
+        \qty{0}{\volt}. Simule también $R_B = \qty{47}{\kilo\ohm}$ con el BC548B y con el
+        2N2222A.
+\end{enumerate}
+
+\paso{3}{Arme y mida (en el laboratorio)}
+\begin{enumerate}[label=\alph*), ref=\alph*, leftmargin=*, itemsep=3pt]
+  \item Arme el circuito con sus valores E12 y conecte la tarjeta como en la
+        figura~\ref{fig:conexion}.
+  \item Ponga \texttt{W1} en \qty{5}{\volt} continuos y luego en \qty{0}{\volt}. En cada caso
+        mida $V_{BE}$, $V_{CE}$ y las caídas en $R_B$ y $R_C$; calcule $I_B$ e $I_C$ con la ley
+        de Ohm.
+  \item \label{paso:cuadrada}Ponga \texttt{W1} como onda cuadrada de \qty{1}{\kilo\hertz},
+        amplitud \qty{2.5}{\volt} y offset \qty{2.5}{\volt}, y capture $v_A$ (CH1) y $v_C$
+        (CH2) con marcadores en los dos niveles de $v_C$.
+  \item Con \texttt{W1} en \qty{5}{\volt}, cambie $R_B$ por \qty{47}{\kilo\ohm} y mida
+        $V_{CE}$. Repita con el 2N2222A en lugar del BC548B (cuide el orden de sus
+        terminales) y compare el brillo del LED.
+\end{enumerate}
 
 % Conexion con la tarjeta, en los colores del arnes de la Analog Discovery
 % Studio (W1 amarillo, osciloscopio 1 naranja y 2 azul, GND negro,
 % alimentacion roja). Los canales son diferenciales: 1- y 2- van a GND.
 \begin{figure}[H]
   \centering
-  \begin{circuitikz}[scale=0.88, transform shape]
+  \begin{circuitikz}[scale=0.85, transform shape]
     \colorlet{cw1}{yellow!70!black}
     \colorlet{cch1}{orange!90!black}
     \colorlet{cch2}{blue!75!black}
     \colorlet{cvcc}{red!80!black}
     \coordinate (gnd) at (0,-1.3);
     \draw (4.2,0) node[npn](Q){};
-    \node[right] at (Q.east) {2N2222A};
+    \node[right] at (Q.east) {BC548B};
     \coordinate (c)   at ($(Q.C)+(0,0.5)$);
     \coordinate (l)   at ($(c)+(0,1.7)$);
     \coordinate (top) at ($(l)+(0,1.8)$);
-    \draw (top) to[R, l=$R_C$, a=\qty{220}{\ohm}] (l)
+    \draw (top) to[R, l=$R_C$] (l)
                 to[leDo] (c) -- (Q.C);
     \coordinate (a) at (0.9,0);
-    \draw (a) to[R, l=$R_B$, a=\qty{10}{\kilo\ohm}, *-] (Q.B);
+    \draw (a) to[R, l=$R_B$, *-] (Q.B);
     \draw (Q.E) -- (Q.E |- gnd) node[circ]{};
     % bus de tierra
     \coordinate (p2m) at (6.3,0);
@@ -583,7 +620,7 @@ a \texttt{GND}. No deje ninguna entrada al aire.
       \fill[\c] (\x-0.12,-3.02) rectangle (\x+0.12,-2.78);
       \node[font=\scriptsize\ttfamily, below] at (\x,-3.02) {\n};
     }
-    \foreach \p/\n/\c in {p2m/2$-$/cch2, p2p/2+/cch2, p5/+5V/cvcc}{
+    \foreach \p/\n/\c in {p2m/2$-$/cch2, p2p/2+/cch2, p5/+12V/cvcc}{
       \fill[\c] ($(\p |- ytab)+(-0.12,-0.12)$) rectangle ($(\p |- ytab)+(0.12,0.12)$);
       \node[font=\scriptsize\ttfamily, below] at ($(\p |- ytab)+(0,-0.12)$) {\n};
     }
@@ -599,140 +636,69 @@ a \texttt{GND}. No deje ninguna entrada al aire.
     \node[cch1, font=\scriptsize, above] at ($(a)+(0,0.1)$) {CH1: $v_A$};
     \node[cch2, font=\scriptsize, above] at ($(c)!0.5!(p2p |- c)$) {CH2: $v_C$};
   \end{circuitikz}
-  \caption{Conexión del experimento 1 con la Analog Discovery Studio
-           (paso~\ref{paso:cuadrada}). \texttt{W1} da la entrada $A$; \texttt{1+} la mide y
-           \texttt{2+} mide el colector. \texttt{1$-$} y \texttt{2$-$} van a \texttt{GND}. El
-           riel de \qty{+5}{\volt} alimenta el circuito.}
+  \caption{Conexión con la Analog Discovery Studio. \texttt{W1} da la entrada $A$; \texttt{1+}
+           la mide y \texttt{2+} mide el colector. \texttt{1$-$} y \texttt{2$-$} van a
+           \texttt{GND}. El riel de \qty{+12}{\volt} alimenta el circuito. En el experimento 3
+           se usa la misma conexión con el riel de \qty{+5}{\volt}.}
   \label{fig:conexion}
 \end{figure}
 
-\begin{enumerate}[label=\roman*., leftmargin=*, labelsep=0.6em]
-  \item Arme el circuito de la figura~\ref{fig:led} y aliméntelo con el riel de
-        \qty{+5}{\volt}. Mida el valor real del riel.
-  \item \textbf{Entrada en 0 y en 1.} Conecte $A$ a \texttt{GND} y luego al riel de
-        \qty{+5}{\volt}. En cada caso mida con el multímetro $V_{BE}$, $V_{CE}$ y las caídas
-        en $R_B$ y en $R_C$, y calcule $I_B$ e $I_C$ con la ley de Ohm. Observe el LED.
-        Identifique la región de trabajo con los criterios de la tabla~\ref{tab:criterios} y
-        complete la tabla~\ref{tab:led}.
-  \item \label{paso:cuadrada}\textbf{Conmutación.} Conecte la tarjeta como indica la
-        figura~\ref{fig:conexion}. Configure \texttt{W1} como onda cuadrada de
-        \qty{1}{\kilo\hertz}, amplitud \qty{2.5}{\volt} y offset \qty{2.5}{\volt}, para que
-        $A$ pase de \qty{0}{\volt} a \qty{5}{\volt}. Vea $v_A$ (CH1) y $v_C$ (CH2) con
-        acoplamiento DC.
-  \item \label{paso:pot}\textbf{Límite de saturación.} Vuelva a conectar $A$ al riel de
-        \qty{+5}{\volt}. Reemplace $R_B$ por el potenciómetro de \qty{100}{\kilo\ohm} en
-        serie con una resistencia de \qty{1}{\kilo\ohm}, que protege la base cuando el
-        potenciómetro está en cero. Suba la resistencia poco a poco mientras mide $V_{CE}$.
-        Cuando $V_{CE}$ pase de \qty{0.3}{\volt}, el transistor salió de saturación: retire el
-        potenciómetro sin moverlo y mida su resistencia. Complete la tabla~\ref{tab:rbmax}.
-\end{enumerate}
-
+\paso{4}{Anote}
 \begin{table}[H]
   \centering
   \renewcommand{\arraystretch}{1.15}
   \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{3.0cm}|*{6}{>{\centering\arraybackslash}X|}}
     \hline
-    & \multicolumn{3}{c|}{\textbf{$A = \qty{0}{\volt}$}}
-    & \multicolumn{3}{c|}{\textbf{$A = \qty{5}{\volt}$}} \\
+    & \multicolumn{3}{c|}{\textbf{Entrada en \qty{5}{\volt}}}
+    & \multicolumn{3}{c|}{\textbf{Entrada en \qty{0}{\volt}}} \\
     \cline{2-7}
     \textbf{Parámetro} & Teórico & Simulado & Medido & Teórico & Simulado & Medido \\
     \hline
+    $R_C$ y $R_B$ (E12)          & \hueco & \multicolumn{5}{c|}{} \\ \hline
     $V_{BE}$                     & \hueco & & & & & \\ \hline
     $V_{CE}$                     & \hueco & & & & & \\ \hline
     $I_B$                        & \hueco & & & & & \\ \hline
     $I_C$                        & \hueco & & & & & \\ \hline
-    $\beta\,I_B$ frente a $I_{C(\text{sat})}$ & \hueco & & & & & \\ \hline
-    $\beta_{\text{forzado}} = I_C/I_B$ & \hueco & & & & & \\ \hline
-    LED (on/off)                 & \hueco & & & & & \\ \hline
+    $\beta_{\text{forzado}} = I_C/I_B$ & \hueco & & & \multicolumn{3}{c|}{---} \\ \hline
     Estado de Q (corte/sat.)     & \hueco & & & & & \\ \hline
   \end{tabularx}
-  \caption{Experimento 1: el transistor en corte y en saturación.}
-  \label{tab:led}
+  \caption{Experimento 1: el interruptor diseñado.}
+  \label{tab:exp1}
 \end{table}
 
 \begin{table}[H]
   \centering
   \renewcommand{\arraystretch}{1.15}
-  \begin{tabularx}{0.75\linewidth}{|>{\centering\arraybackslash}m{5.4cm}|*{2}{>{\centering\arraybackslash}X|}}
+  \begin{tabularx}{0.85\linewidth}{|>{\centering\arraybackslash}m{3.2cm}|*{3}{>{\centering\arraybackslash}X|}}
     \hline
-    \textbf{Parámetro} & \textbf{Teórico} & \textbf{Medido} \\
-    \hline
-    $R_{B(\max)}$ (potenciómetro $+ \qty{1}{\kilo\ohm}$) & \hueco & \\ \hline
-    $\beta$ estimado con~\eqref{eq:rbmax}               & \hueco & \\ \hline
+    $\boldsymbol{R_B = \qty{47}{\kilo\ohm}}$ & \textbf{$V_{CE}$ simulado} & \textbf{$V_{CE}$ medido}
+      & \textbf{Estado de Q} \\ \hline
+    BC548B  & \hueco & & \\ \hline
+    2N2222A & \hueco & & \\ \hline
   \end{tabularx}
-  \caption{Experimento 1: resistencia de base con la que el transistor deja de saturarse.}
-  \label{tab:rbmax}
+  \caption{Experimento 1: la misma $R_B$ en dos transistores distintos.}
+  \label{tab:limite}
 \end{table}
 
-\needspace{8.2cm}
-\noindent\textbf{Captura de la conmutación} (paso~\ref{paso:cuadrada}). Muestre en la misma
-pantalla $v_A$ (CH1) y $v_C$ (CH2). Coloque \textbf{marcadores} (cursores) en los dos niveles
-de $v_C$: el bajo es $V_{CE(\text{sat})}$ y el alto es el colector con el transistor en corte.
-La captura debe mostrar los marcadores y sus valores.
+\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{Captura de la conmutación} (paso~3\ref{paso:cuadrada}).
 \cuadrorespuesta
+\end{minipage}\par
 
-\clearpage
 %-----------------------------------------------------------------------
-\subsection{Experimento 2: inversor (compuerta NOT)}
+\subsection{Experimento 2: compuertas NOR y NAND}
 %-----------------------------------------------------------------------
+Dos compuertas lógicas hechas con diodos y un transistor que solo trabaja en corte o en
+saturación.
+
+\paso{1}{Datos}
+$V_{CC} = \qty{5}{\volt}$; entradas en \qty{0}{\volt} (0) o \qty{5}{\volt} (1); transistor
+2N2222A con $\beta = 150$; diodos de \qty{0.7}{\volt}; LED rojo de \qty{2}{\volt}. Los
+circuitos son los de las figuras~\ref{fig:nor} y~\ref{fig:nand}.
+
 \begin{figure}[H]
   \centering
-  \begin{circuitikz}[scale=0.95, transform shape]
-    \draw (4.2,0) node[npn](Q){};
-    \node[right] at ($(Q.E)+(0.05,0.25)$) {2N2222A};
-    \coordinate (gnd) at ($(Q.E)+(0,-1.6)$);
-    \coordinate (c)   at ($(Q.C)+(0,0.5)$);
-    \coordinate (top) at ($(c)+(0,2.2)$);
-    \draw (top) to[R, l=$R_C$, a=\qty{1}{\kilo\ohm}] (c) -- (Q.C);
-    \draw (top) node[circ]{} -- ++(3.6,0) node[right]{$V_{CC} = \qty{+5}{\volt}$};
-    \draw (c) to[short, *-] ++(2.9,0) coordinate(o)
-          to[R, l=$R_L$, a=\qty{330}{\ohm}, *-] ($(o)+(0,-1.7)$)
-          to[leDo] (o |- gnd);
-    \draw (o) to[short, -o] ++(1.6,0) node[right]{$C$};
-    \draw (Q.E) -- (gnd) node[circ]{} -- (o |- gnd) node[ground]{};
-    \draw ($(Q.B)+(-3.0,0)$) node[left]{$A$}
-          to[R, l=$R_B$, a=\qty{1}{\kilo\ohm}, o-] (Q.B);
-  \end{circuitikz}
-  \caption{Experimento 2: inversor. El LED de salida indica el nivel de $C$.}
-  \label{fig:not}
-\end{figure}
-
-\begin{enumerate}[label=\roman*., leftmargin=*, labelsep=0.6em]
-  \item Arme el circuito de la figura~\ref{fig:not}.
-  \item Ponga $A$ en 0 y en 1. En cada caso mida $V_{BE}$ y la salida $V_C$ y observe el LED.
-        Decida el estado de Q con la tabla~\ref{tab:criterios} y complete la
-        tabla~\ref{tab:not}.
-  \item Con $A$ en 0, desconecte el LED y su resistencia de \qty{330}{\ohm} y vuelva a medir
-        $V_C$. ¿Por qué cambia?
-\end{enumerate}
-
-\begin{table}[H]
-  \centering
-  \renewcommand{\arraystretch}{1.15}
-  \begin{tabularx}{\linewidth}{|c|*{3}{>{\centering\arraybackslash}X|}>{\centering\arraybackslash}m{2.0cm}|>{\centering\arraybackslash}m{2.4cm}|}
-    \hline
-    \textbf{Entrada}
-      & \multicolumn{3}{c|}{\textbf{Salida $V_C$}}
-      & \multirow{2}{=}{\centering\textbf{LED}\par (on/off)}
-      & \multirow{2}{=}{\centering\textbf{Estado de Q}\par (corte/sat.)} \\
-    \cline{1-4}
-    $A$ & \textbf{Teórico} & \textbf{Simulado} & \textbf{Medido} & & \\
-    \hline
-    \qty{0}{\volt} & \hueco & & & & \\ \hline
-    \qty{5}{\volt} & \hueco & & & & \\ \hline
-    \qty{0}{\volt}, sin LED & \hueco & & & --- & \\ \hline
-  \end{tabularx}
-  \caption{Experimento 2: tabla de verdad del inversor.}
-  \label{tab:not}
-\end{table}
-
-\clearpage
-%-----------------------------------------------------------------------
-\subsection{Experimento 3: compuerta NOR}
-%-----------------------------------------------------------------------
-\begin{figure}[H]
-  \centering
-  \begin{circuitikz}[scale=0.95, transform shape]
+  \begin{circuitikz}[scale=0.85, transform shape]
     \draw (6.4,0) node[npn](Q){};
     \node[right] at ($(Q.E)+(0.05,0.25)$) {2N2222A};
     \coordinate (gnd) at ($(Q.E)+(0,-1.6)$);
@@ -745,7 +711,6 @@ La captura debe mostrar los marcadores y sus valores.
           to[leDo] (o |- gnd);
     \draw (o) to[short, -o] ++(1.6,0) node[right]{$D$};
     \draw (Q.E) -- (Q.E |- gnd) node[circ]{} -- (o |- gnd);
-    % red OR de diodos
     \coordinate (x) at ($(Q.B)+(-2.6,0)$);
     \draw ($(x)+(-3.0,1.2)$) node[left]{$A$} to[D, l=$D_1$, o-] ($(x)+(0,1.2)$) -- (x);
     \draw ($(x)+(-3.0,0)$) node[left]{$B$} to[D, l=$D_2$, o-*] (x);
@@ -754,26 +719,13 @@ La captura debe mostrar los marcadores y sus valores.
     \draw (x |- gnd) -- ++(0,-0.01) node[ground]{};
     \node[below right, font=\scriptsize] at (x) {$X$};
   \end{circuitikz}
-  \caption{Experimento 3: red OR de diodos seguida de un inversor.}
+  \caption{Compuerta NOR: red OR de diodos seguida de un inversor.}
   \label{fig:nor}
 \end{figure}
 
-\begin{enumerate}[label=\roman*., leftmargin=*, labelsep=0.6em]
-  \item Arme el circuito de la figura~\ref{fig:nor}.
-  \item Aplique las cuatro combinaciones de entradas. En cada una mida la salida $V_D$, el
-        voltaje del nodo $X$ y $V_{BE}$, y observe el LED. Decida el estado de Q con la
-        tabla~\ref{tab:criterios} y complete la tabla~\ref{tab:nor}.
-\end{enumerate}
-
-\tablaverdad{D}{Experimento 3: tabla de verdad de la compuerta NOR.}{tab:nor}
-
-\clearpage
-%-----------------------------------------------------------------------
-\subsection{Experimento 4: compuerta NAND}
-%-----------------------------------------------------------------------
 \begin{figure}[H]
   \centering
-  \begin{circuitikz}[scale=0.95, transform shape]
+  \begin{circuitikz}[scale=0.85, transform shape]
     \draw (6.4,0) node[npn](Q){};
     \node[right] at ($(Q.E)+(0.05,0.25)$) {2N2222A};
     \coordinate (gnd) at ($(Q.E)+(0,-1.6)$);
@@ -786,7 +738,6 @@ La captura debe mostrar los marcadores y sus valores.
     \draw (o) to[short, -o] ++(1.6,0) node[right]{$E$};
     \draw (Q.E) -- (Q.E |- gnd) -- (o |- gnd);
     \node[ground] at (Q.E |- gnd) {};
-    % red AND de diodos
     \coordinate (x) at ($(Q.B)+(-2.4,0)$);
     \draw (x |- top) to[R, l=$R_P$, a=\qty{22}{\kilo\ohm}] (x);
     \draw (x |- top) -- (top) node[circ]{} -- ++(3.6,0) node[right]{$V_{CC} = \qty{+5}{\volt}$};
@@ -795,32 +746,142 @@ La captura debe mostrar los marcadores y sus valores.
     \draw (x) -- ($(x)+(0,-1.2)$) to[D, l_=$D_2$, -o] ($(x)+(-3.0,-1.2)$) node[left]{$B$};
     \node[above left, font=\scriptsize] at (x) {$X$};
   \end{circuitikz}
-  \caption{Experimento 4: red AND de diodos seguida de un inversor. $D_3$ sube en unos
+  \caption{Compuerta NAND: red AND de diodos seguida de un inversor. $D_3$ sube en unos
            \qty{0.7}{\volt} el voltaje que necesita el nodo $X$ para saturar al transistor.}
   \label{fig:nand}
 \end{figure}
 
-\begin{enumerate}[label=\roman*., leftmargin=*, labelsep=0.6em]
-  \item Arme el circuito de la figura~\ref{fig:nand}.
-  \item Aplique las cuatro combinaciones de entradas. En cada una mida la salida $V_E$, el
-        voltaje del nodo $X$ y $V_{BE}$, y observe el LED. Decida el estado de Q con la
-        tabla~\ref{tab:criterios} y complete la tabla~\ref{tab:nand}.
-  \item Deje la entrada $B$ en 1 y desconecte $A$ (al aire). ¿Qué nivel toma la salida? Haga
-        lo mismo en la compuerta NOR y compare.
+\paso{2}{Calcule (en casa)}
+\begin{enumerate}[label=\alph*), leftmargin=*, itemsep=3pt]
+  \item Para cada compuerta y cada combinación de entradas, decida si el transistor está en
+        corte o en saturación (sección~\ref{sec:identificar}) y calcule el voltaje de salida.
+        Cuando el transistor se satura, sus \qty{0.2}{\volt} no encienden el LED de salida.
+  \item Simule las dos compuertas con las cuatro combinaciones.
 \end{enumerate}
 
-\tablaverdad{E}{Experimento 4: tabla de verdad de la compuerta NAND.}{tab:nand}
+\paso{3}{Arme y mida (en el laboratorio)}
+\begin{enumerate}[label=\alph*), ref=\alph*, leftmargin=*, itemsep=3pt]
+  \item Arme la NOR y aliméntela con el riel de \qty{+5}{\volt}. Para poner una entrada en 1,
+        conéctela con un jumper al riel; para ponerla en 0, a \texttt{GND}. No deje entradas
+        al aire.
+  \item En cada combinación mida la salida, el nodo $X$ y $V_{BE}$, y observe el LED.
+  \item Repita con la NAND.
+\end{enumerate}
+
+\paso{4}{Anote}
+\tablaverdad{D}{Experimento 2: tabla de verdad de la compuerta NOR.}{tab:nor}
+\tablaverdad{E}{Experimento 2: tabla de verdad de la compuerta NAND.}{tab:nand}
+
+%-----------------------------------------------------------------------
+\subsection{Experimento 3: manejo de un relé}
+%-----------------------------------------------------------------------
+Una salida de \qty{5}{\volt} que solo puede entregar \qty{4}{\milli\ampere}, como el pin de
+un microcontrolador, debe activar un relé. El contacto del relé enciende un LED.
+
+\paso{1}{Datos}
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.2}
+  \begin{tabularx}{0.8\linewidth}{|>{\raggedright\arraybackslash}X|>{\centering\arraybackslash}m{4.4cm}|}
+    \hline
+    $V_{CC}$ y $V_{BB}$ & \qty{5}{\volt} \\ \hline
+    $R_{\text{bobina}}$ & mídala (unos \qty{70}{\ohm}) \\ \hline
+    $I_B$ máxima que da la entrada & \qty{4}{\milli\ampere} \\ \hline
+    $\beta_{\text{forzado}}$ & 20 \\ \hline
+    Transistor & 2N2222A ($h_{FE(\min)} = 50$) \\ \hline
+  \end{tabularx}
+  \caption{Experimento 3: datos de diseño.}
+  \label{tab:cond3}
+\end{table}
+
+\begin{figure}[H]
+  \centering
+  \begin{circuitikz}[scale=0.9, transform shape]
+    \draw (4.2,0) node[npn](Q){};
+    \node[right] at ($(Q.E)+(0.05,0.25)$) {2N2222A};
+    \coordinate (c)   at ($(Q.C)+(0,0.5)$);
+    \coordinate (top) at ($(c)+(0,3.0)$);
+    \draw (top) to[L, l_=Bobina del relé] (c) -- (Q.C);
+    \draw (c) to[short, *-] ++(2.4,0) coordinate(d)
+          to[D, l_=$D_V$] (d |- top) -- (top);
+    \node[right, font=\small] at ($(d)!0.5!(d |- top)+(0.55,-0.45)$) {1N4004};
+    \draw (top) node[circ]{} -- ++(-1.8,0) node[left]{$V_{CC} = \qty{+5}{\volt}$};
+    \draw (c) to[short, -o] ++(-1.1,0) node[left]{$C$};
+    \draw ($(Q.B)+(-3.0,0)$) node[left]{$A$}
+          to[R, l=$R_B$, a=?, o-] (Q.B);
+    \draw (Q.E) node[ground]{};
+    % contacto del rele
+    \coordinate (k) at (10.2,3.5);
+    \draw (k) node[circ]{} node[above]{$V_{CC}$}
+          to[nos, l=contacto NA] ++(0,-1.6)
+          to[R, l=\qty{330}{\ohm}] ++(0,-1.8)
+          to[leDo, l=LED rojo] ++(0,-1.6) node[ground]{};
+  \end{circuitikz}
+  \caption{Experimento 3: relé con diodo volante $D_V$. El contacto normalmente abierto (NA),
+           que la bobina mueve, enciende el LED rojo. \textbf{No retire $D_V$ con el circuito
+           energizado.}}
+  \label{fig:rele}
+\end{figure}
+
+\paso{2}{Calcule (en casa)}
+\begin{enumerate}[label=\alph*), leftmargin=*, itemsep=3pt]
+  \item $I_{C(\text{sat})}$ con la resistencia de la bobina, $I_B$ con~\eqref{eq:ib} y
+        $\beta_{\text{forzado}} = 20$, y $R_B$ con~\eqref{eq:rb}. Elija el valor E12 y
+        compruebe que $I_B$ no pase de \qty{4}{\milli\ampere}.
+  \item Simule el circuito con y \textbf{sin} el diodo volante, y anote el voltaje pico del
+        colector cuando el transistor se corta.
+\end{enumerate}
+
+\paso{3}{Arme y mida (en el laboratorio)}
+\begin{enumerate}[label=\alph*), ref=\alph*, leftmargin=*, itemsep=3pt]
+  \item Arme el circuito con el riel de \qty{+5}{\volt}. El cátodo de $D_V$ (la franja) va
+        hacia $V_{CC}$.
+  \item Ponga \texttt{W1} en \qty{5}{\volt} continuos y luego en \qty{0}{\volt}. Mida
+        $V_{BE}$, $V_{CE}$ y las caídas en $R_B$ y en la bobina; calcule $I_B$ e $I_C$.
+  \item \label{paso:volante}Ponga \texttt{W1} como onda cuadrada de \qty{2}{\hertz}, amplitud
+        \qty{2.5}{\volt} y offset \qty{2.5}{\volt}. Con CH1 en $A$ y CH2 en el colector,
+        dispare con el flanco de bajada de CH1 a \qty{1}{\milli\second} por división y capture
+        el pico de $v_C$. \textbf{No retire el diodo para medir}: ese caso solo se simula.
+\end{enumerate}
+
+\paso{4}{Anote}
+\begin{table}[H]
+  \centering
+  \renewcommand{\arraystretch}{1.15}
+  \begin{tabularx}{\linewidth}{|>{\centering\arraybackslash}m{3.0cm}|*{6}{>{\centering\arraybackslash}X|}}
+    \hline
+    & \multicolumn{3}{c|}{\textbf{Entrada en \qty{5}{\volt}}}
+    & \multicolumn{3}{c|}{\textbf{Entrada en \qty{0}{\volt}}} \\
+    \cline{2-7}
+    \textbf{Parámetro} & Teórico & Simulado & Medido & Teórico & Simulado & Medido \\
+    \hline
+    $R_{\text{bobina}}$ y $R_B$ (E12) & \hueco & \multicolumn{5}{c|}{} \\ \hline
+    $V_{CE}$                     & \hueco & & & & & \\ \hline
+    $I_B$                        & \hueco & & & & & \\ \hline
+    $I_C$                        & \hueco & & & & & \\ \hline
+    LED rojo (on/off)            & \hueco & & & & & \\ \hline
+    Estado de Q (corte/sat.)     & \hueco & & & & & \\ \hline
+    Pico de $v_C$ al abrir       & \multicolumn{3}{l|}{Con $D_V$:} & \multicolumn{3}{l|}{Sin $D_V$ (simulado):} \\ \hline
+  \end{tabularx}
+  \caption{Experimento 3: el relé.}
+  \label{tab:exp3}
+\end{table}
+
+\noindent\begin{minipage}{\linewidth}
+\noindent\textbf{Captura de la apertura del relé} (paso~3\ref{paso:volante}).
+\cuadrorespuesta
+\end{minipage}\par
 
 \FloatBarrier
 %=======================================================================
 \section{Informe final}
 %=======================================================================
 \begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, labelsep=0.6em]
-  \item Adjunte los cálculos del diseño previo y la simulación de los cuatro experimentos.
-  \item Compare los valores teóricos, simulados y medidos de las tablas y explique las
-        diferencias.
-  \item Explique el funcionamiento de las compuertas NOR y NAND a partir del estado de los
-        diodos y del transistor en cada combinación de entradas.
+  \item Adjunte los cálculos y las simulaciones de los tres experimentos.
+  \item Compare los valores teóricos, simulados y medidos y explique las diferencias más
+        grandes.
+  \item Explique con la tabla~\ref{tab:limite} por qué la misma $R_B$ satura a un transistor
+        y no al otro.
 \end{enumerate}
 
 \FloatBarrier
@@ -828,19 +889,19 @@ La captura debe mostrar los marcadores y sus valores.
 \section{Cuestionario}
 %=======================================================================
 \begin{enumerate}[label=\textbf{\arabic*.}, leftmargin=*, labelsep=0.6em]
-\item Con el $R_{B(\max)}$ que midió en el experimento 1, estime el $\beta$ de su transistor
-con~\eqref{eq:rbmax} y compárelo con el que midió el multímetro. ¿Qué le pasa al brillo del
-LED cuando $R_B$ supera ese valor? ¿Por qué?
-\lineasresp{3}
-
-\item En el inversor, con la entrada en 0, la salida no llega a \qty{5}{\volt} mientras el LED
-está conectado. Explique por qué y qué pasaría si la salida alimentara a varias compuertas a
-la vez.
+\item En el experimento 1, ¿cuál es la mayor $R_B$ que satura a \emph{cualquier} 2N2222A, si su
+$h_{FE(\min)}$ a esa corriente es 75? ¿Cuánto vale $\beta_{\text{forzado}}$ con esa $R_B$?
 \lineasresp{3}
 
 \item En la compuerta NAND, ¿cuál es el mayor valor de $R_P$ con el que el transistor todavía
 se satura con las dos entradas en 1? ¿Por qué una entrada al aire cuenta como 1 en la NAND y
 como 0 en la NOR?
+\lineasresp{3}
+
+\item En el experimento 3, ¿por qué el colector llega a unos \qty{5.7}{\volt} al abrir el relé
+con el diodo volante? Sin el diodo, si la corriente de la bobina cae a cero en
+\qty{1}{\micro\second} y la bobina tiene \qty{0.1}{\henry}, ¿qué voltaje aparecería?
+Compárelo con el $V_{CEO}$ del 2N2222A (\qty{40}{\volt}).
 \lineasresp{3}
 \end{enumerate}
 

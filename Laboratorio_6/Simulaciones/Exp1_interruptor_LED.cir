@@ -1,0 +1,35 @@
+* Practica 6 - Experimento 1: interruptor de un LED azul, VCC = 12 V, VBB = 5 V
+.include modelos.lib
+VCC vcc 0 12
+VBB a 0 5
+RB a b 2.2k
+Q1 c b 0 BC548B
+RC vcc l 470
+D1 l c LEDAZUL
+.control
+set noaskquit
+op
+echo "RB=2.2k VBB=5"
+print v(b) v(c) v(l) @q1[ib] @q1[ic] v(l)-v(c)
+alter vbb dc=0
+op
+echo "RB=2.2k VBB=0 (sin carga del instrumento)"
+print v(b) v(c) @q1[ic]
+alter vbb dc=5
+alter rb resistance=47k
+op
+echo "RB=47k"
+print v(c) @q1[ib] @q1[ic]
+alter rb resistance=100k
+op
+echo "RB=100k"
+print v(c) @q1[ib] @q1[ic]
+alter rb resistance=220k
+op
+echo "RB=220k"
+print v(c) @q1[ib] @q1[ic]
+alter vbb dc=5
+dc rb 500 300k 500
+wrdata exp1_barrido_rb v(c) i(vcc)
+.endc
+.end

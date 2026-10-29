@@ -1,0 +1,38 @@
+* Practica 6 - Experimento 2: compuerta NOR con diodos y un 2N2222A (VCC = 5 V)
+.include modelos.lib
+VCC vcc 0 5
+VA a 0 0
+VB bb 0 0
+D1 a x D1N4004
+D2 bb x D1N4004
+RP x 0 22k
+RB x b 1k
+Q1 d b 0 Q2N2222A
+RC vcc d 1k
+RL d l 330
+DL l 0 LEDROJO
+.control
+set noaskquit
+foreach ab 00 01 10 11
+  if $ab eq 00
+    alter va dc=0
+    alter vb dc=0
+  end
+  if $ab eq 01
+    alter va dc=0
+    alter vb dc=5
+  end
+  if $ab eq 10
+    alter va dc=5
+    alter vb dc=0
+  end
+  if $ab eq 11
+    alter va dc=5
+    alter vb dc=5
+  end
+  op
+  echo "AB = $ab"
+  print v(x) v(b) v(d) @q1[ib] @q1[ic] i(vcc)
+end
+.endc
+.end

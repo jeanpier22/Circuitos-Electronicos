@@ -1,0 +1,22 @@
+* Practica 6 - Experimento 3: rele de 5 V manejado por un 2N2222A
+* Bobina: 70 Ohm (SRD-05VDC-SL-C) y ~0,1 H (orden de magnitud, no viene en la hoja de datos)
+* W1: cuadrada 0-5 V; se simula un pulso de 20 ms para ver el cierre y la apertura
+.include modelos.lib
+VCC vcc 0 5
+VA a 0 DC 0 PULSE(0 5 1m 1u 1u 20m 100m)
+RB a b 1.2k
+Q1 c b 0 Q2N2222A
+LBOB vcc x 0.1
+RBOB x c 70
+
+* sin diodo volante
+.control
+set noaskquit
+tran 1u 30m 0 1u
+meas tran vce_on  avg v(c)   from=15m to=20m
+meas tran ic_on   avg i(vcc) from=15m to=20m
+meas tran ib_on   avg i(va) from=15m to=20m
+meas tran vc_pico max v(c)   from=20m to=30m
+wrdata exp3_sin_diodo v(c) v(a)
+.endc
+.end
